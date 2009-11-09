@@ -1,0 +1,330 @@
+//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+
+#include "BL_JobsManager_QT.hxx"
+
+BL::JobManagerEvent::JobManagerEvent(const std::string & action_i, 
+				     const std::string & event_name_i, 
+				     const std::string & job_name_i, 
+				     const std::string & data_i) : QEvent(QEvent::User)
+{
+  action = action_i;
+  event_name = event_name_i;
+  job_name = job_name_i;
+  data = data_i;
+}
+
+BL::JobManagerEvent::~JobManagerEvent() {}  
+
+BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome_services) : 
+  QDockWidget(parent), BL::JobsManager(salome_services)
+{
+  DEBTRACE("Creating BL::JobsManager_QT");
+  setObserver(this);
+
+  // Widget Part
+
+  QWidget * main_widget = new QWidget(this);
+
+  _load_jobs = new QPushButton("Load Jobs");
+  _save_jobs = new QPushButton("Save Jobs");
+  _auto_refresh_jobs = new QPushButton("Auto Refresh: no");
+  _timer = new QTimer(this);
+  _timer->stop();
+  connect(_timer, SIGNAL(timeout()), this, SLOT(RefreshJobs()));
+
+  // Menu for auto refresh
+  QMenu * refresh_menu = new QMenu(this);
+  refresh_menu->addAction("No", this, SLOT(no_auto_refresh()));
+  refresh_menu->addAction("10 seconds", this, SLOT(ten_seconds_refresh()));
+  refresh_menu->addAction("30 seconds", this, SLOT(thirty_seconds_refresh()));
+  refresh_menu->addAction("1 minute", this, SLOT(one_minute_refresh()));
+  refresh_menu->addAction("5 minutes", this, SLOT(five_minutes_refresh()));
+  refresh_menu->addAction("30 minutes", this, SLOT(thirty_minutes_refresh()));
+  refresh_menu->addAction("1 hour", this, SLOT(one_hour_refresh()));
+  _auto_refresh_jobs->setMenu(refresh_menu);
+
+  QHBoxLayout * button_layout = new QHBoxLayout();
+  button_layout->addWidget(_load_jobs);
+  button_layout->addWidget(_save_jobs);
+  button_layout->addWidget(_auto_refresh_jobs);
+
+  QGroupBox * message_box = new QGroupBox("Messages");
+  _log = new QTextEdit(this);
+  _log->setReadOnly(true);
+  QVBoxLayout * message_box_layout = new QVBoxLayout(message_box);
+  message_box_layout->addWidget(_log);
+  message_box->setLayout(message_box_layout);
+
+  QVBoxLayout * mainLayout = new QVBoxLayout();
+  mainLayout->addLayout(button_layout);
+  mainLayout->addWidget(message_box);
+  main_widget->setLayout(mainLayout);
+
+  setWidget(main_widget);
+  setWindowTitle("Job Manager");
+}
+
+BL::JobsManager_QT::~JobsManager_QT()
+{
+  DEBTRACE("Destroying BL::JobsManager_QT");
+}
+
+void
+BL::JobsManager_QT::RefreshJobs()
+{
+  refresh_jobs(); 
+}
+
+void
+BL::JobsManager_QT::no_auto_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: no");
+  _timer->stop();
+}
+
+void
+BL::JobsManager_QT::ten_seconds_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 10s");
+  _timer->stop();
+  _timer->start(10 * 1000);
+}
+
+void 
+BL::JobsManager_QT::thirty_seconds_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 30s");
+  _timer->stop();
+  _timer->start(30 * 1000);
+}
+
+void 
+BL::JobsManager_QT::one_minute_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 1min");
+  _timer->stop();
+  _timer->start(1 * 60 * 1000);
+}
+
+void 
+BL::JobsManager_QT::five_minutes_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 5min");
+  _timer->stop();
+  _timer->start(5 * 60 * 1000);
+}
+
+void 
+BL::JobsManager_QT::thirty_minutes_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 30min");
+  _timer->stop();
+  _timer->start(30 * 60 * 1000);
+}
+
+void 
+BL::JobsManager_QT::one_hour_refresh()
+{
+  _auto_refresh_jobs->setText("Auto Refresh: 1hour");
+  _timer->stop();
+  _timer->start(1 * 60 * 60 * 1000);
+}
+
+void
+BL::JobsManager_QT::create_job_wizard()
+{
+    BL::CreateJobWizard wizard(this, _salome_services);
+    wizard.exec();
+
+    if (wizard.job_name != "")
+    {
+      BL::Job * new_job = addNewJob(wizard.job_name);
+      if (wizard.yacs_file != "")
+      {
+	// YACS schema job
+	new_job->setType(BL::Job::YACS_SCHEMA);
+	new_job->setYACSFile(wizard.yacs_file);
+	BL::Job::BatchParam param;
+	param.batch_directory = wizard.batch_directory;
+	param.expected_during_time = wizard.expected_during_time;
+	param.expected_memory = wizard.expected_memory;
+	param.nb_proc = wizard.nb_proc;
+	new_job->setBatchParameters(param);
+	BL::Job::FilesParam files_params;
+	files_params.result_directory = wizard.result_directory;
+	files_params.input_files_list = wizard.input_files_list;
+	files_params.output_files_list = wizard.output_files_list;
+	new_job->setFilesParameters(files_params);
+	new_job->setMachine(wizard.machine_choosed);
+      }
+      else
+      {
+	// Command Job
+	new_job->setType(BL::Job::COMMAND);
+	new_job->setCommand(wizard.command);
+	BL::Job::BatchParam param;
+	param.batch_directory = wizard.batch_directory;
+	param.expected_during_time = wizard.expected_during_time;
+	param.expected_memory = wizard.expected_memory;
+	param.nb_proc = wizard.nb_proc;
+	new_job->setBatchParameters(param);
+	BL::Job::FilesParam files_params;
+	files_params.result_directory = wizard.result_directory;
+	files_params.input_files_list = wizard.input_files_list;
+	files_params.output_files_list = wizard.output_files_list;
+	new_job->setFilesParameters(files_params);
+	new_job->setMachine(wizard.machine_choosed);
+      }
+      emit new_job_added(QString::fromStdString(wizard.job_name));
+      if (wizard.start_job)
+	start_job(wizard.job_name);
+    }
+    else
+    {
+       DEBTRACE("User cancel Create Job Wizard");
+    }
+}
+
+void
+BL::JobsManager_QT::delete_job(QString job_name)
+{
+  BL::JobsManager::removeJob(job_name.toStdString());
+}
+
+void 
+BL::JobsManager_QT::sendEvent(const std::string & action, 
+			      const std::string & event_name, 
+			      const std::string & job_name, 
+			      const std::string & data)
+{
+  DEBTRACE("sendEvent BL::JobsManager_QT");
+
+  // Sending a QEvent to go back to main thread
+  BL::JobManagerEvent * event = new JobManagerEvent(action, event_name, job_name, data);
+  QApplication::postEvent(this, event);
+}
+
+bool 
+BL::JobsManager_QT::event(QEvent * e)
+{
+  QDockWidget::event(e);
+  JobManagerEvent * event = dynamic_cast<JobManagerEvent*>(e);
+  if (!event) return false;
+
+  DEBTRACE("BL::JobsManager_QT Receiving event : " 
+	   << event->action << " " 
+	   << event->event_name << " "
+	   << event->job_name << " "
+	   << event->data);
+  if (event->action == "start_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " queued\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error in starting job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+    emit job_state_changed(QString((event->job_name).c_str()));
+  }
+  else if (event->action == "refresh_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " state changed\n");
+      emit job_state_changed(QString((event->job_name).c_str()));
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error in refreshing job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else if (event->action == "delete_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " deleted\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Warning delete job: " + str + " maybe not complete, exception catch in SALOME Launcher service\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else if (event->action == "get_results_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Results of Job " + str + " are get\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Warning for results of job: " + str + " maybe not complete, exception catch in SALOME Launcher service\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else
+  {
+    QString str((event->action).c_str());
+    write_error_text("Unknown type of event received:" + str + "\n");
+  }
+  return true;
+}
+
+void 
+BL::JobsManager_QT::write_normal_text(const QString & text)
+{
+  _log->setReadOnly(false);
+  QTextCursor cursor = _log->textCursor();
+  QTextCharFormat text_format;
+  text_format.setForeground(Qt::darkBlue);
+  cursor.insertText(text, text_format);
+  _log->setTextCursor(cursor);
+  _log->setReadOnly(true);
+}
+
+void 
+BL::JobsManager_QT::write_error_text(const QString & text)
+{
+  QTextCursor cursor = _log->textCursor();
+  QTextCharFormat text_format;
+  text_format.setForeground(Qt::red);
+  cursor.insertText(text, text_format);
+  _log->setTextCursor(cursor);
+}
