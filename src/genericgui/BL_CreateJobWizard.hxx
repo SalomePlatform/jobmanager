@@ -59,9 +59,10 @@ namespace BL{
       std::string yacs_file;
 
       std::string command;
+      std::string env_file;
 
       std::string batch_directory;
-      std::string expected_during_time;
+      std::string maximum_during_time;
       std::string expected_memory;
       int nb_proc;
 

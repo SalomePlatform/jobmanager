@@ -46,11 +46,13 @@ namespace BL{
 
       void setCommand(std::string & command);
       std::string & getCommand();
+      void setEnvFile(std::string & env_file);
+      std::string & getEnvFile();
 
       struct BatchParam
       {
 	std::string batch_directory;
-	std::string expected_during_time;
+	std::string maximum_during_time;
 	std::string expected_memory;
 	int nb_proc;
       };
@@ -90,6 +92,7 @@ namespace BL{
       BL::Job::JobType _type;
       std::string _yacs_file;
       std::string _command;
+      std::string _env_file;
   
       BL::Job::BatchParam _batch_params;
       BL::Job::FilesParam _files_params;

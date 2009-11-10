@@ -45,9 +45,9 @@ BL::JobsManager::setObserver(BL::Observer * observer)
 }
 
 BL::Job *
-BL::JobsManager::addNewJob(const std::string & name)
+BL::JobsManager::createJob(const std::string & name)
 {
-  DEBTRACE("addNewJob BL::JobsManager");
+  DEBTRACE("createJob BL::JobsManager");
 
   BL::Job * new_job = NULL;
 
@@ -60,9 +60,33 @@ BL::JobsManager::addNewJob(const std::string & name)
     _jobs[name] = new_job;
   }
   else
-    DEBTRACE("addNewJob Error !!!! Job already exist: " << name);
+    DEBTRACE("createJob Error !!!! Job already exist: " << name);
 
   return new_job;
+}
+
+void
+BL::JobsManager::addJobToLauncher(const std::string & name)
+{
+  DEBTRACE("addJobToLauncher BL::JobsManager");
+
+  _jobs_it = _jobs.find(name);
+  if (_jobs_it == _jobs.end())
+  {
+    // TODO: SHOULD SEND an exeception...
+    DEBMSG("[addJobToLauncher] failed, job was not found");
+  }
+  
+  std::string result = "";
+  result = _salome_services->create_job(_jobs_it->second);
+  if (_observer)
+    if (result != "")
+    {
+      _observer->sendEvent("create_job", "Error", name, result);
+      _jobs_it->second->setState(BL::Job::ERROR);
+    }
+    else
+      _observer->sendEvent("create_job", "Ok", name, "");
 }
 
 void
@@ -111,7 +135,6 @@ BL::JobsManager::job_already_exist(const std::string & name)
     return false;
   else
     return true;
-
 }
 
 void

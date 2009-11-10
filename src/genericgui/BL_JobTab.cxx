@@ -84,8 +84,8 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_rd_label = new QLabel("Result directory:");
   _job_rd_label_value = new QLabel("");
 
-  QLabel * job_edt_label = new QLabel("Expected during time:");
-  _job_edt_label_value = new QLabel("");
+  QLabel * job_mdt_label = new QLabel("Maximum during time:");
+  _job_mdt_label_value = new QLabel("");
   QLabel * job_em_label = new QLabel("Expected memory:");
   _job_em_label_value = new QLabel("");
   QLabel * job_nop_label = new QLabel("Number of processors:");
@@ -98,7 +98,7 @@ BL::JobTab::createJobSummaryTab()
   run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
   run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
   QFormLayout * other_run_values_form = new QFormLayout;
-  other_run_values_form->insertRow(0, job_edt_label, _job_edt_label_value);
+  other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
   other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
   other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
   QHBoxLayout * box_layout = new QHBoxLayout();
@@ -189,7 +189,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_bd_label_value->setText(QString(batch_params.batch_directory.c_str()));
     _job_rd_label_value->setText(QString(files_params.result_directory.c_str()));
 
-    _job_edt_label_value->setText(QString(batch_params.expected_during_time.c_str()));
+    _job_mdt_label_value->setText(QString(batch_params.maximum_during_time.c_str()));
     _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
 
@@ -248,7 +248,7 @@ BL::JobTab::reset(QString job_name)
   _job_nof_label_value->setText("");
   _job_bd_label_value->setText("");
   _job_rd_label_value->setText("");
-  _job_edt_label_value->setText("");
+  _job_mdt_label_value->setText("");
   _job_em_label_value->setText("");
   _job_nop_label_value->setText("");
   _job_command_label->setText("Schema or Command:");

@@ -155,7 +155,7 @@ BL::JobsManager_QT::create_job_wizard()
 
     if (wizard.job_name != "")
     {
-      BL::Job * new_job = addNewJob(wizard.job_name);
+      BL::Job * new_job = createJob(wizard.job_name);
       if (wizard.yacs_file != "")
       {
 	// YACS schema job
@@ -163,7 +163,7 @@ BL::JobsManager_QT::create_job_wizard()
 	new_job->setYACSFile(wizard.yacs_file);
 	BL::Job::BatchParam param;
 	param.batch_directory = wizard.batch_directory;
-	param.expected_during_time = wizard.expected_during_time;
+	param.maximum_during_time = wizard.maximum_during_time;
 	param.expected_memory = wizard.expected_memory;
 	param.nb_proc = wizard.nb_proc;
 	new_job->setBatchParameters(param);
@@ -179,9 +179,10 @@ BL::JobsManager_QT::create_job_wizard()
 	// Command Job
 	new_job->setType(BL::Job::COMMAND);
 	new_job->setCommand(wizard.command);
+	new_job->setEnvFile(wizard.env_file);
 	BL::Job::BatchParam param;
 	param.batch_directory = wizard.batch_directory;
-	param.expected_during_time = wizard.expected_during_time;
+	param.maximum_during_time = wizard.maximum_during_time;
 	param.expected_memory = wizard.expected_memory;
 	param.nb_proc = wizard.nb_proc;
 	new_job->setBatchParameters(param);
@@ -192,6 +193,7 @@ BL::JobsManager_QT::create_job_wizard()
 	new_job->setFilesParameters(files_params);
 	new_job->setMachine(wizard.machine_choosed);
       }
+      addJobToLauncher(wizard.job_name);
       emit new_job_added(QString::fromStdString(wizard.job_name));
       if (wizard.start_job)
 	start_job(wizard.job_name);
@@ -233,7 +235,24 @@ BL::JobsManager_QT::event(QEvent * e)
 	   << event->event_name << " "
 	   << event->job_name << " "
 	   << event->data);
-  if (event->action == "start_job")
+
+  if (event->action == "create_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " created\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error in creating job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else if (event->action == "start_job")
   {
     if (event->event_name == "Ok")
     {

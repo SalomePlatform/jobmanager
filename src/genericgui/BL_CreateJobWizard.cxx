@@ -29,8 +29,9 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   job_name = "";
   yacs_file = "";
   command = "";
+  env_file = "";
   batch_directory = "";
-  expected_during_time = "";
+  maximum_during_time = "";
   expected_memory = "";
   nb_proc = 1;
 
@@ -83,6 +84,8 @@ BL::CreateJobWizard::end(int result)
     // Command Panel
     QString f_command = field("command").toString();
     command = f_command.toStdString();
+    QString f_env_file = field("env_file").toString();
+    env_file = f_env_file.toStdString();
     
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
@@ -98,7 +101,7 @@ BL::CreateJobWizard::end(int result)
       time_min = "0" + field("during_time_min").toString();
     else
       time_min = field("during_time_min").toString();
-    expected_during_time = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
+    maximum_during_time = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
 
     QString mem = field("mem_value").toString();
     int mem_type_i = field("mem_type").toInt();
@@ -291,10 +294,15 @@ BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
   QLabel * label_command = new QLabel("Command: ");
   QLineEdit * line_command = new QLineEdit(this);
   registerField("command", line_command);
+  QLabel * label_env_file = new QLabel("Environnement file: ");
+  QLineEdit * line_env_file = new QLineEdit(this);
+  registerField("env_file", line_env_file);
 
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(label_command, 0, 0);
   layout->addWidget(line_command, 0, 1);
+  layout->addWidget(label_env_file, 1, 0);
+  layout->addWidget(line_env_file, 1, 1);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -340,7 +348,7 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   registerField("batch_directory", line_directory);
 
   // exected during time
-  QLabel * label_during_time = new QLabel("Expected during time: ");
+  QLabel * label_during_time = new QLabel("Maximum during time: ");
   QSpinBox * spin_during_time_hour = new QSpinBox(this);
   QLabel * label_during_time_hour = new QLabel("Hours");
   spin_during_time_hour->setMinimum(0);

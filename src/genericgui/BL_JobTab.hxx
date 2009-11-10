@@ -63,7 +63,7 @@ namespace BL
       QLabel * _job_nof_label_value;
       QLabel * _job_bd_label_value;
       QLabel * _job_rd_label_value;
-      QLabel * _job_edt_label_value;
+      QLabel * _job_mdt_label_value;
       QLabel * _job_em_label_value;
       QLabel * _job_nop_label_value;
 

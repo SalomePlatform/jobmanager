@@ -84,57 +84,90 @@ BL::SALOMEServices::getMachineList()
 }
 
 std::string
-BL::SALOMEServices::start_job(BL::Job * job)
+BL::SALOMEServices::create_job(BL::Job * job)
 {
-  return start_yacs_job(job);
-}
-
-std::string
-BL::SALOMEServices::start_yacs_job(BL::Job * job)
-{
+  DEBTRACE("Begin of create_job");
   std::string ret = "";
-  // Prepare Arguments
-  const char * fileToExecute = job->getYACSFile().c_str();
+  Engines::JobParameters_var job_parameters = new Engines::JobParameters;
 
+  // Job type
+  if (job->getType() == BL::Job::COMMAND)
+  {
+    job_parameters->job_type = CORBA::string_dup("command");
+    job_parameters->command = CORBA::string_dup(job->getCommand().c_str());
+    job_parameters->env_file = CORBA::string_dup(job->getEnvFile().c_str());
+  }
+  else if (job->getType() == BL::Job::YACS_SCHEMA)
+  {
+    job_parameters->job_type = CORBA::string_dup("yacs_file");
+    job_parameters->yacs_file = CORBA::string_dup(job->getYACSFile().c_str());
+  }
+
+  // Files
   BL::Job::FilesParam files = job->getFilesParameters();
-  Engines::FilesList_var filesToExport = new Engines::FilesList;
-  filesToExport->length(files.input_files_list.size());
   std::list<std::string>::iterator it;
-  int i = 0;
-  for (it=files.input_files_list.begin() ; it != files.input_files_list.end(); it++)
+  int i,j = 0;
+
+  job_parameters->in_files.length(files.input_files_list.size());
+  for (it = files.input_files_list.begin() ; it != files.input_files_list.end(); it++)
   {
-    filesToExport[i] = CORBA::string_dup((*it).c_str());
+    job_parameters->in_files[i] = CORBA::string_dup((*it).c_str());
     i++;
   }
-  Engines::FilesList_var filesToImport = new Engines::FilesList;
-  filesToImport->length(files.output_files_list.size());
-  i = 0;
-  for (it=files.output_files_list.begin() ; it != files.output_files_list.end(); it++)
+
+  job_parameters->out_files.length(files.output_files_list.size());
+  for (it = files.output_files_list.begin() ; it != files.output_files_list.end(); it++)
   {
-    filesToImport[i] = CORBA::string_dup((*it).c_str());
-    i++;
+    job_parameters->out_files[j] = CORBA::string_dup((*it).c_str());
+    j++;
   }
+  job_parameters->local_directory = CORBA::string_dup("");
+  job_parameters->result_directory = CORBA::string_dup(files.result_directory.c_str());
 
   BL::Job::BatchParam cpp_batch_params =  job->getBatchParameters();
-  Engines::BatchParameters_var batch_params = new Engines::BatchParameters;
-  batch_params->batch_directory = CORBA::string_dup(cpp_batch_params.batch_directory.c_str());
-  batch_params->expected_during_time = CORBA::string_dup(cpp_batch_params.expected_during_time.c_str());
-  batch_params->mem = CORBA::string_dup(cpp_batch_params.expected_memory.c_str());
-  batch_params->nb_proc = cpp_batch_params.nb_proc;
+  job_parameters->work_directory = CORBA::string_dup(cpp_batch_params.batch_directory.c_str());
 
-  Engines::MachineParameters_var machine = new Engines::MachineParameters;
-  machine->hostname = CORBA::string_dup(job->getMachine().c_str());
+  // Resource
+  job_parameters->maximum_during_time = CORBA::string_dup(cpp_batch_params.maximum_during_time.c_str());
+  job_parameters->resource_required.hostname = CORBA::string_dup(job->getMachine().c_str());
+  job_parameters->resource_required.nb_node = cpp_batch_params.nb_proc;
 
-  // Start Job !
+  // Memory
+  CORBA::Long memory;
+  std::string ram = cpp_batch_params.expected_memory.substr(0,cpp_batch_params.expected_memory.size()-2);
+  std::istringstream iss(ram);
+  iss >> memory;
+  std::string unity = cpp_batch_params.expected_memory.substr(cpp_batch_params.expected_memory.size()-2, 2);
+  if((unity.find("gb") != std::string::npos))
+    memory = memory * 1024;
+  job_parameters->resource_required.mem_mb = memory;
+
+  // Create Job
   try
   {
-    int job_id = _salome_launcher->submitSalomeJob(fileToExecute, filesToExport,
-						   filesToImport, batch_params, machine);
+    int job_id = _salome_launcher->createJob(job_parameters);
     job->setSalomeLauncherId(job_id);
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in submitSalomeJob !");
+    DEBTRACE("SALOME Exception in createJob !");
+    ret = ex.details.text.in();
+  }
+  return ret;
+}
+
+std::string
+BL::SALOMEServices::start_job(BL::Job * job)
+{
+  std::string ret = "";
+  // Launch Job !
+  try
+  {
+    _salome_launcher->launchJob(job->getSalomeLauncherId());
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBTRACE("SALOME Exception in launchJob !");
     ret = ex.details.text.in();
   }
   return ret;
@@ -145,24 +178,15 @@ BL::SALOMEServices::refresh_job(BL::Job * job)
 {
   std::string ret = "";
 
-  Engines::MachineParameters_var machine = new Engines::MachineParameters;
-  machine->hostname = CORBA::string_dup(job->getMachine().c_str());
-
   // Refresh Job !
   try
   {
-    CORBA::String_var result = _salome_launcher->queryJob(job->getSalomeLauncherId(), machine);
-    std::string res = result.in();
-    if (res == "Running")
-      return "RUNNING";
-    else if (res == "Done")
-      return "FINISHED";
-    else
-      return result.in();
+    CORBA::String_var result = _salome_launcher->getJobState(job->getSalomeLauncherId());
+    ret = result.in();
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in refresh_job !");
+    DEBTRACE("SALOME Exception in getJobState !");
     ret = ex.details.text.in();
   }
   return ret;
@@ -172,18 +196,14 @@ std::string
 BL::SALOMEServices::delete_job(BL::Job * job)
 {
   std::string ret = "";
-
-  Engines::MachineParameters_var machine = new Engines::MachineParameters;
-  machine->hostname = CORBA::string_dup(job->getMachine().c_str());
-
   // Delete Job !
   try
   {
-    _salome_launcher->deleteJob(job->getSalomeLauncherId(), machine);
+    _salome_launcher->removeJob(job->getSalomeLauncherId());
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in refresh_job !");
+    DEBTRACE("SALOME Exception in removeJob !");
     ret = ex.details.text.in();
   }
   return ret;
@@ -194,16 +214,13 @@ BL::SALOMEServices::get_results_job(BL::Job * job)
 {
   std::string ret = "";
 
-  Engines::MachineParameters_var machine = new Engines::MachineParameters;
-  machine->hostname = CORBA::string_dup(job->getMachine().c_str());
-
   BL::Job::FilesParam files = job->getFilesParameters();
   CORBA::String_var directory = CORBA::string_dup(files.result_directory.c_str());
 
   // get job results !
   try
   {
-    _salome_launcher->getResultsJob(directory, job->getSalomeLauncherId(), machine);
+    _salome_launcher->getJobResults(job->getSalomeLauncherId(), directory);
   }
   catch (const SALOME::SALOME_Exception & ex)
   {

@@ -25,8 +25,9 @@ BL::Job::Job()
   _name = "";
   _yacs_file = "";
   _command = "";
+  _env_file = "";
   _batch_params.batch_directory = "";
-  _batch_params.expected_during_time = "";
+  _batch_params.maximum_during_time = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
@@ -42,8 +43,9 @@ BL::Job::Job(const std::string & name)
   _name = name;
   _yacs_file = "";
   _command = "";
+  _env_file = "";
   _batch_params.batch_directory = "";
-  _batch_params.expected_during_time = "";
+  _batch_params.maximum_during_time = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
@@ -105,10 +107,22 @@ BL::Job::getCommand()
 }
 
 void 
+BL::Job::setEnvFile(std::string & env_file)
+{
+  _env_file = env_file;
+}
+
+std::string & 
+BL::Job::getEnvFile()
+{
+  return _env_file;
+}
+
+void 
 BL::Job::setBatchParameters(BL::Job::BatchParam & param)
 {
   _batch_params.batch_directory = param.batch_directory;
-  _batch_params.expected_during_time = param.expected_during_time;
+  _batch_params.maximum_during_time = param.maximum_during_time;
   _batch_params.expected_memory = param.expected_memory;
   _batch_params.nb_proc = param.nb_proc;
 }

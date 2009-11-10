@@ -40,7 +40,8 @@ namespace BL{
 
       void setObserver(BL::Observer * observer);
 
-      BL::Job * addNewJob(const std::string & name);
+      BL::Job * createJob(const std::string & name);
+      void addJobToLauncher(const std::string & name);
       void removeJob(const std::string & name);
 
       BL::Job * getJob(const std::string & name);

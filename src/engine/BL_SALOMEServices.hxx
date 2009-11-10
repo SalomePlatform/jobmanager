@@ -43,13 +43,11 @@ namespace BL{
 
       std::list<std::string> getMachineList();
 
+      std::string create_job(BL::Job * job);
       std::string start_job(BL::Job * job);
       std::string refresh_job(BL::Job * job);
       std::string delete_job(BL::Job * job);
       std::string get_results_job(BL::Job * job);
-
-    protected:
-      std::string start_yacs_job(BL::Job * job);
 
     private:
       CORBA::ORB_var _orb;
