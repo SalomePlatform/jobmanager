@@ -47,7 +47,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   setPage(Page_YACSSchema, new BL::YACSSchemaPage(this));
   setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
   setPage(Page_Files, new BL::FilesPage(this));
-  setPage(Page_Command_Main_Definitions, new BL::CreateJobWizard::CommandMainPage(this));
+  setPage(Page_Command_Main_Definitions, new BL::CommandMainPage(this));
   setPage(Page_Machine, new BL::MachinePage(this, salome_services));
   setPage(Page_Conclusion, new BL::CreateJobWizard::ConclusionPage(this));
 
@@ -283,7 +283,7 @@ BL::YACSSchemaPage::nextId() const
   return BL::CreateJobWizard::Page_BatchParameters;
 }
 
-BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
+BL::CommandMainPage::CommandMainPage(QWidget * parent)
 : QWizardPage(parent)
 {
   setTitle("Define command job");
@@ -291,18 +291,25 @@ BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
   label->setWordWrap(true);
 
   // command
-  QLabel * label_command = new QLabel("Command: ");
-  QLineEdit * line_command = new QLineEdit(this);
-  registerField("command", line_command);
-  QLabel * label_env_file = new QLabel("Environnement file: ");
-  QLineEdit * line_env_file = new QLineEdit(this);
-  registerField("env_file", line_env_file);
+  QPushButton * command_file_button = new QPushButton(tr("Choose a command file"));
+  command_file_button->show();
+  connect(command_file_button, SIGNAL(clicked()), this, SLOT(choose_command_file()));
+  _line_command = new QLineEdit(this);
+  registerField("command", _line_command);
+  _line_command->setReadOnly(true);
+
+  QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
+  command_env_file_button->show();
+  connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
+  _line_env_file = new QLineEdit(this);
+  registerField("env_file", _line_env_file);
+  _line_env_file->setReadOnly(true);
 
   QGridLayout *layout = new QGridLayout;
-  layout->addWidget(label_command, 0, 0);
-  layout->addWidget(line_command, 0, 1);
-  layout->addWidget(label_env_file, 1, 0);
-  layout->addWidget(line_env_file, 1, 1);
+  layout->addWidget(command_file_button, 0, 0);
+  layout->addWidget(_line_command, 0, 1);
+  layout->addWidget(command_env_file_button, 1, 0);
+  layout->addWidget(_line_env_file, 1, 1);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -310,11 +317,33 @@ BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
   setLayout(main_layout);
 };
 
-BL::CreateJobWizard::CommandMainPage::~CommandMainPage()
+BL::CommandMainPage::~CommandMainPage()
 {}
 
+void
+BL::CommandMainPage::choose_command_file()
+{
+  QString command_file = QFileDialog::getOpenFileName(this,
+						      tr("Open command file"), "",
+						      tr("sh (*.sh);;All Files (*)"));
+  _line_command->setReadOnly(false);
+  _line_command->setText(command_file);
+  _line_command->setReadOnly(true);
+}
+
+void
+BL::CommandMainPage::choose_env_file()
+{
+  QString env_file = QFileDialog::getOpenFileName(this,
+						      tr("Open environnement file"), "",
+						      tr("sh (*.sh);;All Files (*)"));
+  _line_env_file->setReadOnly(false);
+  _line_env_file->setText(env_file);
+  _line_env_file->setReadOnly(true);
+}
+
 bool
-BL::CreateJobWizard::CommandMainPage::validatePage()
+BL::CommandMainPage::validatePage()
 {
   QString command = field("command").toString();
   if (command == "")
@@ -327,7 +356,7 @@ BL::CreateJobWizard::CommandMainPage::validatePage()
 }
 
 int 
-BL::CreateJobWizard::CommandMainPage::nextId() const
+BL::CommandMainPage::nextId() const
 {
   return BL::CreateJobWizard::Page_BatchParameters;
 }

@@ -93,15 +93,6 @@ namespace BL{
       };
 
 
-      class CommandMainPage: virtual public QWizardPage
-      {
-	public:
-	  CommandMainPage(QWidget * parent);
-	  virtual ~CommandMainPage();
-
-	  virtual bool validatePage();
-	  virtual int nextId() const ;
-      };
 
       class ConclusionPage: virtual public QWizardPage
       {
@@ -131,6 +122,27 @@ namespace BL{
     private:
       QPushButton * _yacs_file_button;
       QLineEdit * _yacs_file_text;
+  };
+
+  class CommandMainPage: virtual public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      CommandMainPage(QWidget * parent);
+      virtual ~CommandMainPage();
+
+      virtual bool validatePage();
+      virtual int nextId() const ;
+
+    public slots:
+      void choose_command_file();
+      void choose_env_file();
+
+    private:
+      QLineEdit * _line_command;
+      QLineEdit * _line_env_file;
+
   };
 
   class BatchParametersPage: virtual public QWizardPage
