@@ -106,7 +106,8 @@ BL::SALOMEServices::create_job(BL::Job * job)
   // Files
   BL::Job::FilesParam files = job->getFilesParameters();
   std::list<std::string>::iterator it;
-  int i,j = 0;
+  int i = 0;
+  int j = 0;
 
   job_parameters->in_files.length(files.input_files_list.size());
   for (it = files.input_files_list.begin() ; it != files.input_files_list.end(); it++)
