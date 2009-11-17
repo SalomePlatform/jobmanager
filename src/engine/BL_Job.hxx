@@ -71,6 +71,9 @@ namespace BL{
       void setMachine(std::string & machine);
       std::string & getMachine();
 
+      void setBatchQueue(std::string & queue);
+      std::string & getBatchQueue();
+
       enum State {CREATED, IN_PROCESS, QUEUED, RUNNING, PAUSED, FINISHED, ERROR};
       void setState(BL::Job::State state);
       BL::Job::State getState();
@@ -97,6 +100,7 @@ namespace BL{
       BL::Job::BatchParam _batch_params;
       BL::Job::FilesParam _files_params;
       std::string _machine_choosed;
+      std::string _batch_queue;
 
       int _salome_launcher_id;
   };

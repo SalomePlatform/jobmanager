@@ -173,6 +173,7 @@ BL::JobsManager_QT::create_job_wizard()
 	files_params.output_files_list = wizard.output_files_list;
 	new_job->setFilesParameters(files_params);
 	new_job->setMachine(wizard.machine_choosed);
+	new_job->setBatchQueue(wizard.batch_queue);
       }
       else
       {
@@ -192,6 +193,7 @@ BL::JobsManager_QT::create_job_wizard()
 	files_params.output_files_list = wizard.output_files_list;
 	new_job->setFilesParameters(files_params);
 	new_job->setMachine(wizard.machine_choosed);
+	new_job->setBatchQueue(wizard.batch_queue);
       }
       addJobToLauncher(wizard.job_name);
       emit new_job_added(QString::fromStdString(wizard.job_name));

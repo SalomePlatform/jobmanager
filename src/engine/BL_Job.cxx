@@ -32,6 +32,7 @@ BL::Job::Job()
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
   _machine_choosed = "";
+  _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
@@ -50,6 +51,7 @@ BL::Job::Job(const std::string & name)
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
   _machine_choosed = "";
+  _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
@@ -157,6 +159,18 @@ std::string &
 BL::Job::getMachine()
 {
   return _machine_choosed;
+}
+
+void
+BL::Job::setBatchQueue(std::string & queue)
+{
+  _batch_queue = queue;
+}
+
+std::string &
+BL::Job::getBatchQueue()
+{
+  return _batch_queue;
 }
 
 void 

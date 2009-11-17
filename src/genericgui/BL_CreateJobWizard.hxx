@@ -71,6 +71,7 @@ namespace BL{
       std::list<std::string> output_files_list;
 
       std::string machine_choosed;
+      std::string batch_queue;
 
       bool start_job;
 

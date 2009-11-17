@@ -38,6 +38,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   result_directory = "";
 
   machine_choosed = "";
+  batch_queue = "";
 
   start_job = false;
 
@@ -131,6 +132,10 @@ BL::CreateJobWizard::end(int result)
     // Machine list
     QString f_machine_choosed = field("machine_choosed").toString();
     machine_choosed = f_machine_choosed.toStdString(); 
+
+    // Batch Queue
+    QString f_batch_queue = field("batch_queue").toString();
+    batch_queue = f_batch_queue.toStdString(); 
 
     start_job = field("start_job").toBool();
   }
@@ -684,10 +689,16 @@ BL::MachinePage::MachinePage(BL::CreateJobWizard * parent, BL::SALOMEServices * 
   _machine_choosed->setReadOnly(true);
   registerField("machine_choosed", _machine_choosed);
 
+  QLabel * bqLabel = new QLabel("Batch Queue (optional):");
+  QLineEdit * _bqLineEdit = new QLineEdit(this);
+  registerField("batch_queue", _bqLineEdit);
+
   QGridLayout * main_layout = new QGridLayout;
   main_layout->addWidget(machine_group_box, 0, 0, 1, -1);
   main_layout->addWidget(machine_label, 1, 0);
   main_layout->addWidget(_machine_choosed, 1, 1);
+  main_layout->addWidget(bqLabel, 2, 0);
+  main_layout->addWidget(_bqLineEdit, 2, 1);
   setLayout(main_layout);
 };
 
