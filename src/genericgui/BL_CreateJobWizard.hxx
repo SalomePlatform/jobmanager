@@ -119,10 +119,12 @@ namespace BL{
 
     public slots:
       void choose_file();
+      void choose_env_file();
 
     private:
       QPushButton * _yacs_file_button;
       QLineEdit * _yacs_file_text;
+      QLineEdit * _line_env_file;
   };
 
   class CommandMainPage: virtual public QWizardPage

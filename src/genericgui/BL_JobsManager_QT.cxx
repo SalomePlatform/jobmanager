@@ -161,6 +161,7 @@ BL::JobsManager_QT::create_job_wizard()
 	// YACS schema job
 	new_job->setType(BL::Job::YACS_SCHEMA);
 	new_job->setYACSFile(wizard.yacs_file);
+	new_job->setEnvFile(wizard.env_file);
 	BL::Job::BatchParam param;
 	param.batch_directory = wizard.batch_directory;
 	param.maximum_duration = wizard.maximum_duration;

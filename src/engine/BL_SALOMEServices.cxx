@@ -95,7 +95,6 @@ BL::SALOMEServices::create_job(BL::Job * job)
   {
     job_parameters->job_type = CORBA::string_dup("command");
     job_parameters->command = CORBA::string_dup(job->getCommand().c_str());
-    job_parameters->env_file = CORBA::string_dup(job->getEnvFile().c_str());
   }
   else if (job->getType() == BL::Job::YACS_SCHEMA)
   {
@@ -104,6 +103,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   }
 
   // Files
+  job_parameters->env_file = CORBA::string_dup(job->getEnvFile().c_str());
   BL::Job::FilesParam files = job->getFilesParameters();
   std::list<std::string>::iterator it;
   int i = 0;

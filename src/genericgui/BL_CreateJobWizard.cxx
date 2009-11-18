@@ -85,9 +85,10 @@ BL::CreateJobWizard::end(int result)
     // Command Panel
     QString f_command = field("command").toString();
     command = f_command.toStdString();
+    
     QString f_env_file = field("env_file").toString();
     env_file = f_env_file.toStdString();
-    
+
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
     batch_directory = f_batch_directory.toStdString();
@@ -242,11 +243,20 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   registerField("yacs_file", _yacs_file_text);
   _yacs_file_text->setReadOnly(true);
 
+  QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
+  command_env_file_button->show();
+  connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
+  _line_env_file = new QLineEdit(this);
+  registerField("env_file", _line_env_file);
+  _line_env_file->setReadOnly(true);
+
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(_yacs_file_button, 0, 0);
   layout->addWidget(_yacs_file_text, 0, 1);
+  layout->addWidget(command_env_file_button, 1, 0);
+  layout->addWidget(_line_env_file, 1, 1);
   main_layout->insertLayout(-1, layout);
   setLayout(main_layout);
 };
@@ -281,6 +291,18 @@ BL::YACSSchemaPage::choose_file()
   _yacs_file_text->setText(yacs_file);
   _yacs_file_text->setReadOnly(true);
 }
+
+void
+BL::YACSSchemaPage::choose_env_file()
+{
+  QString env_file = QFileDialog::getOpenFileName(this,
+						      tr("Open environnement file"), "",
+						      tr("sh (*.sh);;All Files (*)"));
+  _line_env_file->setReadOnly(false);
+  _line_env_file->setText(env_file);
+  _line_env_file->setReadOnly(true);
+}
+
 
 int 
 BL::YACSSchemaPage::nextId() const
