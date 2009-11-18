@@ -129,7 +129,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->work_directory = CORBA::string_dup(cpp_batch_params.batch_directory.c_str());
 
   // Resource
-  job_parameters->maximum_during_time = CORBA::string_dup(cpp_batch_params.maximum_during_time.c_str());
+  job_parameters->maximum_duration = CORBA::string_dup(cpp_batch_params.maximum_duration.c_str());
   job_parameters->resource_required.hostname = CORBA::string_dup(job->getMachine().c_str());
   job_parameters->resource_required.nb_node = cpp_batch_params.nb_proc;
   job_parameters->queue = CORBA::string_dup(job->getBatchQueue().c_str());

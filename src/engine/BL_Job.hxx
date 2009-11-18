@@ -52,7 +52,7 @@ namespace BL{
       struct BatchParam
       {
 	std::string batch_directory;
-	std::string maximum_during_time;
+	std::string maximum_duration;
 	std::string expected_memory;
 	int nb_proc;
       };

@@ -31,7 +31,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   command = "";
   env_file = "";
   batch_directory = "";
-  maximum_during_time = "";
+  maximum_duration = "";
   expected_memory = "";
   nb_proc = 1;
 
@@ -94,15 +94,15 @@ BL::CreateJobWizard::end(int result)
 
     QString time_hour;
     QString time_min;
-    if (field("during_time_hour").toInt() < 10)
-      time_hour = "0" + field("during_time_hour").toString();
+    if (field("duration_hour").toInt() < 10)
+      time_hour = "0" + field("duration_hour").toString();
     else
-      time_hour = field("during_time_hour").toString();
-    if (field("during_time_min").toInt() < 10)
-      time_min = "0" + field("during_time_min").toString();
+      time_hour = field("duration_hour").toString();
+    if (field("duration_min").toInt() < 10)
+      time_min = "0" + field("duration_min").toString();
     else
-      time_min = field("during_time_min").toString();
-    maximum_during_time = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
+      time_min = field("duration_min").toString();
+    maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
 
     QString mem = field("mem_value").toString();
     int mem_type_i = field("mem_type").toInt();
@@ -382,17 +382,17 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   registerField("batch_directory", line_directory);
 
   // exected during time
-  QLabel * label_during_time = new QLabel("Maximum during time: ");
-  QSpinBox * spin_during_time_hour = new QSpinBox(this);
-  QLabel * label_during_time_hour = new QLabel("Hours");
-  spin_during_time_hour->setMinimum(0);
-  spin_during_time_hour->setMaximum(1000000);
-  registerField("during_time_hour", spin_during_time_hour);
-  QSpinBox * spin_during_time_min = new QSpinBox(this);
-  QLabel * label_during_time_min = new QLabel("Minutes");
-  spin_during_time_min->setMinimum(0);
-  spin_during_time_min->setMaximum(59);
-  registerField("during_time_min", spin_during_time_min);
+  QLabel * label_duration = new QLabel("Maximum during time: ");
+  QSpinBox * spin_duration_hour = new QSpinBox(this);
+  QLabel * label_duration_hour = new QLabel("Hours");
+  spin_duration_hour->setMinimum(0);
+  spin_duration_hour->setMaximum(1000000);
+  registerField("duration_hour", spin_duration_hour);
+  QSpinBox * spin_duration_min = new QSpinBox(this);
+  QLabel * label_duration_min = new QLabel("Minutes");
+  spin_duration_min->setMinimum(0);
+  spin_duration_min->setMaximum(59);
+  registerField("duration_min", spin_duration_min);
 
   // memory
   QLabel * label_memory = new QLabel("Memory per nodes expected: ");
@@ -416,11 +416,11 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(label_directory, 0, 0);
   layout->addWidget(line_directory, 0, 1, 1, -1);
-  layout->addWidget(label_during_time, 1, 0);
-  layout->addWidget(spin_during_time_hour, 1, 1);
-  layout->addWidget(label_during_time_hour, 1, 2);
-  layout->addWidget(spin_during_time_min, 1, 3);
-  layout->addWidget(label_during_time_min, 1, 4);
+  layout->addWidget(label_duration, 1, 0);
+  layout->addWidget(spin_duration_hour, 1, 1);
+  layout->addWidget(label_duration_hour, 1, 2);
+  layout->addWidget(spin_duration_min, 1, 3);
+  layout->addWidget(label_duration_min, 1, 4);
   layout->addWidget(label_memory, 2, 0);
   layout->addWidget(spin_memory, 2, 1);
   layout->addWidget(combo_memory, 2, 2);
@@ -445,8 +445,8 @@ BL::BatchParametersPage::validatePage()
     return false;
   }
 
-  int time_hour = field("during_time_hour").toInt();
-  int time_min = field("during_time_min").toInt();
+  int time_hour = field("duration_hour").toInt();
+  int time_min = field("duration_min").toInt();
   if (time_hour == 0 and time_min == 0)
   {
     QMessageBox::warning(NULL, "Time Error", "Please enter an expected during time");

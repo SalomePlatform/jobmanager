@@ -84,7 +84,7 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_rd_label = new QLabel("Result directory:");
   _job_rd_label_value = new QLabel("");
 
-  QLabel * job_mdt_label = new QLabel("Maximum during time:");
+  QLabel * job_mdt_label = new QLabel("Maximum duration:");
   _job_mdt_label_value = new QLabel("");
   QLabel * job_em_label = new QLabel("Expected memory:");
   _job_em_label_value = new QLabel("");
@@ -189,7 +189,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_bd_label_value->setText(QString(batch_params.batch_directory.c_str()));
     _job_rd_label_value->setText(QString(files_params.result_directory.c_str()));
 
-    _job_mdt_label_value->setText(QString(batch_params.maximum_during_time.c_str()));
+    _job_mdt_label_value->setText(QString(batch_params.maximum_duration.c_str()));
     _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
 

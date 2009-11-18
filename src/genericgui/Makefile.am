@@ -45,7 +45,7 @@ libBL_GenericGui_la_CXXFLAGS = $(qt4_cppflags) \
 
 libBL_GenericGui_la_LDFLAGS = $(qt4_ldflags) 
 
-libBL_GenericGui_la_LIBADD = -lQtGui -lQtCore -lQtWebKit \
+libBL_GenericGui_la_LIBADD = -lQtGui -lQtCore \
 			     $(top_builddir)/src/bases/libBL_Bases.la \
 			     $(top_builddir)/src/engine/libBL_Engine.la
 

@@ -163,7 +163,7 @@ BL::JobsManager_QT::create_job_wizard()
 	new_job->setYACSFile(wizard.yacs_file);
 	BL::Job::BatchParam param;
 	param.batch_directory = wizard.batch_directory;
-	param.maximum_during_time = wizard.maximum_during_time;
+	param.maximum_duration = wizard.maximum_duration;
 	param.expected_memory = wizard.expected_memory;
 	param.nb_proc = wizard.nb_proc;
 	new_job->setBatchParameters(param);
@@ -183,7 +183,7 @@ BL::JobsManager_QT::create_job_wizard()
 	new_job->setEnvFile(wizard.env_file);
 	BL::Job::BatchParam param;
 	param.batch_directory = wizard.batch_directory;
-	param.maximum_during_time = wizard.maximum_during_time;
+	param.maximum_duration = wizard.maximum_duration;
 	param.expected_memory = wizard.expected_memory;
 	param.nb_proc = wizard.nb_proc;
 	new_job->setBatchParameters(param);
