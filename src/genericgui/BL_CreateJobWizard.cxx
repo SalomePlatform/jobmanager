@@ -37,7 +37,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   result_directory = "";
 
-  machine_choosed = "";
+  resource_choosed = "";
   batch_queue = "";
 
   start_job = false;
@@ -49,7 +49,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
   setPage(Page_Files, new BL::FilesPage(this));
   setPage(Page_Command_Main_Definitions, new BL::CommandMainPage(this));
-  setPage(Page_Machine, new BL::MachinePage(this, salome_services));
+  setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
   setPage(Page_Conclusion, new BL::CreateJobWizard::ConclusionPage(this));
 
   setWindowTitle("Create Job Wizard");
@@ -130,9 +130,9 @@ BL::CreateJobWizard::end(int result)
       output_files_list.push_back(item_text.toStdString());
     }
 
-    // Machine list
-    QString f_machine_choosed = field("machine_choosed").toString();
-    machine_choosed = f_machine_choosed.toStdString(); 
+    // Resource list
+    QString f_resource_choosed = field("resource_choosed").toString();
+    resource_choosed = f_resource_choosed.toStdString(); 
 
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
@@ -651,7 +651,7 @@ BL::FilesPage::output_itemSelectionChanged()
 int 
 BL::FilesPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Machine;
+  return BL::CreateJobWizard::Page_Resource;
 }
 
 BL::CreateJobWizard::ConclusionPage::ConclusionPage(QWidget * parent)
@@ -680,77 +680,77 @@ BL::CreateJobWizard::ConclusionPage::nextId() const
   return -1;
 }
 
-BL::MachinePage::MachinePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
+BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
 : QWizardPage(parent)
 {
   _salome_services = salome_services;
-  setTitle("Select a Machine");
+  setTitle("Select a Resource");
 
-  QLabel * main_label = new QLabel("In this step you select the machine of your job");
+  QLabel * main_label = new QLabel("In this step you select the resource of your job");
   main_label->setWordWrap(true);
 
-  // input_Machine
-  QGroupBox * machine_group_box = new QGroupBox("Machine List");
-  _machine_list = new QListWidget();
-  _machine_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  std::list<std::string> machine_list = _salome_services->getMachineList();
+  // input_Resource
+  QGroupBox * resource_group_box = new QGroupBox("Resource List");
+  _resource_list = new QListWidget();
+  _resource_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  std::list<std::string> resource_list = _salome_services->getResourceList();
   std::list<std::string>::iterator it;
-  for (it = machine_list.begin(); it != machine_list.end(); it++)
+  for (it = resource_list.begin(); it != resource_list.end(); it++)
   {
-    std::string machine = *it;
-    _machine_list->addItem(QString(machine.c_str()));
+    std::string resource = *it;
+    _resource_list->addItem(QString(resource.c_str()));
   }
-  connect(_machine_list, SIGNAL(itemSelectionChanged()), this, SLOT(machine_itemSelectionChanged()));
-  QVBoxLayout * machine_list_layout = new QVBoxLayout();
-  machine_list_layout->addWidget(_machine_list);
-  machine_group_box->setLayout(machine_list_layout);
+  connect(_resource_list, SIGNAL(itemSelectionChanged()), this, SLOT(resource_itemSelectionChanged()));
+  QVBoxLayout * resource_list_layout = new QVBoxLayout();
+  resource_list_layout->addWidget(_resource_list);
+  resource_group_box->setLayout(resource_list_layout);
 
-  QLabel * machine_label = new QLabel("Machine selected: ");
-  _machine_choosed = new QLineEdit();
-  _machine_choosed->setText("");
-  _machine_choosed->setReadOnly(true);
-  registerField("machine_choosed", _machine_choosed);
+  QLabel * resource_label = new QLabel("Resource selected: ");
+  _resource_choosed = new QLineEdit();
+  _resource_choosed->setText("");
+  _resource_choosed->setReadOnly(true);
+  registerField("resource_choosed", _resource_choosed);
 
   QLabel * bqLabel = new QLabel("Batch Queue (optional):");
   QLineEdit * _bqLineEdit = new QLineEdit(this);
   registerField("batch_queue", _bqLineEdit);
 
   QGridLayout * main_layout = new QGridLayout;
-  main_layout->addWidget(machine_group_box, 0, 0, 1, -1);
-  main_layout->addWidget(machine_label, 1, 0);
-  main_layout->addWidget(_machine_choosed, 1, 1);
+  main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
+  main_layout->addWidget(resource_label, 1, 0);
+  main_layout->addWidget(_resource_choosed, 1, 1);
   main_layout->addWidget(bqLabel, 2, 0);
   main_layout->addWidget(_bqLineEdit, 2, 1);
   setLayout(main_layout);
 };
 
-BL::MachinePage::~MachinePage()
+BL::ResourcePage::~ResourcePage()
 {}
 
 bool
-BL::MachinePage::validatePage()
+BL::ResourcePage::validatePage()
 {
-  QString machine_choosed = field("machine_choosed").toString();
-  if (machine_choosed == "")
+  QString resource_choosed = field("resource_choosed").toString();
+  if (resource_choosed == "")
   {
-    QMessageBox::warning(NULL, "Machine Error", "Please choose a machine");
+    QMessageBox::warning(NULL, "Resource Error", "Please choose a resource");
     return false;
   }
   return true;
 }
 
 void 
-BL::MachinePage::machine_itemSelectionChanged()
+BL::ResourcePage::resource_itemSelectionChanged()
 {
-  _machine_choosed->setReadOnly(false);
-  QList<QListWidgetItem *> list = _machine_list->selectedItems();
+  _resource_choosed->setReadOnly(false);
+  QList<QListWidgetItem *> list = _resource_list->selectedItems();
   QListWidgetItem * item = list.at(0);
-  _machine_choosed->setText(item->text());
-  _machine_choosed->setReadOnly(true);
+  _resource_choosed->setText(item->text());
+  _resource_choosed->setReadOnly(true);
 }
 
 int 
-BL::MachinePage::nextId() const
+BL::ResourcePage::nextId() const
 {
   return BL::CreateJobWizard::Page_Conclusion;
 }

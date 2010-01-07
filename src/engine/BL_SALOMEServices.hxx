@@ -41,7 +41,7 @@ namespace BL{
 
       bool initNS();
 
-      std::list<std::string> getMachineList();
+      std::list<std::string> getResourceList();
 
       std::string create_job(BL::Job * job);
       std::string start_job(BL::Job * job);

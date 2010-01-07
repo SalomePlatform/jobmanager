@@ -17,8 +17,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _BL_MACHINECATALOG_HXX_
-#define _BL_MACHINECATALOG_HXX_
+#ifndef _JM_RESOURCECATALOG_HXX_
+#define _JM_RESOURCECATALOG_HXX_
 
 #include <QtGui>
 
@@ -27,25 +27,25 @@
 #include <string>
 #include <list>
 
-namespace BL 
+namespace JM 
 {
-  class MachineCatalog: public QWidget
+  class ResourceCatalog: public QWidget
   {
     Q_OBJECT
 
     public:
-      MachineCatalog(QWidget *parent, BL::SALOMEServices * salome_services);
-      virtual ~MachineCatalog();
+      ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services);
+      virtual ~ResourceCatalog();
 
     public slots:
-      void refresh_machine_list();
+      void refresh_resource_list();
 
     protected:
       QWidget* _parent;
       BL::SALOMEServices * _salome_services;
 
       QPushButton * _refresh_button;
-      QListWidget * _machine_files_list;
+      QListWidget * _resource_files_list;
   };
 }
 

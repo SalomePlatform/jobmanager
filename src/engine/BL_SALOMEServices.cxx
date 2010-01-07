@@ -64,23 +64,23 @@ BL::SALOMEServices::initNS()
 }
 
 std::list<std::string> 
-BL::SALOMEServices::getMachineList()
+BL::SALOMEServices::getResourceList()
 {
-  std::list<std::string> machine_list;
+  std::list<std::string> resource_list;
   
   if (_state)
   {
-    Engines::MachineParameters params;
+    Engines::ResourceParameters params;
     _lcc->preSet(params);
-    Engines::MachineList * machineList = _resources_manager->GetFittingResources(params);
-    for (int i = 0; i < machineList->length(); i++)
+    Engines::ResourceList * resourceList = _resources_manager->GetFittingResources(params);
+    for (int i = 0; i < resourceList->length(); i++)
     {
-      const char* aMachine = (*machineList)[i];
-      machine_list.push_back(aMachine);
+      const char* aResource = (*resourceList)[i];
+      resource_list.push_back(aResource);
     }
   }
 
-  return machine_list;
+  return resource_list;
 }
 
 std::string
@@ -94,12 +94,12 @@ BL::SALOMEServices::create_job(BL::Job * job)
   if (job->getType() == BL::Job::COMMAND)
   {
     job_parameters->job_type = CORBA::string_dup("command");
-    job_parameters->command = CORBA::string_dup(job->getCommand().c_str());
+    job_parameters->job_file = CORBA::string_dup(job->getCommand().c_str());
   }
   else if (job->getType() == BL::Job::YACS_SCHEMA)
   {
     job_parameters->job_type = CORBA::string_dup("yacs_file");
-    job_parameters->yacs_file = CORBA::string_dup(job->getYACSFile().c_str());
+    job_parameters->job_file = CORBA::string_dup(job->getYACSFile().c_str());
   }
 
   // Files
@@ -130,7 +130,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
 
   // Resource
   job_parameters->maximum_duration = CORBA::string_dup(cpp_batch_params.maximum_duration.c_str());
-  job_parameters->resource_required.hostname = CORBA::string_dup(job->getMachine().c_str());
+  job_parameters->resource_required.name = CORBA::string_dup(job->getResource().c_str());
   job_parameters->resource_required.nb_node = cpp_batch_params.nb_proc;
   job_parameters->queue = CORBA::string_dup(job->getBatchQueue().c_str());
 

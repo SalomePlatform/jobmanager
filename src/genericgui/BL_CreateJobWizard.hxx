@@ -70,14 +70,14 @@ namespace BL{
       std::list<std::string> input_files_list;
       std::list<std::string> output_files_list;
 
-      std::string machine_choosed;
+      std::string resource_choosed;
       std::string batch_queue;
 
       bool start_job;
 
     public:
       enum {Page_JobName, Page_YACSSchema, Page_BatchParameters, Page_Files, 
-	Page_Command_Main_Definitions, Page_Machine, Page_Conclusion};
+	Page_Command_Main_Definitions, Page_Resource, Page_Conclusion};
 
       class JobNamePage: virtual public QWizardPage
       {
@@ -190,23 +190,23 @@ namespace BL{
       QListWidget * _output_files_list;
   };
 
-  class MachinePage: virtual public QWizardPage
+  class ResourcePage: virtual public QWizardPage
   {
     Q_OBJECT
 
     public:
-      MachinePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services);
-      virtual ~MachinePage();
+      ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services);
+      virtual ~ResourcePage();
 
       virtual int nextId() const;
       virtual bool validatePage();
 
     public slots:
-      void machine_itemSelectionChanged();
+      void resource_itemSelectionChanged();
 
     private:
-      QListWidget * _machine_list;
-      QLineEdit * _machine_choosed;
+      QListWidget * _resource_list;
+      QLineEdit * _resource_choosed;
       BL::SALOMEServices * _salome_services;
   };
 }

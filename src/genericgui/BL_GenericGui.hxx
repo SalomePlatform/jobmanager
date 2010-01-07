@@ -34,7 +34,7 @@
 #include "BL_JobTab.hxx"
 #include "BL_Buttons.hxx"
 #include "BL_Summary.hxx"
-#include "BL_MachineCatalog.hxx"
+#include "JM_ResourceCatalog.hxx"
 
 namespace BL 
 {
@@ -72,7 +72,7 @@ namespace BL
       QMainWindow * _dock_parent;
       QMainWindow * _tab_parent;
       QDockWidget * _dw_summary;
-      QDockWidget * _dw_machine_catalog;
+      QDockWidget * _dw_resource_catalog;
      
       BL::Buttons * _buttons;
       BL::JobsTable * _jobs_table;  
@@ -88,7 +88,7 @@ namespace BL
       BL::JobsManager_QT * _jobs_manager;
       BL::QModelManager * _model_manager;
       QStandardItemModel * _model;
-      BL::MachineCatalog * _machine_catalog;
+      JM::ResourceCatalog * _resource_catalog;
 
       int _row_selected;
       QString _job_name_selected;

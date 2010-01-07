@@ -31,7 +31,7 @@ BL::Job::Job()
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
-  _machine_choosed = "";
+  _resource_choosed = "";
   _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
@@ -50,7 +50,7 @@ BL::Job::Job(const std::string & name)
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
-  _machine_choosed = "";
+  _resource_choosed = "";
   _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
@@ -150,15 +150,15 @@ BL::Job::getFilesParameters()
 }
 
 void
-BL::Job::setMachine(std::string & machine)
+BL::Job::setResource(std::string & resource)
 {
-  _machine_choosed = machine;
+  _resource_choosed = resource;
 }
 
 std::string &
-BL::Job::getMachine()
+BL::Job::getResource()
 {
-  return _machine_choosed;
+  return _resource_choosed;
 }
 
 void

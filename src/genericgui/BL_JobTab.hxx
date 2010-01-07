@@ -54,7 +54,7 @@ namespace BL
       QLabel * _job_name_label_value;
       QLabel * _job_type_label_value;
       QLabel * _job_state_label_value;
-      QLabel * _job_machine_label_value;
+      QLabel * _job_resource_label_value;
       QLabel * _job_command_label;
       QLabel * _job_command_label_value;
 

@@ -61,8 +61,8 @@ BL::JobTab::createJobSummaryTab()
   _job_type_label_value = new QLabel("");
   QLabel * job_state_label = new QLabel("State:");
   _job_state_label_value = new QLabel("");
-  QLabel * job_machine_label = new QLabel("Machine:");
-  _job_machine_label_value = new QLabel("");
+  QLabel * job_resource_label = new QLabel("Resource:");
+  _job_resource_label_value = new QLabel("");
   _job_command_label = new QLabel("Schema or Command:");
   _job_command_label_value = new QLabel("");
 
@@ -71,7 +71,7 @@ BL::JobTab::createJobSummaryTab()
   values_form->insertRow(0, job_name_label, _job_name_label_value);
   values_form->insertRow(1, job_type_label, _job_type_label_value);
   values_form->insertRow(2, job_state_label, _job_state_label_value);
-  values_form->insertRow(3, job_machine_label, _job_machine_label_value);
+  values_form->insertRow(3, job_resource_label, _job_resource_label_value);
   values_form->insertRow(4, _job_command_label, _job_command_label_value);
   main_values_box->setLayout(values_form);
 
@@ -177,7 +177,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _job_type_label_value->setText("Command");
     }
 
-    _job_machine_label_value->setText(QString(job->getMachine().c_str()));
+    _job_resource_label_value->setText(QString(job->getResource().c_str()));
 
     BL::Job::BatchParam batch_params = job->getBatchParameters();
 
@@ -243,7 +243,7 @@ BL::JobTab::reset(QString job_name)
   _job_name_label_value->setText("");
   _job_type_label_value->setText("");
   _job_state_label_value->setText("");
-  _job_machine_label_value->setText("");
+  _job_resource_label_value->setText("");
   _job_nif_label_value->setText("");
   _job_nof_label_value->setText("");
   _job_bd_label_value->setText("");

@@ -82,18 +82,18 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _summary->setModel(_model);
   _dw_summary->setWidget(_summary);
 
-  /* MachineCatalog */
-  _dw_machine_catalog = new QDockWidget(_dock_parent);
-  _dw_machine_catalog->setWindowTitle("Machine Catalog");
-  _machine_catalog = new BL::MachineCatalog(_dock_parent, _salome_services);
-  _dw_machine_catalog->setWidget(_machine_catalog);
+  /* ResourceCatalog */
+  _dw_resource_catalog = new QDockWidget(_dock_parent);
+  _dw_resource_catalog->setWindowTitle("Resource Catalog");
+  _resource_catalog = new JM::ResourceCatalog(_dock_parent, _salome_services);
+  _dw_resource_catalog->setWidget(_resource_catalog);
 
   /* Main Dock Window */
   _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _jobs_manager);
   _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_summary);
-  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_machine_catalog);
+  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_resource_catalog);
   _dock_parent->splitDockWidget(_jobs_manager, _dw_summary, Qt::Vertical);
-  _dock_parent->tabifyDockWidget(_dw_summary, _dw_machine_catalog);
+  _dock_parent->tabifyDockWidget(_dw_summary, _dw_resource_catalog);
 
   /* Signals and Slots */
 
@@ -130,7 +130,7 @@ BL::GenericGui::showDockWidgets(bool isVisible)
   DEBTRACE("BL::GenericGui::showDockWidgets " << isVisible);
   if (_jobs_manager) _jobs_manager->setVisible(isVisible);
   if (_dw_summary) _dw_summary->setVisible(isVisible);
-  if (_dw_machine_catalog) _dw_machine_catalog->setVisible(isVisible);
+  if (_dw_resource_catalog) _dw_resource_catalog->setVisible(isVisible);
 }
 
 void

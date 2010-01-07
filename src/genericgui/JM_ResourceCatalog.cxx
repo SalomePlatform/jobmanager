@@ -17,50 +17,50 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "BL_MachineCatalog.hxx"
+#include "JM_ResourceCatalog.hxx"
 #include "BL_Traces.hxx"
 
-BL::MachineCatalog::MachineCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
+JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
 {
-  DEBTRACE("Creating BL::MachineCatalog");
+  DEBTRACE("Creating JM::ResourceCatalog");
   BL_ASSERT(parent);
   BL_ASSERT(salome_services);
   _parent = parent;
   _salome_services = salome_services;
   
-  _refresh_button = new QPushButton("Refresh Machine List");
+  _refresh_button = new QPushButton("Refresh Resource List");
   _refresh_button->show();
-  connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_machine_list()));
-  _machine_files_list = new QListWidget(this);
-  _machine_files_list->setSelectionMode(QAbstractItemView::NoSelection);
-  std::list<std::string> machine_list = _salome_services->getMachineList();
+  connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_resource_list()));
+  _resource_files_list = new QListWidget(this);
+  _resource_files_list->setSelectionMode(QAbstractItemView::NoSelection);
+  std::list<std::string> resource_list = _salome_services->getResourceList();
   std::list<std::string>::iterator it;
-  for (it = machine_list.begin(); it != machine_list.end(); it++)
+  for (it = resource_list.begin(); it != resource_list.end(); it++)
   {
-    std::string machine = *it;
-    _machine_files_list->addItem(QString(machine.c_str()));
+    std::string resource = *it;
+    _resource_files_list->addItem(QString(resource.c_str()));
   }
 
   QVBoxLayout * mainLayout = new QVBoxLayout(this);
   mainLayout->addWidget(_refresh_button);
-  mainLayout->addWidget(_machine_files_list);
+  mainLayout->addWidget(_resource_files_list);
   setLayout(mainLayout);
 }
 
-BL::MachineCatalog::~MachineCatalog()
+JM::ResourceCatalog::~ResourceCatalog()
 {
-  DEBTRACE("Destroying BL::MachineCatalog");
+  DEBTRACE("Destroying JM::ResourceCatalog");
 }
 
 void
-BL::MachineCatalog::refresh_machine_list()
+JM::ResourceCatalog::refresh_resource_list()
 {
-  _machine_files_list->clear();
-  std::list<std::string> machine_list = _salome_services->getMachineList();
+  _resource_files_list->clear();
+  std::list<std::string> resource_list = _salome_services->getResourceList();
   std::list<std::string>::iterator it;
-  for (it = machine_list.begin(); it != machine_list.end(); it++)
+  for (it = resource_list.begin(); it != resource_list.end(); it++)
   {
-    std::string machine = *it;
-    _machine_files_list->addItem(QString(machine.c_str()));
+    std::string resource = *it;
+    _resource_files_list->addItem(QString(resource.c_str()));
   }
 }

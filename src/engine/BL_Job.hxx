@@ -68,8 +68,8 @@ namespace BL{
       void setFilesParameters(BL::Job::FilesParam & param);
       BL::Job::FilesParam & getFilesParameters();
 
-      void setMachine(std::string & machine);
-      std::string & getMachine();
+      void setResource(std::string & resource);
+      std::string & getResource();
 
       void setBatchQueue(std::string & queue);
       std::string & getBatchQueue();
@@ -99,7 +99,7 @@ namespace BL{
   
       BL::Job::BatchParam _batch_params;
       BL::Job::FilesParam _files_params;
-      std::string _machine_choosed;
+      std::string _resource_choosed;
       std::string _batch_queue;
 
       int _salome_launcher_id;
