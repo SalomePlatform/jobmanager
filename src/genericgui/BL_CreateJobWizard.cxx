@@ -86,7 +86,12 @@ BL::CreateJobWizard::end(int result)
     QString f_command = field("command").toString();
     command = f_command.toStdString();
     
-    QString f_env_file = field("env_file").toString();
+    QString f_env_file;
+    
+    if (yacs_file != "")
+      f_env_file = field("env_yacs_file").toString();
+    else
+      f_env_file = field("env_command_file").toString();
     env_file = f_env_file.toStdString();
 
     // Batch Panel
@@ -247,7 +252,7 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   command_env_file_button->show();
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
-  registerField("env_file", _line_env_file);
+  registerField("env_yacs_file", _line_env_file);
   _line_env_file->setReadOnly(true);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
@@ -329,7 +334,7 @@ BL::CommandMainPage::CommandMainPage(QWidget * parent)
   command_env_file_button->show();
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
-  registerField("env_file", _line_env_file);
+  registerField("env_command_file", _line_env_file);
   _line_env_file->setReadOnly(true);
 
   QGridLayout *layout = new QGridLayout;

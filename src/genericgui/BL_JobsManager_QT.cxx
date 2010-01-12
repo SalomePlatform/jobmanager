@@ -160,42 +160,32 @@ BL::JobsManager_QT::create_job_wizard()
       {
 	// YACS schema job
 	new_job->setType(BL::Job::YACS_SCHEMA);
-	new_job->setYACSFile(wizard.yacs_file);
-	new_job->setEnvFile(wizard.env_file);
-	BL::Job::BatchParam param;
-	param.batch_directory = wizard.batch_directory;
-	param.maximum_duration = wizard.maximum_duration;
-	param.expected_memory = wizard.expected_memory;
-	param.nb_proc = wizard.nb_proc;
-	new_job->setBatchParameters(param);
-	BL::Job::FilesParam files_params;
-	files_params.result_directory = wizard.result_directory;
-	files_params.input_files_list = wizard.input_files_list;
-	files_params.output_files_list = wizard.output_files_list;
-	new_job->setFilesParameters(files_params);
-	new_job->setResource(wizard.resource_choosed);
-	new_job->setBatchQueue(wizard.batch_queue);
+	new_job->setJobFile(wizard.yacs_file);
       }
       else
       {
 	// Command Job
 	new_job->setType(BL::Job::COMMAND);
-	new_job->setCommand(wizard.command);
-	new_job->setEnvFile(wizard.env_file);
-	BL::Job::BatchParam param;
-	param.batch_directory = wizard.batch_directory;
-	param.maximum_duration = wizard.maximum_duration;
-	param.expected_memory = wizard.expected_memory;
-	param.nb_proc = wizard.nb_proc;
-	new_job->setBatchParameters(param);
-	BL::Job::FilesParam files_params;
-	files_params.result_directory = wizard.result_directory;
-	files_params.input_files_list = wizard.input_files_list;
-	files_params.output_files_list = wizard.output_files_list;
-	new_job->setFilesParameters(files_params);
-	new_job->setResource(wizard.resource_choosed);
-	new_job->setBatchQueue(wizard.batch_queue);
+	new_job->setJobFile(wizard.command);
       }
+
+      // For all jobs
+      new_job->setEnvFile(wizard.env_file);
+      BL::Job::BatchParam param;
+      param.batch_directory = wizard.batch_directory;
+      param.maximum_duration = wizard.maximum_duration;
+      param.expected_memory = wizard.expected_memory;
+      param.nb_proc = wizard.nb_proc;
+      new_job->setBatchParameters(param);
+      BL::Job::FilesParam files_params;
+      files_params.result_directory = wizard.result_directory;
+      files_params.input_files_list = wizard.input_files_list;
+      files_params.output_files_list = wizard.output_files_list;
+      new_job->setFilesParameters(files_params);
+      new_job->setResource(wizard.resource_choosed);
+      new_job->setBatchQueue(wizard.batch_queue);
+      
+      // End
       addJobToLauncher(wizard.job_name);
       emit new_job_added(QString::fromStdString(wizard.job_name));
       if (wizard.start_job)

@@ -23,8 +23,7 @@ BL::Job::Job()
 {
   DEBTRACE("Creating BL::Job");
   _name = "";
-  _yacs_file = "";
-  _command = "";
+  _job_file = "";
   _env_file = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
@@ -42,8 +41,7 @@ BL::Job::Job(const std::string & name)
 {
   DEBTRACE("Creating BL::Job with name : " << name);
   _name = name;
-  _yacs_file = "";
-  _command = "";
+  _job_file = "";
   _env_file = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
@@ -85,27 +83,15 @@ BL::Job::getType()
 }
 
 void 
-BL::Job::setYACSFile(std::string & yacs_file)
+BL::Job::setJobFile(std::string & job_file)
 {
-  _yacs_file = yacs_file;
+  _job_file = job_file;
 }
 
 std::string & 
-BL::Job::getYACSFile()
+BL::Job::getJobFile()
 {
-  return _yacs_file;
-}
-
-void 
-BL::Job::setCommand(std::string & command)
-{
-  _command = command;
-}
-
-std::string & 
-BL::Job::getCommand()
-{
-  return _command;
+  return _job_file;
 }
 
 void 

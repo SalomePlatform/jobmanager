@@ -41,11 +41,9 @@ namespace BL{
       void setType(BL::Job::JobType type);
       BL::Job::JobType getType();
 
-      void setYACSFile(std::string & yacs_file);
-      std::string & getYACSFile();
+      void setJobFile(std::string & job_file);
+      std::string & getJobFile();
 
-      void setCommand(std::string & command);
-      std::string & getCommand();
       void setEnvFile(std::string & env_file);
       std::string & getEnvFile();
 
@@ -93,8 +91,7 @@ namespace BL{
       std::string _name;
 
       BL::Job::JobType _type;
-      std::string _yacs_file;
-      std::string _command;
+      std::string _job_file;
       std::string _env_file;
   
       BL::Job::BatchParam _batch_params;

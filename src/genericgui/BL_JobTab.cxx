@@ -63,8 +63,10 @@ BL::JobTab::createJobSummaryTab()
   _job_state_label_value = new QLabel("");
   QLabel * job_resource_label = new QLabel("Resource:");
   _job_resource_label_value = new QLabel("");
-  _job_command_label = new QLabel("Schema or Command:");
-  _job_command_label_value = new QLabel("");
+  QLabel * job_jobfile_label = new QLabel("Job File:");
+  _job_jobfile_label_value = new QLabel("");
+  QLabel * job_envfile_label = new QLabel("Env File:");
+  _job_envfile_label_value = new QLabel("");
 
   QGroupBox * main_values_box = new QGroupBox("Main values");
   QFormLayout * values_form = new QFormLayout;
@@ -72,7 +74,8 @@ BL::JobTab::createJobSummaryTab()
   values_form->insertRow(1, job_type_label, _job_type_label_value);
   values_form->insertRow(2, job_state_label, _job_state_label_value);
   values_form->insertRow(3, job_resource_label, _job_resource_label_value);
-  values_form->insertRow(4, _job_command_label, _job_command_label_value);
+  values_form->insertRow(4, job_jobfile_label, _job_jobfile_label_value);
+  values_form->insertRow(5, job_envfile_label, _job_envfile_label_value);
   main_values_box->setLayout(values_form);
 
   QLabel * job_nif_label = new QLabel("Number of Input Files:");
@@ -164,18 +167,12 @@ BL::JobTab::job_selected(const QModelIndex & index)
     else 
       _job_state_label_value->setText("Finished");
 
+    _job_jobfile_label_value->setText(QString(job->getJobFile().c_str()));
+    _job_envfile_label_value->setText(QString(job->getEnvFile().c_str()));
     if (job->getType() == BL::Job::YACS_SCHEMA)
-    {
-      _job_command_label->setText("Schema:");
-      _job_command_label_value->setText(QString(job->getYACSFile().c_str()));
       _job_type_label_value->setText("YACS_Schema");
-    }
     else
-    {
-      _job_command_label->setText("Command:");
-      _job_command_label_value->setText(QString(job->getCommand().c_str()));
       _job_type_label_value->setText("Command");
-    }
 
     _job_resource_label_value->setText(QString(job->getResource().c_str()));
 
@@ -251,8 +248,8 @@ BL::JobTab::reset(QString job_name)
   _job_mdt_label_value->setText("");
   _job_em_label_value->setText("");
   _job_nop_label_value->setText("");
-  _job_command_label->setText("Schema or Command:");
-  _job_command_label_value->setText("");
+  _job_jobfile_label_value->setText("");
+  _job_envfile_label_value->setText("");
 
   _input_files_list->clear();
   _output_files_list->clear();
