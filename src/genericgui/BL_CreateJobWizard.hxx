@@ -57,8 +57,9 @@ namespace BL{
       std::string job_name;
       
       std::string yacs_file;
-
       std::string command;
+      std::string python_salome_file;
+
       std::string env_file;
 
       std::string batch_directory;
@@ -76,76 +77,40 @@ namespace BL{
       bool start_job;
 
     public:
-      enum {Page_JobName, Page_YACSSchema, Page_BatchParameters, Page_Files, 
-	Page_Command_Main_Definitions, Page_Resource, Page_Conclusion};
-
-      class JobNamePage: virtual public QWizardPage
-      {
-	public:
-	  JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager);
-	  virtual ~JobNamePage();
-
-	  virtual bool validatePage();
-	  virtual int nextId() const ;
-
-	private:	  
-	  BL::JobsManager_QT * _jobs_manager;
-	  QRadioButton * _yacs_schema_button;
-      };
-
-
-
-      class ConclusionPage: virtual public QWizardPage
-      {
-	public:
-	  ConclusionPage(QWidget * parent);
-	  virtual ~ConclusionPage();
-
-	  virtual bool validatePage();
-	  virtual int nextId() const ;
-      };
+      enum {Page_JobName, 
+	    Page_YACSSchema,
+	    Page_Command_Main_Definitions,
+	    Page_PythonSalome_Main_Definitions,
+	    Page_BatchParameters, 
+	    Page_Files, 
+	    Page_Resource, 
+	    Page_Conclusion};
   };
 
-  class YACSSchemaPage: virtual public QWizardPage
+  class JobNamePage: virtual public QWizardPage
   {
-    Q_OBJECT
-
     public:
-      YACSSchemaPage(QWidget * parent);
-      virtual ~YACSSchemaPage();
+      JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager);
+      virtual ~JobNamePage();
 
       virtual bool validatePage();
       virtual int nextId() const ;
 
-    public slots:
-      void choose_file();
-      void choose_env_file();
-
-    private:
-      QPushButton * _yacs_file_button;
-      QLineEdit * _yacs_file_text;
-      QLineEdit * _line_env_file;
+    private:	  
+      BL::JobsManager_QT * _jobs_manager;
+      QRadioButton * _yacs_schema_button;
+      QRadioButton * _command_button;
+      QRadioButton * _python_salome_button;
   };
 
-  class CommandMainPage: virtual public QWizardPage
+  class ConclusionPage: virtual public QWizardPage
   {
-    Q_OBJECT
-
     public:
-      CommandMainPage(QWidget * parent);
-      virtual ~CommandMainPage();
+      ConclusionPage(QWidget * parent);
+      virtual ~ConclusionPage();
 
       virtual bool validatePage();
       virtual int nextId() const ;
-
-    public slots:
-      void choose_command_file();
-      void choose_env_file();
-
-    private:
-      QLineEdit * _line_command;
-      QLineEdit * _line_env_file;
-
   };
 
   class BatchParametersPage: virtual public QWizardPage
@@ -208,6 +173,66 @@ namespace BL{
       QListWidget * _resource_list;
       QLineEdit * _resource_choosed;
       BL::SALOMEServices * _salome_services;
+  };
+
+  class YACSSchemaPage: virtual public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      YACSSchemaPage(QWidget * parent);
+      virtual ~YACSSchemaPage();
+
+      virtual bool validatePage();
+      virtual int nextId() const ;
+
+    public slots:
+      void choose_file();
+      void choose_env_file();
+
+    private:
+      QLineEdit * _yacs_file_text;
+      QLineEdit * _line_env_file;
+  };
+
+  class CommandMainPage: virtual public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      CommandMainPage(QWidget * parent);
+      virtual ~CommandMainPage();
+
+      virtual bool validatePage();
+      virtual int nextId() const ;
+
+    public slots:
+      void choose_command_file();
+      void choose_env_file();
+
+    private:
+      QLineEdit * _line_command;
+      QLineEdit * _line_env_file;
+  };
+
+  class PythonSalomeMainPage: virtual public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      PythonSalomeMainPage(QWidget * parent);
+      virtual ~PythonSalomeMainPage();
+
+      virtual bool validatePage();
+      virtual int nextId() const ;
+
+    public slots:
+      void choose_PythonSalome_file();
+      void choose_env_file();
+
+    private:
+      QLineEdit * _line_PythonSalome;
+      QLineEdit * _line_env_file;
   };
 }
 

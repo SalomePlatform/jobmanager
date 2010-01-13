@@ -162,11 +162,17 @@ BL::JobsManager_QT::create_job_wizard()
 	new_job->setType(BL::Job::YACS_SCHEMA);
 	new_job->setJobFile(wizard.yacs_file);
       }
-      else
+      else if (wizard.command != "")
       {
 	// Command Job
 	new_job->setType(BL::Job::COMMAND);
 	new_job->setJobFile(wizard.command);
+      }
+      else if (wizard.python_salome_file != "")
+      {
+	// Command Job
+	new_job->setType(BL::Job::PYTHON_SALOME);
+	new_job->setJobFile(wizard.python_salome_file);
       }
 
       // For all jobs

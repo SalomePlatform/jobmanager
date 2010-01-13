@@ -53,8 +53,10 @@ BL::QModelManager::new_job_added(const QString & name)
   QStandardItem * new_job_type;
   if (job->getType() == BL::Job::YACS_SCHEMA)
     new_job_type = new QStandardItem("YACS_Schema");
-  else
+  else if (job->getType() == BL::Job::COMMAND)
     new_job_type = new QStandardItem("Command");
+  else if (job->getType() == BL::Job::PYTHON_SALOME)
+    new_job_type = new QStandardItem("Python_Salome");
 
   QStandardItem * new_job_state;
   if (job->getState() == BL::Job::CREATED)

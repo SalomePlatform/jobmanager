@@ -99,6 +99,10 @@ BL::SALOMEServices::create_job(BL::Job * job)
   {
     job_parameters->job_type = CORBA::string_dup("yacs_file");
   }
+  else if (job->getType() == BL::Job::PYTHON_SALOME)
+  {
+    job_parameters->job_type = CORBA::string_dup("python_salome");
+  }
 
   // Files
   job_parameters->job_file = CORBA::string_dup(job->getJobFile().c_str());
