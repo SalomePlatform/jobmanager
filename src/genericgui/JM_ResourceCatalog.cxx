@@ -19,6 +19,7 @@
 
 #include "JM_ResourceCatalog.hxx"
 #include "BL_Traces.hxx"
+#include "JM_SalomeResource.hxx"
 
 JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
 {
@@ -32,7 +33,8 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   _refresh_button->show();
   connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_resource_list()));
   _resource_files_list = new QListWidget(this);
-  _resource_files_list->setSelectionMode(QAbstractItemView::NoSelection);
+  _resource_files_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  connect(_resource_files_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(item_choosed(QListWidgetItem*)));
   std::list<std::string> resource_list = _salome_services->getResourceList();
   std::list<std::string>::iterator it;
   for (it = resource_list.begin(); it != resource_list.end(); it++)
@@ -63,4 +65,16 @@ JM::ResourceCatalog::refresh_resource_list()
     std::string resource = *it;
     _resource_files_list->addItem(QString(resource.c_str()));
   }
+}
+
+void
+JM::ResourceCatalog::item_choosed(QListWidgetItem * item)
+{
+  DEBTRACE("JM::ResourceCatalog::item_choosed");
+  JM::SalomeResource * resource_widget = new JM::SalomeResource(this, 
+								_salome_services,
+								item->text().toStdString(),
+								false);
+  resource_widget->exec();
+  delete resource_widget;
 }

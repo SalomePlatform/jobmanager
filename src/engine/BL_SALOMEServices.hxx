@@ -33,6 +33,25 @@
 
 namespace BL{
 
+  struct ResourceDescr
+  {
+    std::string name;
+    std::string hostname;
+    std::string protocol;
+    std::string username;
+    std::string applipath;
+    std::list<std::string> componentList;
+
+    std::string OS;
+    unsigned int mem_mb;
+    unsigned int cpu_clock;
+    unsigned int nb_node;
+    unsigned int nb_proc_per_node;
+    std::string batch;
+    std::string mpiImpl;
+    std::string iprotocol;
+  };
+
   class SALOMEServices
   {
     public:
@@ -42,6 +61,7 @@ namespace BL{
       bool initNS();
 
       std::list<std::string> getResourceList();
+      BL::ResourceDescr getResourceDescr(const std::string& name);
 
       std::string create_job(BL::Job * job);
       std::string start_job(BL::Job * job);

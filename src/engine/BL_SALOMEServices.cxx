@@ -78,9 +78,38 @@ BL::SALOMEServices::getResourceList()
       const char* aResource = (*resourceList)[i];
       resource_list.push_back(aResource);
     }
+    delete resourceList;
   }
 
   return resource_list;
+}
+
+BL::ResourceDescr
+BL::SALOMEServices::getResourceDescr(const std::string& name)
+{
+  Engines::ResourceDefinition_var resource_definition = _resources_manager-> GetResourceDefinition(name.c_str());
+  BL::ResourceDescr resource_descr;
+
+  resource_descr.name = resource_definition->name.in();
+  resource_descr.hostname = resource_definition->hostname.in();
+  resource_descr.protocol = resource_definition->protocol.in();
+  resource_descr.username = resource_definition->username.in();
+  resource_descr.applipath = resource_definition->applipath.in();
+  for (int i = 0; i < resource_definition->componentList.length(); i++)
+  {
+    resource_descr.componentList.push_back(resource_definition->componentList[i].in());
+  }
+
+  resource_descr.OS = resource_definition->OS.in();
+  resource_descr.mem_mb = resource_definition->mem_mb;
+  resource_descr.cpu_clock = resource_definition->cpu_clock;
+  resource_descr.nb_node = resource_definition->nb_node;
+  resource_descr.nb_proc_per_node = resource_definition->nb_proc_per_node;
+  resource_descr.batch = resource_definition->batch.in();
+  resource_descr.mpiImpl = resource_definition->mpiImpl.in();
+  resource_descr.iprotocol = resource_definition->iprotocol.in();
+
+  return resource_descr;
 }
 
 std::string

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2010 CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -17,41 +17,50 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _JM_RESOURCECATALOG_HXX_
-#define _JM_RESOURCECATALOG_HXX_
+#ifndef _JM_SALOMERESOURCE_HXX_
+#define _JM_SALOMERESOURCE_HXX_
 
 #include <QtGui>
-
 #include "BL_SALOMEServices.hxx"
 
 #include <string>
-#include <list>
 
 namespace JM 
 {
-  class ResourceCatalog: public QWidget
+  class SalomeResource: public QDialog
   {
     Q_OBJECT
 
     public:
-      ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services);
-      virtual ~ResourceCatalog();
+      SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
+		     const std::string & resource_name, bool edit);
+      virtual ~SalomeResource();
 
       void get_infos();
-
-    public slots:
-      void refresh_resource_list();
-      void item_choosed(QListWidgetItem * item);
 
     protected:
       QWidget* _parent;
       BL::SALOMEServices * _salome_services;
+      std::string _resource_name;
+      bool _edit;
 
-      QPushButton * _refresh_button;
-      QListWidget * _resource_files_list;
+      // widget
+      QLineEdit * _name_line;
+      QLineEdit * _hostname_line;
+      QLineEdit * _protocol_line;
+      QLineEdit * _username_line;
+      QLineEdit * _applipath_line;
+      QListWidget * _componentList;
+      QLineEdit * _os_line;
+      QLineEdit * _mem_mb_line;
+      QLineEdit * _cpu_clock_line;
+      QLineEdit * _nb_node_line;
+      QLineEdit * _nb_proc_per_node_line;
+      QLineEdit * _batch_line;
+      QLineEdit * _mpiImpl_line;
+      QLineEdit * _iprotocol_line;
   };
 }
 
 #endif
-
 
