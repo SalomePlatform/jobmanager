@@ -27,6 +27,7 @@ libBL_Engine_la_SOURCES = BL_JobsManager.hxx BL_JobsManager.cxx \
 			  BL_Observer.hxx
 
 libBL_Engine_la_CXXFLAGS = -I$(top_srcdir)/src/bases \
+			   $(OMNIORB_INCLUDES) \
 			   -I$(KERNEL_ROOT_DIR)/include/salome
 
 libBL_Engine_la_LIBADD = $(top_builddir)/src/bases/libBL_Bases.la
