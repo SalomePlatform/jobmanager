@@ -712,16 +712,9 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
 
   // input_Resource
   QGroupBox * resource_group_box = new QGroupBox("Resource List");
-  _resource_list = new QListWidget();
-  _resource_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  std::list<std::string> resource_list = _salome_services->getResourceList();
-  std::list<std::string>::iterator it;
-  for (it = resource_list.begin(); it != resource_list.end(); it++)
-  {
-    std::string resource = *it;
-    _resource_list->addItem(QString(resource.c_str()));
-  }
-  connect(_resource_list, SIGNAL(itemSelectionChanged()), this, SLOT(resource_itemSelectionChanged()));
+  _resource_list = new JM::ResourceCatalog(this, _salome_services);
+  connect(_resource_list->getQListWidget(), SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemSelected(QListWidgetItem*)));
+
   QVBoxLayout * resource_list_layout = new QVBoxLayout();
   resource_list_layout->addWidget(_resource_list);
   resource_group_box->setLayout(resource_list_layout);
@@ -761,11 +754,9 @@ BL::ResourcePage::validatePage()
 }
 
 void 
-BL::ResourcePage::resource_itemSelectionChanged()
+BL::ResourcePage::itemSelected(QListWidgetItem * item)
 {
   _resource_choosed->setReadOnly(false);
-  QList<QListWidgetItem *> list = _resource_list->selectedItems();
-  QListWidgetItem * item = list.at(0);
   _resource_choosed->setText(item->text());
   _resource_choosed->setReadOnly(true);
 }

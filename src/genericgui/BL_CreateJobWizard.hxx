@@ -25,6 +25,7 @@
 #include "BL_Traces.hxx"
 #include "BL_JobsManager_QT.hxx"
 #include "BL_SALOMEServices.hxx"
+#include "JM_ResourceCatalog.hxx"
 
 #include <string>
 #include <list>
@@ -167,10 +168,10 @@ namespace BL{
       virtual bool validatePage();
 
     public slots:
-      void resource_itemSelectionChanged();
+      void itemSelected(QListWidgetItem * item);
 
     private:
-      QListWidget * _resource_list;
+      JM::ResourceCatalog * _resource_list;
       QLineEdit * _resource_choosed;
       BL::SALOMEServices * _salome_services;
   };

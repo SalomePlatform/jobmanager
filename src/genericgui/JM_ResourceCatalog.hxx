@@ -39,6 +39,8 @@ namespace JM
 
       void get_infos();
 
+      QListWidget * getQListWidget();
+
     public slots:
       void refresh_resource_list();
       void item_choosed(QListWidgetItem * item);

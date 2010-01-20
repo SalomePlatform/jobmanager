@@ -33,7 +33,7 @@ namespace JM
 
     public:
       SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
-		     const std::string & resource_name, bool edit);
+		     const std::string & resource_name);
       virtual ~SalomeResource();
 
       void get_infos();
@@ -42,7 +42,6 @@ namespace JM
       QWidget* _parent;
       BL::SALOMEServices * _salome_services;
       std::string _resource_name;
-      bool _edit;
 
       // widget
       QLineEdit * _name_line;

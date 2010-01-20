@@ -21,7 +21,7 @@
 #include "BL_Traces.hxx"
 
 JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
-				   const std::string & resource_name, bool edit) : QDialog(parent)
+				   const std::string & resource_name) : QDialog(parent)
 {
   DEBTRACE("Creating JM::SalomeResource");
   BL_ASSERT(parent);
@@ -29,7 +29,6 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   _parent = parent;
   _salome_services = salome_services;
   _resource_name = resource_name;
-  _edit = edit;
 
   // Widget code
   QGroupBox * main_groupBox = new QGroupBox("Main values");
@@ -104,43 +103,37 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   mainLayout->addWidget(config_groupBox);
   setLayout(mainLayout);
 
-  if (_edit)
-  {
-    setWindowTitle("Add a new resource");
-  }
-  else
-  {
-    setWindowTitle("Resource");
-    get_infos();
-    // Line cannot be changed
-    _name_line->setCursorPosition(0);
-    _hostname_line->setCursorPosition(0);
-    _protocol_line->setCursorPosition(0);
-    _username_line->setCursorPosition(0);
-    _applipath_line->setCursorPosition(0);
-    _os_line->setCursorPosition(0);
-    _mem_mb_line->setCursorPosition(0);
-    _cpu_clock_line->setCursorPosition(0);
-    _nb_node_line->setCursorPosition(0);
-    _nb_proc_per_node_line->setCursorPosition(0);
-    _batch_line->setCursorPosition(0);
-    _mpiImpl_line->setCursorPosition(0);
-    _iprotocol_line->setCursorPosition(0);
+  setWindowTitle("Resource");
+  get_infos();
 
-    _name_line->setReadOnly(true);
-    _hostname_line->setReadOnly(true);
-    _protocol_line->setReadOnly(true);
-    _username_line->setReadOnly(true);
-    _applipath_line->setReadOnly(true);
-    _os_line->setReadOnly(true);
-    _mem_mb_line->setReadOnly(true);
-    _cpu_clock_line->setReadOnly(true);
-    _nb_node_line->setReadOnly(true);
-    _nb_proc_per_node_line->setReadOnly(true);
-    _batch_line->setReadOnly(true);
-    _mpiImpl_line->setReadOnly(true);
-    _iprotocol_line->setReadOnly(true);
-  }
+  // Line cannot be changed
+  _name_line->setCursorPosition(0);
+  _hostname_line->setCursorPosition(0);
+  _protocol_line->setCursorPosition(0);
+  _username_line->setCursorPosition(0);
+  _applipath_line->setCursorPosition(0);
+  _os_line->setCursorPosition(0);
+  _mem_mb_line->setCursorPosition(0);
+  _cpu_clock_line->setCursorPosition(0);
+  _nb_node_line->setCursorPosition(0);
+  _nb_proc_per_node_line->setCursorPosition(0);
+  _batch_line->setCursorPosition(0);
+  _mpiImpl_line->setCursorPosition(0);
+  _iprotocol_line->setCursorPosition(0);
+
+  _name_line->setReadOnly(true);
+  _hostname_line->setReadOnly(true);
+  _protocol_line->setReadOnly(true);
+  _username_line->setReadOnly(true);
+  _applipath_line->setReadOnly(true);
+  _os_line->setReadOnly(true);
+  _mem_mb_line->setReadOnly(true);
+  _cpu_clock_line->setReadOnly(true);
+  _nb_node_line->setReadOnly(true);
+  _nb_proc_per_node_line->setReadOnly(true);
+  _batch_line->setReadOnly(true);
+  _mpiImpl_line->setReadOnly(true);
+  _iprotocol_line->setReadOnly(true);
 }
 
 JM::SalomeResource::~SalomeResource()

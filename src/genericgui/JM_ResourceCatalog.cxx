@@ -54,6 +54,12 @@ JM::ResourceCatalog::~ResourceCatalog()
   DEBTRACE("Destroying JM::ResourceCatalog");
 }
 
+QListWidget * 
+JM::ResourceCatalog::getQListWidget()
+{
+  return _resource_files_list;
+}
+
 void
 JM::ResourceCatalog::refresh_resource_list()
 {
@@ -73,8 +79,7 @@ JM::ResourceCatalog::item_choosed(QListWidgetItem * item)
   DEBTRACE("JM::ResourceCatalog::item_choosed");
   JM::SalomeResource * resource_widget = new JM::SalomeResource(this, 
 								_salome_services,
-								item->text().toStdString(),
-								false);
+								item->text().toStdString());
   resource_widget->exec();
   delete resource_widget;
 }
