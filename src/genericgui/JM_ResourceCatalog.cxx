@@ -47,11 +47,14 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   _edit_button = new QPushButton("Edit");
   _edit_button->setEnabled(false);
   _add_button = new QPushButton("Add");
+  _remove_button = new QPushButton("Remove");
+  _remove_button->setEnabled(false);
 
   QHBoxLayout * button_layout = new QHBoxLayout(this);
   button_layout->addWidget(_show_button);
   button_layout->addWidget(_edit_button);
   button_layout->addWidget(_add_button);
+  button_layout->addWidget(_remove_button);
   QWidget * layout_widget = new QWidget(this);
   layout_widget->setLayout(button_layout);
 
@@ -66,6 +69,7 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   connect(_show_button, SIGNAL(clicked()), this, SLOT(show_button()));
   connect(_edit_button, SIGNAL(clicked()), this, SLOT(edit_button()));
   connect(_add_button, SIGNAL(clicked()), this, SLOT(add_button()));
+  connect(_remove_button, SIGNAL(clicked()), this, SLOT(remove_button()));
   // Double click on an item
   connect(_resource_files_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(item_choosed(QListWidgetItem*)));
   // Selection management
@@ -117,11 +121,13 @@ JM::ResourceCatalog::buttons_management()
   {
     _show_button->setEnabled(false);
     _edit_button->setEnabled(false);
+    _remove_button->setEnabled(false);
   }
   else
   {
     _show_button->setEnabled(true);
     _edit_button->setEnabled(true);
+    _remove_button->setEnabled(true);
   }
 }
 
@@ -139,6 +145,16 @@ JM::ResourceCatalog::add_button()
 									_salome_services);
   resource_widget->exec();
   delete resource_widget;
+  refresh_resource_list();
+}
+
+void
+JM::ResourceCatalog::remove_button()
+{
+  QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
+  QString item_name = item_list.at(0)->text();
+  _salome_services->removeResource(item_name.toStdString());
+  refresh_resource_list();
 }
 
 void
@@ -151,4 +167,5 @@ JM::ResourceCatalog::edit_button()
 									item_name.toStdString());
   resource_widget->exec();
   delete resource_widget;
+  refresh_resource_list();
 }

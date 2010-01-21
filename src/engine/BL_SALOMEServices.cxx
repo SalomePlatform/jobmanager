@@ -80,7 +80,6 @@ BL::SALOMEServices::getResourceList()
     }
     delete resourceList;
   }
-
   return resource_list;
 }
 
@@ -148,6 +147,19 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
   catch (const SALOME::SALOME_Exception & ex)
   {
     DEBTRACE("SALOME Exception in addResource ! " << ex.details.text.in());
+  }
+}
+
+void 
+BL::SALOMEServices::removeResource(const std::string & name)
+{
+  try
+  {
+    _resources_manager->RemoveResource(name.c_str(), true, "");
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBTRACE("SALOME Exception in removeResource ! " << ex.details.text.in());
   }
 }
 

@@ -63,6 +63,7 @@ namespace BL{
       std::list<std::string> getResourceList();
       BL::ResourceDescr getResourceDescr(const std::string& name);
       void addResource(BL::ResourceDescr & new_resource);
+      void removeResource(const std::string & name);
 
       std::string create_job(BL::Job * job);
       std::string start_job(BL::Job * job);

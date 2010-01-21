@@ -48,6 +48,7 @@ namespace JM
       void show_button();
       void edit_button();
       void add_button();
+      void remove_button();
 
     protected:
       QWidget* _parent;
@@ -57,6 +58,7 @@ namespace JM
       QPushButton * _show_button;
       QPushButton * _edit_button;
       QPushButton * _add_button;
+      QPushButton * _remove_button;
       QListWidget * _resource_files_list;
   };
 }
