@@ -112,6 +112,45 @@ BL::SALOMEServices::getResourceDescr(const std::string& name)
   return resource_descr;
 }
 
+void
+BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
+{
+  Engines::ResourceDefinition_var resource_definition = new Engines::ResourceDefinition;
+
+  resource_definition->name = CORBA::string_dup(new_resource.name.c_str());
+  resource_definition->hostname = CORBA::string_dup(new_resource.hostname.c_str());
+  resource_definition->protocol = CORBA::string_dup(new_resource.protocol.c_str());
+  resource_definition->username = CORBA::string_dup(new_resource.username.c_str());
+  resource_definition->applipath = CORBA::string_dup(new_resource.applipath.c_str());
+
+  int i = 0;
+  std::list<std::string>::iterator it = new_resource.componentList.begin();
+  resource_definition->componentList.length(new_resource.componentList.size());
+  for(; it != new_resource.componentList.end(); it++)
+  {
+    resource_definition->componentList[i] = CORBA::string_dup((*it).c_str());
+    i++;
+  }
+
+  resource_definition->OS = CORBA::string_dup(new_resource.OS.c_str());
+  resource_definition->mem_mb = new_resource.mem_mb;
+  resource_definition->cpu_clock = new_resource.cpu_clock;
+  resource_definition->nb_node = new_resource.nb_node;
+  resource_definition->nb_proc_per_node = new_resource.nb_proc_per_node;  
+  resource_definition->batch = CORBA::string_dup(new_resource.batch.c_str());
+  resource_definition->mpiImpl = CORBA::string_dup(new_resource.mpiImpl.c_str());
+  resource_definition->iprotocol = CORBA::string_dup(new_resource.iprotocol.c_str());
+
+  try
+  {
+    _resources_manager->AddResource(resource_definition, true, "");
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBTRACE("SALOME Exception in addResource ! " << ex.details.text.in());
+  }
+}
+
 std::string
 BL::SALOMEServices::create_job(BL::Job * job)
 {

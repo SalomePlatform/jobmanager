@@ -166,4 +166,3 @@ JM::SalomeResource::get_infos()
    for(; it != resource_descr.componentList.end(); it++)
      _componentList->addItem(QString((*it).c_str()));
 }
-

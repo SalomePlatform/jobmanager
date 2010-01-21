@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2010 CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -17,50 +17,60 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _JM_RESOURCECATALOG_HXX_
-#define _JM_RESOURCECATALOG_HXX_
-
-#include <QtGui>
-
-#include "BL_SALOMEServices.hxx"
+#ifndef _JM_EDITSALOMERESOURCE_HXX_
+#define _JM_EDITSALOMERESOURCE_HXX_
 
 #include <string>
-#include <list>
+#include <QtGui>
+#include "BL_SALOMEServices.hxx"
 
 namespace JM 
 {
-  class ResourceCatalog: public QWidget
+  class EditSalomeResource: public QDialog
   {
     Q_OBJECT
 
     public:
-      ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services);
-      virtual ~ResourceCatalog();
+      EditSalomeResource(QWidget *parent, 
+			 BL::SALOMEServices * salome_services, 
+			 const std::string & resource_name = "");
+      virtual ~EditSalomeResource();
 
       void get_infos();
 
-      QListWidget * getQListWidget();
-
     public slots:
-      void refresh_resource_list();
-      void item_choosed(QListWidgetItem * item);
-      void buttons_management();
-      void show_button();
-      void edit_button();
-      void add_button();
+      virtual void accept();
+      void add_component();
+      void remove_components();
+      void itemSelectionChanged();
 
     protected:
       QWidget* _parent;
       BL::SALOMEServices * _salome_services;
+      std::string _resource_name;
 
-      QPushButton * _refresh_button;
-      QPushButton * _show_button;
-      QPushButton * _edit_button;
+      // widget
+      QLineEdit * _name_line;
+      QLineEdit * _hostname_line;
+      QLineEdit * _username_line;
+      QLineEdit * _applipath_line;
+      QListWidget * _componentList;
+      QLineEdit * _os_line;
+
+      QComboBox * _protocol_line;
+      QComboBox * _iprotocol_line;
+      QComboBox * _batch_line;
+      QComboBox * _mpiImpl_line;
+
+      QSpinBox * _mem_mb_line;
+      QSpinBox * _cpu_clock_line;
+      QSpinBox * _nb_node_line;
+      QSpinBox * _nb_proc_per_node_line;
+
       QPushButton * _add_button;
-      QListWidget * _resource_files_list;
+      QPushButton * _remove_button;
   };
 }
 
 #endif
-
 

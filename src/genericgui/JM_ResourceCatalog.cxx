@@ -20,6 +20,7 @@
 #include "JM_ResourceCatalog.hxx"
 #include "BL_Traces.hxx"
 #include "JM_SalomeResource.hxx"
+#include "JM_EditSalomeResource.hxx"
 
 JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
 {
@@ -31,10 +32,8 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   
   _refresh_button = new QPushButton("Refresh Resource List");
   _refresh_button->show();
-  connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_resource_list()));
   _resource_files_list = new QListWidget(this);
   _resource_files_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  connect(_resource_files_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(item_choosed(QListWidgetItem*)));
   std::list<std::string> resource_list = _salome_services->getResourceList();
   std::list<std::string>::iterator it;
   for (it = resource_list.begin(); it != resource_list.end(); it++)
@@ -43,10 +42,34 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
     _resource_files_list->addItem(QString(resource.c_str()));
   }
 
+  _show_button = new QPushButton("Show");
+  _show_button->setEnabled(false);
+  _edit_button = new QPushButton("Edit");
+  _edit_button->setEnabled(false);
+  _add_button = new QPushButton("Add");
+
+  QHBoxLayout * button_layout = new QHBoxLayout(this);
+  button_layout->addWidget(_show_button);
+  button_layout->addWidget(_edit_button);
+  button_layout->addWidget(_add_button);
+  QWidget * layout_widget = new QWidget(this);
+  layout_widget->setLayout(button_layout);
+
   QVBoxLayout * mainLayout = new QVBoxLayout(this);
   mainLayout->addWidget(_refresh_button);
   mainLayout->addWidget(_resource_files_list);
+  mainLayout->addWidget(layout_widget);
   setLayout(mainLayout);
+  
+  // Buttons
+  connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_resource_list()));
+  connect(_show_button, SIGNAL(clicked()), this, SLOT(show_button()));
+  connect(_edit_button, SIGNAL(clicked()), this, SLOT(edit_button()));
+  connect(_add_button, SIGNAL(clicked()), this, SLOT(add_button()));
+  // Double click on an item
+  connect(_resource_files_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(item_choosed(QListWidgetItem*)));
+  // Selection management
+  connect(_resource_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(buttons_management()));
 }
 
 JM::ResourceCatalog::~ResourceCatalog()
@@ -80,6 +103,52 @@ JM::ResourceCatalog::item_choosed(QListWidgetItem * item)
   JM::SalomeResource * resource_widget = new JM::SalomeResource(this, 
 								_salome_services,
 								item->text().toStdString());
+  resource_widget->exec();
+  delete resource_widget;
+}
+
+void
+JM::ResourceCatalog::buttons_management()
+{
+  QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
+  
+  // Test if an item is selected
+  if (item_list.size() == 0)
+  {
+    _show_button->setEnabled(false);
+    _edit_button->setEnabled(false);
+  }
+  else
+  {
+    _show_button->setEnabled(true);
+    _edit_button->setEnabled(true);
+  }
+}
+
+void
+JM::ResourceCatalog::show_button()
+{
+  QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
+  item_choosed(item_list.at(0));
+}
+
+void
+JM::ResourceCatalog::add_button()
+{
+  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this, 
+									_salome_services);
+  resource_widget->exec();
+  delete resource_widget;
+}
+
+void
+JM::ResourceCatalog::edit_button()
+{
+  QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
+  QString item_name = item_list.at(0)->text();
+  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this, 
+									_salome_services,
+									item_name.toStdString());
   resource_widget->exec();
   delete resource_widget;
 }
