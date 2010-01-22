@@ -308,6 +308,8 @@ JM::EditSalomeResource::accept()
   resource.protocol = _protocol_line->currentText().toStdString();
   resource.iprotocol = _iprotocol_line->currentText().toStdString();
   resource.batch = _batch_line->currentText().toStdString();
+  if (resource.batch == "ssh")
+    resource.batch = "ssh_batch";
   resource.mpiImpl = _mpiImpl_line->currentText().toStdString();
 
   // QSpinBox
