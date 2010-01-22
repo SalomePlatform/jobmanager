@@ -192,6 +192,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
 
+    _input_files_list->clear();
+    _output_files_list->clear();
     std::list<std::string>::iterator it;
     for (it = files_params.input_files_list.begin(); it != files_params.input_files_list.end(); it++)
     {

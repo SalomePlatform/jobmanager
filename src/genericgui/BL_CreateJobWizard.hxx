@@ -141,6 +141,7 @@ namespace BL{
       void choose_input_files();
       void remove_input_files();
       void input_itemSelectionChanged();
+      void choose_local_directory();
 
       void add_output_file();
       void remove_output_files();
@@ -150,6 +151,7 @@ namespace BL{
       QPushButton * _input_files_button;
       QPushButton * _remove_input_files_button;
       QListWidget * _input_files_list;
+      QLineEdit * _result_directory;
 
       QPushButton * _output_files_button;
       QPushButton * _remove_output_files_button;

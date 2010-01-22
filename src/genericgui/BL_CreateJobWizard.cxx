@@ -420,7 +420,7 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   main_layout->addWidget(label);
 
   // batch_directory
-  QLabel * label_directory = new QLabel("Batch directory: ");
+  QLabel * label_directory = new QLabel("Remote work directory: ");
   QLineEdit * line_directory = new QLineEdit(this);
   registerField("batch_directory", line_directory);
 
@@ -554,16 +554,17 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
   connect(_output_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(output_itemSelectionChanged()));
 
   // Results Directory
-  QLabel * label_result_directory = new QLabel("Result directory: ");
-  QLineEdit * result_directory = new QLineEdit(this);
-  registerField("result_directory", result_directory);
+  QPushButton * button_result = new QPushButton("Local Result directory");
+  connect(button_result, SIGNAL(clicked()), this, SLOT(choose_local_directory()));
+  _result_directory = new QLineEdit(this);
+  registerField("result_directory", _result_directory);
 
   QGridLayout * output_box = new QGridLayout;
   output_box->addWidget(_output_files_button, 0, 0);
   output_box->addWidget(_remove_output_files_button, 0, 1);
   output_box->addWidget(_output_files_list, 1, 0, 1, -1);
-  output_box->addWidget(label_result_directory, 2, 0);
-  output_box->addWidget(result_directory, 2, 1, 1, -1);
+  output_box->addWidget(button_result, 2, 0);
+  output_box->addWidget(_result_directory, 2, 1, 1, -1);
   output_group_box->setLayout(output_box);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
@@ -619,6 +620,18 @@ BL::FilesPage::choose_input_files()
     if (_input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
       _input_files_list->addItem(files.at(i));
   }
+}
+
+void
+BL::FilesPage::choose_local_directory()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose local result directory"),
+                                                 "",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+
+  if (dir != "")
+    _result_directory->setText(dir);
 }
 
 void 
