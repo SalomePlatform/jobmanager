@@ -231,7 +231,16 @@ BL::JobsManager::refresh_job(void * object_ptr)
 	if (job_state != BL::Job::FINISHED or job_state != BL::Job::ERROR)
 	{
 	  std::string result = object->_salome_services->refresh_job(job);
-	  if (result == "QUEUED")
+	  if (result == "CREATED")
+	  {
+	    if (job_state != BL::Job::CREATED)
+	    {
+	      job->setState(BL::Job::CREATED);
+	      if (object->_observer)
+		object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
+	    }
+	  }
+	  else if (result == "QUEUED")
 	  {
 	    if (job_state != BL::Job::QUEUED)
 	    {
@@ -269,15 +278,21 @@ BL::JobsManager::refresh_job(void * object_ptr)
 	  }
 	  else if (result == "FINISHED")
 	  {
-	    job->setState(BL::Job::FINISHED);
-	    if (object->_observer)
-	      object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
+	    if (job_state != BL::Job::FINISHED)
+	    {
+	      job->setState(BL::Job::FINISHED);
+	      if (object->_observer)
+		object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
+	    }
 	  }
 	  else if (result == "ERROR")
 	  {
-	    job->setState(BL::Job::ERROR);
-	    if (object->_observer)
-	      object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
+	    if (job_state != BL::Job::ERROR)
+	    {
+	      job->setState(BL::Job::ERROR);
+	      if (object->_observer)
+		object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
+	    }
 	  }
 	  else
 	  {

@@ -171,7 +171,7 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
   registerField("job_name", _nameLineEdit);
 
   QLabel * label_type = new QLabel("Choose type of batch job:");
-  QGroupBox *groupBox = new QGroupBox();
+  QGroupBox *groupBox = new QGroupBox("Type of job");
   _yacs_schema_button = new QRadioButton(tr("YACS Schema"));
   _yacs_schema_button->setChecked(true);
   _command_button = new QRadioButton(tr("Command"));
@@ -183,6 +183,14 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
   vbox->addStretch(1);
   groupBox->setLayout(vbox);
 
+  QGroupBox * explanationBox = new QGroupBox("Explanation");
+  QVBoxLayout *explanationvbox = new QVBoxLayout;
+  _explanation = new QLabel();
+  _explanation->setWordWrap(true);
+  explanationvbox->addWidget(_explanation);
+  explanationvbox->addStretch(1);
+  explanationBox->setLayout(explanationvbox);
+
   // Layouts
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -192,11 +200,40 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
   main_layout->insertLayout(-1, layout);
   layout->addWidget(label_type, 2, 0);
   layout->addWidget(groupBox, 3, 0, 1, -1);
+  layout->addWidget(explanationBox, 4, 0, 1, -1);
   setLayout(main_layout);
+
+  connect(_yacs_schema_button, SIGNAL(clicked(bool)), this, SLOT(yacs_schema_button(bool)));
+  connect(_command_button, SIGNAL(clicked(bool)), this, SLOT(command_button(bool)));
+  connect(_python_salome_button, SIGNAL(clicked(bool)), this, SLOT(python_salome_button(bool)));
+
+  // Default button
+  yacs_schema_button(true);
 }
 
 BL::JobNamePage::~JobNamePage()
 {}
+
+void
+BL::JobNamePage::yacs_schema_button(bool checked)
+{
+  if (checked)
+    _explanation->setText("This job permits to launch a YACS schema into a SALOME application");
+}
+
+void
+BL::JobNamePage::command_button(bool checked)
+{
+  if (checked)
+    _explanation->setText("This job permits to launch a script into a distributed resource. This script is not launched into a SALOME application");
+}
+
+void
+BL::JobNamePage::python_salome_button(bool checked)
+{
+  if (checked)
+    _explanation->setText("This job permits to launch a python script into a SALOME application");
+}
 
 bool
 BL::JobNamePage::validatePage()
@@ -597,12 +634,6 @@ BL::FilesPage::validatePage()
   if (result_directory == "" and _output_files_list->count() != 0)
   {
     QMessageBox::warning(NULL, "Result Directory Error", "Please enter a result directory or remove output files");
-    return false;
-  }
-
-  if (result_directory != "" and _output_files_list->count() == 0)
-  {
-    QMessageBox::warning(NULL, "Result Error", "Please add output files or erase result directory");
     return false;
   }
 

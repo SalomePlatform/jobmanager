@@ -90,6 +90,8 @@ namespace BL{
 
   class JobNamePage: virtual public QWizardPage
   {
+    Q_OBJECT
+
     public:
       JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager);
       virtual ~JobNamePage();
@@ -97,11 +99,17 @@ namespace BL{
       virtual bool validatePage();
       virtual int nextId() const ;
 
+    public slots:
+      void yacs_schema_button(bool checked);
+      void command_button(bool checked);
+      void python_salome_button(bool checked);
+
     private:	  
       BL::JobsManager_QT * _jobs_manager;
       QRadioButton * _yacs_schema_button;
       QRadioButton * _command_button;
       QRadioButton * _python_salome_button;
+      QLabel * _explanation;
   };
 
   class ConclusionPage: virtual public QWizardPage

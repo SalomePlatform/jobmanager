@@ -44,6 +44,8 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome
 
   _load_jobs = new QPushButton("Load Jobs");
   _save_jobs = new QPushButton("Save Jobs");
+  _load_jobs->setEnabled(false);
+  _save_jobs->setEnabled(false);
   _auto_refresh_jobs = new QPushButton("Auto Refresh: no");
   _timer = new QTimer(this);
   _timer->stop();
