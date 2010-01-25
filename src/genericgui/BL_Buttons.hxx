@@ -35,10 +35,14 @@ namespace BL
       virtual ~Buttons();
 
       void setCreateButtonSlot(QObject * receiver, const char * name);
+      void setEditCloneButtonSlot(QObject * receiver, const char * name);
       void setStartButtonSlot(QObject * receiver, const char * name);
       void setDeleteButtonSlot(QObject * receiver, const char * name);
       void setRefreshButtonSlot(QObject * receiver, const char * name);
       void setGetResultsButtonSlot(QObject * receiver, const char * name);
+
+      void enable_edit_clone_button();
+      void disable_edit_clone_button();
 
       void enable_start_button();
       void disable_start_button();
@@ -51,6 +55,7 @@ namespace BL
 
     protected:  
       QPushButton * _create_button;
+      QPushButton * _edit_clone_button;
       QPushButton * _start_button;
       QPushButton * _delete_button;
       QPushButton * _get_results_button;

@@ -25,14 +25,16 @@ BL::Buttons::Buttons(QWidget * parent) : QGroupBox(parent)
 
   setTitle("Actions");
 
-  _create_button = new QPushButton("Create Job", this);
-  _start_button = new QPushButton("Start Job", this);
-  _delete_button = new QPushButton("Delete Job", this);
+  _create_button = new QPushButton("Create a Job", this);
+  _edit_clone_button = new QPushButton("Edit/Clone a Job", this);
+  _start_button = new QPushButton("Start a Job", this);
+  _delete_button = new QPushButton("Delete a Job", this);
   _get_results_button = new QPushButton("Get Job Results", this);
   _refresh_button = new QPushButton("Refresh Jobs", this);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(_create_button);
+  mainLayout->addWidget(_edit_clone_button);
   mainLayout->addWidget(_start_button);
   mainLayout->addWidget(_delete_button);
   mainLayout->addWidget(_get_results_button);
@@ -60,6 +62,12 @@ BL::Buttons::setCreateButtonSlot(QObject * receiver, const char * name)
 }
 
 void
+BL::Buttons::setEditCloneButtonSlot(QObject * receiver, const char * name)
+{
+  connect(_edit_clone_button, SIGNAL(clicked()), receiver, name);
+}
+
+void
 BL::Buttons::setStartButtonSlot(QObject * receiver, const char * name)
 {
   connect(_start_button, SIGNAL(clicked()), receiver, name);
@@ -81,6 +89,18 @@ void
 BL::Buttons::setGetResultsButtonSlot(QObject * receiver, const char * name)
 {
   connect(_get_results_button, SIGNAL(clicked()), receiver, name);
+}
+
+void 
+BL::Buttons::enable_edit_clone_button()
+{
+  _edit_clone_button->setEnabled(true);
+}
+
+void 
+BL::Buttons::disable_edit_clone_button()
+{
+  _edit_clone_button->setEnabled(false);
 }
 
 void 

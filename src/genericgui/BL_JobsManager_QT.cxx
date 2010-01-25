@@ -150,9 +150,11 @@ BL::JobsManager_QT::one_hour_refresh()
 }
 
 void
-BL::JobsManager_QT::create_job_wizard()
+BL::JobsManager_QT::create_job_wizard(const std::string & name)
 {
     BL::CreateJobWizard wizard(this, _salome_services);
+    if (name != "")
+      wizard.clone(name);
     wizard.exec();
 
     if (wizard.job_name != "")

@@ -57,7 +57,7 @@ namespace BL{
       virtual ~JobsManager_QT();
 
       void delete_job(QString job_name);
-      void create_job_wizard();
+      void create_job_wizard(const std::string & name = "");
 
       virtual void sendEvent(const std::string & action, 
 			     const std::string & event_name, 

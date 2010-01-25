@@ -89,7 +89,7 @@ BL::SALOMEServices::getResourceList()
     Engines::ResourceList * resourceList = NULL;
     try
     {
-      Engines::ResourceList * resourceList = _resources_manager->GetFittingResources(params);
+      resourceList = _resources_manager->GetFittingResources(params);
     }
     catch (const SALOME::SALOME_Exception & ex)
     {

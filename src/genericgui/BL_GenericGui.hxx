@@ -52,6 +52,7 @@ namespace BL
 
     public slots:
       void create_job();
+      void edit_clone_job();
       void start_job();
       void delete_job();
       void refresh_job();
@@ -80,6 +81,7 @@ namespace BL
       BL::Summary * _summary;
 
       QAction * _create_job_action;
+      QAction * _edit_clone_job_action;
       QAction * _start_job_action;
       QAction * _delete_job_action;
       QAction * _get_results_job_action;

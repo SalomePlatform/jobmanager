@@ -46,7 +46,9 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
 
   // Common pages
-  setPage(Page_JobName, new BL::JobNamePage(this, _jobs_manager));
+  _job_name_page = new BL::JobNamePage(this, _jobs_manager);
+
+  setPage(Page_JobName, _job_name_page);
   setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
   setPage(Page_Files, new BL::FilesPage(this));
   setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
@@ -64,6 +66,83 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 BL::CreateJobWizard::~CreateJobWizard()
 {
   DEBTRACE("Destroying BL::CreateJobWizard");
+}
+
+void
+BL::CreateJobWizard::clone(const std::string & name)
+{
+  if (_jobs_manager->job_already_exist(name) == true)
+  {
+    BL::Job * job = _jobs_manager->getJob(name);
+
+    // We can only edit a job in CREATED, ERROR or FINISHED
+    if (job->getState() == BL::Job::CREATED or BL::Job::FINISHED or BL::Job::ERROR)
+    { 
+      setField("job_name", QString(name.c_str()));
+    }
+
+    if (job->getType() == BL::Job::YACS_SCHEMA)
+    {
+      setField("yacs_file", QString(job->getJobFile().c_str()));
+      _job_name_page->_yacs_schema_button->click();
+      setField("env_yacs_file", QString(job->getEnvFile().c_str()));
+    }
+    else if (job->getType() == BL::Job::COMMAND)
+    {
+      setField("command", QString(job->getJobFile().c_str()));
+      _job_name_page->_command_button->click();
+      setField("env_command_file", QString(job->getEnvFile().c_str()));
+    }
+    else if (job->getType() == BL::Job::PYTHON_SALOME)
+    {
+      setField("PythonSalome", QString(job->getJobFile().c_str()));
+      _job_name_page->_yacs_schema_button->click();
+      setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
+    }
+
+    BL::Job::BatchParam batch_params = job->getBatchParameters();
+    setField("batch_directory", QString(batch_params.batch_directory.c_str()));
+    QString proc_value;
+    proc_value.setNum(batch_params.nb_proc);
+    setField("proc_value", proc_value);
+
+    std::size_t pos = batch_params.maximum_duration.find(":");
+    std::string hour_str = batch_params.maximum_duration.substr(0, pos);
+    int hour; 
+    std::istringstream iss_hour(hour_str);
+    iss_hour >> hour;
+    setField("duration_hour", hour);
+
+    std::string min_str = batch_params.maximum_duration.substr(pos + 1, batch_params.maximum_duration.npos);
+    int min; 
+    std::istringstream iss_min(min_str);
+    iss_min >> min;
+    setField("duration_min", min);
+
+    std::string mem_type = batch_params.expected_memory.substr(batch_params.expected_memory.size() - 2, 2);
+    if (mem_type == "mb")
+      setField("mem_type", 0);
+    else
+      setField("mem_type", 1);
+    std::string mem_value = batch_params.expected_memory.substr(0, batch_params.expected_memory.find(mem_type));
+    int mem_val; 
+    std::istringstream iss_mem(mem_value);
+    iss_mem >> mem_val;
+    setField("mem_value", mem_val);
+
+    BL::Job::FilesParam files_params = job->getFilesParameters();
+
+    std::list<std::string>::iterator it = files_params.input_files_list.begin();
+    for (; it != files_params.input_files_list.end(); it++)
+      _input_files_list->addItem(QString((*it).c_str()));
+    it = files_params.output_files_list.begin();
+    for (; it != files_params.output_files_list.end(); it++)
+      _output_files_list->addItem(QString((*it).c_str()));
+
+    setField("result_directory", QString(files_params.result_directory.c_str()));
+    setField("resource_choosed", QString(job->getResource().c_str()));
+    setField("batch_queue", QString(job->getBatchQueue().c_str()));
+  }
 }
 
 void
@@ -118,7 +197,7 @@ BL::CreateJobWizard::end(int result)
       time_min = "0" + field("duration_min").toString();
     else
       time_min = field("duration_min").toString();
-    maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
+    maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
 
     QString mem = field("mem_value").toString();
     int mem_type_i = field("mem_type").toInt();

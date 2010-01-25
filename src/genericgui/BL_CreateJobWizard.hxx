@@ -33,6 +33,7 @@
 namespace BL{
 
   class JobsManager_QT;
+  class JobNamePage;
   class CreateJobWizard: virtual public QWizard
   {
     Q_OBJECT
@@ -43,6 +44,8 @@ namespace BL{
 
       void setFilesList(QListWidget * input_files_list, QListWidget * output_files_list);
 
+      void clone(const std::string & name);
+
     public slots:
       void end(int result);
 
@@ -52,6 +55,8 @@ namespace BL{
       BL::JobsManager_QT * _jobs_manager;
       QListWidget * _input_files_list;
       QListWidget * _output_files_list;
+
+      BL::JobNamePage * _job_name_page;
 
     public:
       // Results
@@ -106,10 +111,12 @@ namespace BL{
 
     private:	  
       BL::JobsManager_QT * _jobs_manager;
+      QLabel * _explanation;
+
+    public:
       QRadioButton * _yacs_schema_button;
       QRadioButton * _command_button;
       QRadioButton * _python_salome_button;
-      QLabel * _explanation;
   };
 
   class ConclusionPage: virtual public QWizardPage

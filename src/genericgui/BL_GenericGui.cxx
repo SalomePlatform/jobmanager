@@ -43,6 +43,7 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   /* Buttons */
   _buttons = new BL::Buttons(_tab_parent);
   _buttons->setCreateButtonSlot(this, SLOT(create_job()));
+  _buttons->setEditCloneButtonSlot(this, SLOT(edit_clone_job()));
   _buttons->setStartButtonSlot(this, SLOT(start_job()));
   _buttons->setDeleteButtonSlot(this, SLOT(delete_job()));
   _buttons->setRefreshButtonSlot(this, SLOT(refresh_job()));
@@ -137,10 +138,11 @@ void
 BL::GenericGui::createActions()
 {
   DEBTRACE("CreateActions BL::GenericGui");
-  _create_job_action = _wrapper->createAction("Create Job", QIcon(), "Create Job", "Create Job", 0, _dock_parent, false, this, SLOT(create_job()));
-  _start_job_action = _wrapper->createAction("Start Job", QIcon(), "Start Job", "Start Job", 0, _dock_parent, false, this, SLOT(start_job()));
-  _delete_job_action = _wrapper->createAction("Delete Job", QIcon(), "Delete Job", "Delete Job", 0, _dock_parent, false, this, SLOT(delete_job()));
-  _refresh_job_action = _wrapper->createAction("Refresh Job", QIcon(), "Refresh Job", "Refresh Job", 0, _dock_parent, false, this, SLOT(refresh_job()));
+  _create_job_action = _wrapper->createAction("Create a Job", QIcon(), "Create a Job", "Create a Job", 0, _dock_parent, false, this, SLOT(create_job()));
+  _edit_clone_job_action = _wrapper->createAction("Edit/Clone a Job", QIcon(), "Edit/Clone a Job", "Edit/Clone a Job", 0, _dock_parent, false, this, SLOT(edit_clone_job()));
+  _start_job_action = _wrapper->createAction("Start a Job", QIcon(), "Start a Job", "Start a Job", 0, _dock_parent, false, this, SLOT(start_job()));
+  _delete_job_action = _wrapper->createAction("Delete a Job", QIcon(), "Delete a Job", "Delete a Job", 0, _dock_parent, false, this, SLOT(delete_job()));
+  _refresh_job_action = _wrapper->createAction("Refresh Jobs", QIcon(), "Refresh Jobs", "Refresh Jobs", 0, _dock_parent, false, this, SLOT(refresh_job()));
   _get_results_job_action = _wrapper->createAction("Get Job Results", QIcon(), "Get Job Results", "Get Job Results", 0, _dock_parent, false, this, SLOT(refresh_job()));
 }
 
@@ -150,6 +152,7 @@ BL::GenericGui::createMenus()
   DEBTRACE("CreateMenus BL::GenericGui");
   int menu_id = _wrapper->createTopMenu("JobManager");
   _wrapper->addActionToMenu(_create_job_action, menu_id);
+  _wrapper->addActionToMenu(_edit_clone_job_action, menu_id);
   _wrapper->addActionToMenu(_start_job_action, menu_id);
   _wrapper->addActionToMenu(_delete_job_action, menu_id);
   _wrapper->addActionToMenu(_get_results_job_action, menu_id);
@@ -161,6 +164,13 @@ BL::GenericGui::create_job()
 {
   DEBTRACE("Create Job Slot BL::GenericGui");
   _jobs_manager->create_job_wizard();
+}
+
+void
+BL::GenericGui::edit_clone_job()
+{
+  DEBTRACE("Edit/Clone Job Slot BL::GenericGui");
+  _jobs_manager->create_job_wizard(_job_name_selected.toStdString());
 }
 
 void
@@ -234,12 +244,16 @@ BL::GenericGui::updateButtonsStates()
     _buttons->disable_start_button();
     _buttons->disable_delete_button();
     _buttons->disable_get_results_button();
+    _edit_clone_job_action->setEnabled(false);
+    _buttons->disable_edit_clone_button();
   }
   else if (_job_name_selected != "" and _row_selected != -1)
   {
     BL::Job * job = _jobs_manager->getJob(_job_name_selected.toStdString());
     BL::Job::State job_state = job->getState();
 
+    _edit_clone_job_action->setEnabled(true);
+    _buttons->enable_edit_clone_button();
     switch (job_state)
     {
       case BL::Job::CREATED:
