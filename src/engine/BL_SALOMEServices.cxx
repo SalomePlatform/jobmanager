@@ -19,6 +19,20 @@
 
 #include "BL_SALOMEServices.hxx"
 
+static std::ostream & 
+operator<<(std::ostream & os, const CORBA::Exception & e)
+{
+  CORBA::Any tmp;
+  tmp <<=e ;
+  CORBA::TypeCode_var tc = tmp.type();
+  const char * p = tc->name ();
+  if (*p != '\0')
+    os << p;
+  else
+    os << tc->id();
+  return os;
+}
+
 BL::SALOMEServices::SALOMEServices()
 {
   int nbargs = 0; char **args = 0;
@@ -47,7 +61,7 @@ BL::SALOMEServices::initNS()
 
   if (CORBA::is_nil(_salome_launcher))
   {
-    DEBTRACE("SALOME Launcher is not reachable!")
+    DEBMSG("SALOME Launcher is not reachable!")
     return_value = false;
   }
 
@@ -55,7 +69,7 @@ BL::SALOMEServices::initNS()
   _resources_manager = Engines::ResourcesManager::_narrow(obj);
   if (CORBA::is_nil(_resources_manager))
   {
-    DEBTRACE("SALOME Resource Manager is not reachable !");
+    DEBMSG("SALOME Resource Manager is not reachable !");
     return_value = false;
   }
 
@@ -72,13 +86,29 @@ BL::SALOMEServices::getResourceList()
   {
     Engines::ResourceParameters params;
     _lcc->preSet(params);
-    Engines::ResourceList * resourceList = _resources_manager->GetFittingResources(params);
-    for (int i = 0; i < resourceList->length(); i++)
+    Engines::ResourceList * resourceList = NULL;
+    try
     {
-      const char* aResource = (*resourceList)[i];
-      resource_list.push_back(aResource);
+      Engines::ResourceList * resourceList = _resources_manager->GetFittingResources(params);
     }
-    delete resourceList;
+    catch (const SALOME::SALOME_Exception & ex)
+    {
+      DEBMSG("SALOME Exception in addResource ! " << ex.details.text.in());
+    }
+    catch (const CORBA::SystemException& ex)
+    {
+      DEBMSG("Receive SALOME System Exception: " << ex);
+      DEBMSG("Check SALOME servers...");
+    }
+    if (resourceList)
+    {
+      for (int i = 0; i < resourceList->length(); i++)
+      {
+	const char* aResource = (*resourceList)[i];
+	resource_list.push_back(aResource);
+      }
+      delete resourceList;
+    }
   }
   return resource_list;
 }
@@ -86,28 +116,46 @@ BL::SALOMEServices::getResourceList()
 BL::ResourceDescr
 BL::SALOMEServices::getResourceDescr(const std::string& name)
 {
-  Engines::ResourceDefinition_var resource_definition = _resources_manager-> GetResourceDefinition(name.c_str());
+  Engines::ResourceDefinition * resource_definition = NULL;
   BL::ResourceDescr resource_descr;
 
-  resource_descr.name = resource_definition->name.in();
-  resource_descr.hostname = resource_definition->hostname.in();
-  resource_descr.protocol = resource_definition->protocol.in();
-  resource_descr.username = resource_definition->username.in();
-  resource_descr.applipath = resource_definition->applipath.in();
-  for (int i = 0; i < resource_definition->componentList.length(); i++)
+  try 
   {
-    resource_descr.componentList.push_back(resource_definition->componentList[i].in());
+    resource_definition = _resources_manager-> GetResourceDefinition(name.c_str());
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in addResource ! " << ex.details.text.in());
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
   }
 
-  resource_descr.OS = resource_definition->OS.in();
-  resource_descr.mem_mb = resource_definition->mem_mb;
-  resource_descr.cpu_clock = resource_definition->cpu_clock;
-  resource_descr.nb_node = resource_definition->nb_node;
-  resource_descr.nb_proc_per_node = resource_definition->nb_proc_per_node;
-  resource_descr.batch = resource_definition->batch.in();
-  resource_descr.mpiImpl = resource_definition->mpiImpl.in();
-  resource_descr.iprotocol = resource_definition->iprotocol.in();
+  if(resource_definition)
+  {
+    resource_descr.name = resource_definition->name.in();
+    resource_descr.hostname = resource_definition->hostname.in();
+    resource_descr.protocol = resource_definition->protocol.in();
+    resource_descr.username = resource_definition->username.in();
+    resource_descr.applipath = resource_definition->applipath.in();
+    for (int i = 0; i < resource_definition->componentList.length(); i++)
+    {
+      resource_descr.componentList.push_back(resource_definition->componentList[i].in());
+    }
 
+    resource_descr.OS = resource_definition->OS.in();
+    resource_descr.mem_mb = resource_definition->mem_mb;
+    resource_descr.cpu_clock = resource_definition->cpu_clock;
+    resource_descr.nb_node = resource_definition->nb_node;
+    resource_descr.nb_proc_per_node = resource_definition->nb_proc_per_node;
+    resource_descr.batch = resource_definition->batch.in();
+    resource_descr.mpiImpl = resource_definition->mpiImpl.in();
+    resource_descr.iprotocol = resource_definition->iprotocol.in();
+
+    delete resource_definition;
+  }
   return resource_descr;
 }
 
@@ -146,7 +194,12 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in addResource ! " << ex.details.text.in());
+    DEBMSG("SALOME Exception in addResource ! " << ex.details.text.in());
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
   }
 }
 
@@ -159,14 +212,19 @@ BL::SALOMEServices::removeResource(const std::string & name)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in removeResource ! " << ex.details.text.in());
+    DEBMSG("SALOME Exception in removeResource ! " << ex.details.text.in());
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
   }
 }
 
 std::string
 BL::SALOMEServices::create_job(BL::Job * job)
 {
-  DEBTRACE("Begin of create_job");
+  DEBMSG("Begin of create_job");
   std::string ret = "";
   Engines::JobParameters_var job_parameters = new Engines::JobParameters;
 
@@ -235,8 +293,14 @@ BL::SALOMEServices::create_job(BL::Job * job)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in createJob !");
+    DEBMSG("SALOME Exception in createJob !");
     ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
   }
   return ret;
 }
@@ -252,8 +316,14 @@ BL::SALOMEServices::start_job(BL::Job * job)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in launchJob !");
+    DEBMSG("SALOME Exception in launchJob !");
     ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
   }
   return ret;
 }
@@ -271,8 +341,14 @@ BL::SALOMEServices::refresh_job(BL::Job * job)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in getJobState !");
+    DEBMSG("SALOME Exception in getJobState !");
     ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
   }
   return ret;
 }
@@ -288,8 +364,14 @@ BL::SALOMEServices::delete_job(BL::Job * job)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in removeJob !");
+    DEBMSG("SALOME Exception in removeJob !");
     ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
   }
   return ret;
 }
@@ -309,8 +391,14 @@ BL::SALOMEServices::get_results_job(BL::Job * job)
   }
   catch (const SALOME::SALOME_Exception & ex)
   {
-    DEBTRACE("SALOME Exception in refresh_job !");
+    DEBMSG("SALOME Exception in refresh_job !");
     ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
   }
   return ret;
 }
