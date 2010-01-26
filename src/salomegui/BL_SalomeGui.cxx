@@ -29,6 +29,10 @@ BL::SalomeGui::SalomeGui() : MainWindows_SALOME("JobManager"),
 BL::SalomeGui::~SalomeGui()
 {
   DEBTRACE("Destroying BL::SalomeGui");
+  if (getApp())
+    disconnect(getApp(), SIGNAL(studyClosed()), this, SLOT(studyClosed()));
+  if (_gengui)
+    delete _gengui;
 }
 
 void 
@@ -36,12 +40,18 @@ BL::SalomeGui::initialize(CAM_Application* app)
 {
    DEBTRACE("Entering in initialize");
    SalomeApp_Module::initialize(app); // MANDATORY -> Otherwise SISEGV...
-   BL::MainWindows_SALOME::initialize(getApp());
+   connect( getApp(), SIGNAL(studyClosed()), this, SLOT(studyClosed()));
+}
 
-   _gengui = new BL::GenericGui(this);
-   _gengui->createActions();
-   _gengui->createMenus();
-   _gengui->updateButtonsStates();
+void
+BL::SalomeGui::studyClosed()
+{
+  if (_gengui)
+  {
+    _gengui->deleteDockWidget();
+    delete _gengui;
+    _gengui = NULL;
+  }
 }
 
 bool 
@@ -49,9 +59,17 @@ BL::SalomeGui::activateModule(SUIT_Study* theStudy)
 {
   DEBTRACE("Entering in BL::SalomeGui::activateModule");
 
+  if (!_gengui)
+  {
+   BL::MainWindows_SALOME::initialize(getApp());
+   _gengui = new BL::GenericGui(this);
+   _gengui->createActions();
+   _gengui->createMenus();
+   _gengui->updateButtonsStates();
+  }
+
   bool bOk = SalomeApp_Module::activateModule(theStudy);
   setMenuShown(true);
-
   _gengui->showDockWidgets(true);
   return bOk;
 }
@@ -68,9 +86,9 @@ bool
 BL::SalomeGui::deactivateModule(SUIT_Study* theStudy)
 {
   DEBTRACE("Entering in BL::SalomeGui::deactivateModule");
-
   setMenuShown(false);
-  _gengui->showDockWidgets(false);
+  if (_gengui)
+    _gengui->showDockWidgets(false);
   bool bOk = SalomeApp_Module::deactivateModule(theStudy);
   return bOk;
 }

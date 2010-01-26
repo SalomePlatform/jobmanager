@@ -52,6 +52,9 @@ namespace BL
 
       void delete_job_internal();
 
+      void deleteDockWidget();
+
+
     public slots:
       void create_job();
       void edit_clone_job();

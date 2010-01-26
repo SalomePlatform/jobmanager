@@ -80,14 +80,14 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   /* Summary */
   _dw_summary = new QDockWidget(_dock_parent);
   _dw_summary->setWindowTitle("Summary");
-  _summary = new BL::Summary(_dock_parent, _jobs_manager);
+  _summary = new BL::Summary(_dw_summary, _jobs_manager);
   _summary->setModel(_model);
   _dw_summary->setWidget(_summary);
 
   /* ResourceCatalog */
   _dw_resource_catalog = new QDockWidget(_dock_parent);
   _dw_resource_catalog->setWindowTitle("Resource Catalog");
-  _resource_catalog = new JM::ResourceCatalog(_dock_parent, _salome_services);
+  _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services);
   _dw_resource_catalog->setWidget(_resource_catalog);
 
   /* Main Dock Window */
@@ -122,8 +122,19 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
 BL::GenericGui::~GenericGui()
 {
   DEBTRACE("Destroying BL::GenericGui");
-
   delete _salome_services;
+}
+
+void
+BL::GenericGui::deleteDockWidget()
+{
+  // Specific for SALOME...
+  _dock_parent->removeDockWidget(_dw_summary);
+  delete _dw_summary;
+  _dock_parent->removeDockWidget(_dw_resource_catalog);
+  delete _dw_resource_catalog;
+  _dock_parent->removeDockWidget(_jobs_manager);
+  delete _jobs_manager;
 }
 
 void 

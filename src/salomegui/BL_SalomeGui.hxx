@@ -44,6 +44,7 @@ namespace BL
     public slots:
       bool deactivateModule( SUIT_Study* theStudy);
       bool activateModule( SUIT_Study* theStudy);
+      void studyClosed();
 
     protected:
       BL::GenericGui * _gengui;
