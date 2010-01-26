@@ -27,7 +27,7 @@ BL::QModelManager::QModelManager(QObject * parent, BL::JobsManager_QT * jobs_man
 
   _model = new QStandardItemModel(this);
   QStringList headers;
-  headers << "Job Name" << "Type" << "State" << "Resource";
+  headers << "Job Name" << "Type" << "State" << "Resource" << "Launcher Id";
   _model->setHorizontalHeaderLabels(headers);
 }
 
@@ -73,12 +73,16 @@ BL::QModelManager::new_job_added(const QString & name)
     new_job_state = new QStandardItem("Finished");
 
   QStandardItem * new_job_resource =  new QStandardItem(job->getResource().c_str());
+  QString id_str;
+  id_str.setNum(job->getSalomeLauncherId());
+  QStandardItem * new_job_id =  new QStandardItem(id_str);
 
   int row = _model->rowCount();
   _model->setItem(row, 0, new_job_name);
   _model->setItem(row, 1, new_job_type);
   _model->setItem(row, 2, new_job_state);
   _model->setItem(row, 3, new_job_resource);
+  _model->setItem(row, 4, new_job_id);
 }
 
 void
