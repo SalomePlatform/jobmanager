@@ -98,7 +98,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     else if (job->getType() == BL::Job::PYTHON_SALOME)
     {
       setField("PythonSalome", QString(job->getJobFile().c_str()));
-      _job_name_page->_yacs_schema_button->click();
+      _job_name_page->_python_salome_button->click();
       setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
     }
 
