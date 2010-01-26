@@ -33,7 +33,7 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _salome_services = new BL::SALOMEServices();
   if (_salome_services->initNS() == false)
     DEBMSG("WARNING !!!!! SALOME IS NOT REACHABLE !!!!");
-  _jobs_manager = new BL::JobsManager_QT(_dock_parent, _salome_services);
+  _jobs_manager = new BL::JobsManager_QT(_dock_parent, this, _salome_services);
   _model_manager = new BL::QModelManager(this, _jobs_manager);
 
   _model = _model_manager->getModel();
@@ -45,6 +45,7 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _buttons->setCreateButtonSlot(this, SLOT(create_job()));
   _buttons->setEditCloneButtonSlot(this, SLOT(edit_clone_job()));
   _buttons->setStartButtonSlot(this, SLOT(start_job()));
+  _buttons->setReStartButtonSlot(this, SLOT(restart_job()));
   _buttons->setDeleteButtonSlot(this, SLOT(delete_job()));
   _buttons->setRefreshButtonSlot(this, SLOT(refresh_job()));
   _buttons->setGetResultsButtonSlot(this, SLOT(get_results_job()));
@@ -141,6 +142,7 @@ BL::GenericGui::createActions()
   _create_job_action = _wrapper->createAction("Create a Job", QIcon(), "Create a Job", "Create a Job", 0, _dock_parent, false, this, SLOT(create_job()));
   _edit_clone_job_action = _wrapper->createAction("Edit/Clone a Job", QIcon(), "Edit/Clone a Job", "Edit/Clone a Job", 0, _dock_parent, false, this, SLOT(edit_clone_job()));
   _start_job_action = _wrapper->createAction("Start a Job", QIcon(), "Start a Job", "Start a Job", 0, _dock_parent, false, this, SLOT(start_job()));
+  _restart_job_action = _wrapper->createAction("Restart a Job", QIcon(), "Restart a Job", "Restart a Job", 0, _dock_parent, false, this, SLOT(restart_job()));
   _delete_job_action = _wrapper->createAction("Delete a Job", QIcon(), "Delete a Job", "Delete a Job", 0, _dock_parent, false, this, SLOT(delete_job()));
   _refresh_job_action = _wrapper->createAction("Refresh Jobs", QIcon(), "Refresh Jobs", "Refresh Jobs", 0, _dock_parent, false, this, SLOT(refresh_job()));
   _get_results_job_action = _wrapper->createAction("Get Job Results", QIcon(), "Get Job Results", "Get Job Results", 0, _dock_parent, false, this, SLOT(refresh_job()));
@@ -154,6 +156,7 @@ BL::GenericGui::createMenus()
   _wrapper->addActionToMenu(_create_job_action, menu_id);
   _wrapper->addActionToMenu(_edit_clone_job_action, menu_id);
   _wrapper->addActionToMenu(_start_job_action, menu_id);
+  _wrapper->addActionToMenu(_restart_job_action, menu_id);
   _wrapper->addActionToMenu(_delete_job_action, menu_id);
   _wrapper->addActionToMenu(_get_results_job_action, menu_id);
   _wrapper->addActionToMenu(_refresh_job_action, menu_id);
@@ -163,14 +166,14 @@ void
 BL::GenericGui::create_job()
 {
   DEBTRACE("Create Job Slot BL::GenericGui");
-  _jobs_manager->create_job_wizard();
+  _jobs_manager->create_job();
 }
 
 void
 BL::GenericGui::edit_clone_job()
 {
   DEBTRACE("Edit/Clone Job Slot BL::GenericGui");
-  _jobs_manager->create_job_wizard(_job_name_selected.toStdString());
+  _jobs_manager->edit_clone_job(_job_name_selected.toStdString());
 }
 
 void
@@ -178,6 +181,14 @@ BL::GenericGui::start_job()
 {
   DEBTRACE("Start Job Slot BL::GenericGui");
   _jobs_manager->start_job(_job_name_selected.toStdString());
+  updateButtonsStates();
+}
+
+void
+BL::GenericGui::restart_job()
+{
+  DEBTRACE("Restart Job Slot BL::GenericGui");
+  _jobs_manager->restart_job(_job_name_selected.toStdString());
   updateButtonsStates();
 }
 
@@ -204,13 +215,19 @@ BL::GenericGui::delete_job()
 				 QMessageBox::Ok);
   if (ret == QMessageBox::Ok)
   {
-    _jobs_manager->delete_job(_job_name_selected);
-    _model_manager->deleteJob(_row_selected);
-    emit job_deleted(_job_name_selected);
-    _row_selected = -1;
-    _job_name_selected = "";
-    updateButtonsStates();
+    delete_job_internal();
   }
+}
+
+void
+BL::GenericGui::delete_job_internal()
+{
+  _jobs_manager->delete_job(_job_name_selected);
+  _model_manager->deleteJob(_row_selected);
+  emit job_deleted(_job_name_selected);
+  _row_selected = -1;
+  _job_name_selected = "";
+  updateButtonsStates();
 }
 
 void
@@ -246,6 +263,8 @@ BL::GenericGui::updateButtonsStates()
     _buttons->disable_get_results_button();
     _edit_clone_job_action->setEnabled(false);
     _buttons->disable_edit_clone_button();
+    _restart_job_action->setEnabled(false);
+    _buttons->disable_restart_button();
   }
   else if (_job_name_selected != "" and _row_selected != -1)
   {
@@ -263,6 +282,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_start_button();
 	_buttons->enable_delete_button();
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(false);
+	_buttons->disable_restart_button();
 	break;
 
       case BL::Job::IN_PROCESS:
@@ -272,6 +293,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_delete_button();
 	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(false);
+	_buttons->disable_restart_button();
 	break;
 
       case BL::Job::QUEUED:
@@ -281,6 +304,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(false);
+	_buttons->disable_restart_button();
 	break;
 
       case BL::Job::RUNNING:
@@ -290,6 +315,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(false);
+	_buttons->disable_restart_button();
 	break;
 
       case BL::Job::PAUSED:
@@ -299,6 +326,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(false);
+	_buttons->disable_restart_button();
 	break;
 
       case BL::Job::ERROR:
@@ -308,6 +337,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(true);
+	_buttons->enable_restart_button();
 	break;
 
       case BL::Job::FINISHED:
@@ -317,6 +348,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(true);
 	_buttons->enable_get_results_button();
+	_restart_job_action->setEnabled(true);
+	_buttons->enable_restart_button();
 	break;
     }
   }

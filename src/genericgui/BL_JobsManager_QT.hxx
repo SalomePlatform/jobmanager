@@ -46,6 +46,7 @@ namespace BL{
       std::string data;
   };
 
+  class GenericGui;
   class JobsManager_QT: virtual public QDockWidget,
 			virtual public BL::JobsManager,
 			virtual public BL::Observer
@@ -53,11 +54,14 @@ namespace BL{
     Q_OBJECT
 
     public:
-      JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome_services);
+      JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, BL::SALOMEServices * salome_services);
       virtual ~JobsManager_QT();
 
       void delete_job(QString job_name);
-      void create_job_wizard(const std::string & name = "");
+
+      void create_job();
+      void edit_clone_job(const std::string & name);
+      void restart_job(const std::string & name);
 
       virtual void sendEvent(const std::string & action, 
 			     const std::string & event_name, 
@@ -67,6 +71,9 @@ namespace BL{
 
       void write_normal_text(const QString & text);
       void write_error_text(const QString & text);
+
+    protected:
+      void create_job_with_wizard(BL::CreateJobWizard & wizard);
 
     public slots:
       void RefreshJobs();
@@ -88,6 +95,7 @@ namespace BL{
       QPushButton * _auto_refresh_jobs;
       QTimer * _timer;
       QTextEdit * _log;
+      BL::GenericGui * _main_gui;
   };
 
 }

@@ -28,6 +28,7 @@ BL::Buttons::Buttons(QWidget * parent) : QGroupBox(parent)
   _create_button = new QPushButton("Create a Job", this);
   _edit_clone_button = new QPushButton("Edit/Clone a Job", this);
   _start_button = new QPushButton("Start a Job", this);
+  _restart_button = new QPushButton("Restart a Job", this);
   _delete_button = new QPushButton("Delete a Job", this);
   _get_results_button = new QPushButton("Get Job Results", this);
   _refresh_button = new QPushButton("Refresh Jobs", this);
@@ -36,6 +37,7 @@ BL::Buttons::Buttons(QWidget * parent) : QGroupBox(parent)
   mainLayout->addWidget(_create_button);
   mainLayout->addWidget(_edit_clone_button);
   mainLayout->addWidget(_start_button);
+  mainLayout->addWidget(_restart_button);
   mainLayout->addWidget(_delete_button);
   mainLayout->addWidget(_get_results_button);
   mainLayout->addWidget(_refresh_button);
@@ -71,6 +73,12 @@ void
 BL::Buttons::setStartButtonSlot(QObject * receiver, const char * name)
 {
   connect(_start_button, SIGNAL(clicked()), receiver, name);
+}
+
+void
+BL::Buttons::setReStartButtonSlot(QObject * receiver, const char * name)
+{
+  connect(_restart_button, SIGNAL(clicked()), receiver, name);
 }
 
 void
@@ -113,6 +121,18 @@ void
 BL::Buttons::disable_start_button()
 {
   _start_button->setEnabled(false);
+}
+
+void 
+BL::Buttons::enable_restart_button()
+{
+  _restart_button->setEnabled(true);
+}
+
+void 
+BL::Buttons::disable_restart_button()
+{
+  _restart_button->setEnabled(false);
 }
 
 void 

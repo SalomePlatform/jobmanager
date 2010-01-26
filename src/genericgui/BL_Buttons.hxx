@@ -37,6 +37,7 @@ namespace BL
       void setCreateButtonSlot(QObject * receiver, const char * name);
       void setEditCloneButtonSlot(QObject * receiver, const char * name);
       void setStartButtonSlot(QObject * receiver, const char * name);
+      void setReStartButtonSlot(QObject * receiver, const char * name);
       void setDeleteButtonSlot(QObject * receiver, const char * name);
       void setRefreshButtonSlot(QObject * receiver, const char * name);
       void setGetResultsButtonSlot(QObject * receiver, const char * name);
@@ -46,6 +47,9 @@ namespace BL
 
       void enable_start_button();
       void disable_start_button();
+
+      void enable_restart_button();
+      void disable_restart_button();
 
       void enable_delete_button();
       void disable_delete_button();
@@ -57,6 +61,7 @@ namespace BL
       QPushButton * _create_button;
       QPushButton * _edit_clone_button;
       QPushButton * _start_button;
+      QPushButton * _restart_button;
       QPushButton * _delete_button;
       QPushButton * _get_results_button;
       QPushButton * _refresh_button;

@@ -18,6 +18,7 @@
 //
 
 #include "BL_JobsManager_QT.hxx"
+#include "BL_GenericGui.hxx"
 
 BL::JobManagerEvent::JobManagerEvent(const std::string & action_i, 
 				     const std::string & event_name_i, 
@@ -32,10 +33,11 @@ BL::JobManagerEvent::JobManagerEvent(const std::string & action_i,
 
 BL::JobManagerEvent::~JobManagerEvent() {}  
 
-BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome_services) : 
+BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, BL::SALOMEServices * salome_services) : 
   QDockWidget(parent), BL::JobsManager(salome_services)
 {
   DEBTRACE("Creating BL::JobsManager_QT");
+  _main_gui = main_gui;
   setObserver(this);
 
   // Widget Part
@@ -149,62 +151,102 @@ BL::JobsManager_QT::one_hour_refresh()
   _timer->start(1 * 60 * 60 * 1000);
 }
 
+void 
+BL::JobsManager_QT::restart_job(const std::string & name)
+{
+  DEBTRACE("Restart job with name: " << name);
+  BL::CreateJobWizard wizard(this, _salome_services);
+  wizard.clone(name);
+  wizard.end(1);
+  wizard.job_name = name;
+  wizard.start_job = true;
+  _main_gui->delete_job_internal();
+  create_job_with_wizard(wizard);
+}
+
+void 
+BL::JobsManager_QT::edit_clone_job(const std::string & name)
+{
+  BL::CreateJobWizard wizard(this, _salome_services);
+  wizard.clone(name);
+  wizard.exec();
+
+  // Check if the job has the same name
+  if (name == wizard.job_name)
+  {
+    DEBTRACE("Job " << name << " has been changed");
+    _main_gui->delete_job_internal();
+  }
+
+  if (wizard.job_name != "")
+  {
+    create_job_with_wizard(wizard);
+  }
+  else
+  {
+    DEBTRACE("User cancel Create Job Wizard");
+  }
+}
+
 void
-BL::JobsManager_QT::create_job_wizard(const std::string & name)
+BL::JobsManager_QT::create_job()
 {
     BL::CreateJobWizard wizard(this, _salome_services);
-    if (name != "")
-      wizard.clone(name);
     wizard.exec();
-
     if (wizard.job_name != "")
     {
-      BL::Job * new_job = createJob(wizard.job_name);
-      if (wizard.yacs_file != "")
-      {
-	// YACS schema job
-	new_job->setType(BL::Job::YACS_SCHEMA);
-	new_job->setJobFile(wizard.yacs_file);
-      }
-      else if (wizard.command != "")
-      {
-	// Command Job
-	new_job->setType(BL::Job::COMMAND);
-	new_job->setJobFile(wizard.command);
-      }
-      else if (wizard.python_salome_file != "")
-      {
-	// Command Job
-	new_job->setType(BL::Job::PYTHON_SALOME);
-	new_job->setJobFile(wizard.python_salome_file);
-      }
-
-      // For all jobs
-      new_job->setEnvFile(wizard.env_file);
-      BL::Job::BatchParam param;
-      param.batch_directory = wizard.batch_directory;
-      param.maximum_duration = wizard.maximum_duration;
-      param.expected_memory = wizard.expected_memory;
-      param.nb_proc = wizard.nb_proc;
-      new_job->setBatchParameters(param);
-      BL::Job::FilesParam files_params;
-      files_params.result_directory = wizard.result_directory;
-      files_params.input_files_list = wizard.input_files_list;
-      files_params.output_files_list = wizard.output_files_list;
-      new_job->setFilesParameters(files_params);
-      new_job->setResource(wizard.resource_choosed);
-      new_job->setBatchQueue(wizard.batch_queue);
-      
-      // End
-      addJobToLauncher(wizard.job_name);
-      emit new_job_added(QString::fromStdString(wizard.job_name));
-      if (wizard.start_job)
-	start_job(wizard.job_name);
+      create_job_with_wizard(wizard);
     }
     else
     {
        DEBTRACE("User cancel Create Job Wizard");
     }
+}
+
+void 
+BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
+{
+  BL::Job * new_job = createJob(wizard.job_name);
+  if (wizard.yacs_file != "")
+  {
+    // YACS schema job
+    new_job->setType(BL::Job::YACS_SCHEMA);
+    new_job->setJobFile(wizard.yacs_file);
+  }
+  else if (wizard.command != "")
+  {
+    // Command Job
+    new_job->setType(BL::Job::COMMAND);
+    new_job->setJobFile(wizard.command);
+  }
+  else if (wizard.python_salome_file != "")
+  {
+    // Command Job
+    new_job->setType(BL::Job::PYTHON_SALOME);
+    new_job->setJobFile(wizard.python_salome_file);
+  }
+
+  // For all jobs
+  new_job->setEnvFile(wizard.env_file);
+  BL::Job::BatchParam param;
+  param.batch_directory = wizard.batch_directory;
+  param.maximum_duration = wizard.maximum_duration;
+  param.expected_memory = wizard.expected_memory;
+  param.nb_proc = wizard.nb_proc;
+  new_job->setBatchParameters(param);
+  BL::Job::FilesParam files_params;
+  files_params.result_directory = wizard.result_directory;
+  files_params.input_files_list = wizard.input_files_list;
+  files_params.output_files_list = wizard.output_files_list;
+  new_job->setFilesParameters(files_params);
+  new_job->setResource(wizard.resource_choosed);
+  new_job->setBatchQueue(wizard.batch_queue);
+
+  // End
+  addJobToLauncher(wizard.job_name);
+  emit new_job_added(QString::fromStdString(wizard.job_name));
+  if (wizard.start_job)
+    start_job(wizard.job_name);
 }
 
 void

@@ -50,10 +50,13 @@ namespace BL
       void createActions();
       void createMenus();
 
+      void delete_job_internal();
+
     public slots:
       void create_job();
       void edit_clone_job();
       void start_job();
+      void restart_job();
       void delete_job();
       void refresh_job();
       void get_results_job();
@@ -83,6 +86,7 @@ namespace BL
       QAction * _create_job_action;
       QAction * _edit_clone_job_action;
       QAction * _start_job_action;
+      QAction * _restart_job_action;
       QAction * _delete_job_action;
       QAction * _get_results_job_action;
       QAction * _refresh_job_action;

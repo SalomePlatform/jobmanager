@@ -18,6 +18,7 @@
 //
 
 #include "BL_CreateJobWizard.hxx"
+#include "BL_JobsManager_QT.hxx"
 
 BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALOMEServices * salome_services)
 {
@@ -75,10 +76,11 @@ BL::CreateJobWizard::clone(const std::string & name)
   {
     BL::Job * job = _jobs_manager->getJob(name);
 
-    // We can only edit a job in CREATED, ERROR or FINISHED
-    if (job->getState() == BL::Job::CREATED or BL::Job::FINISHED or BL::Job::ERROR)
+    // We can only edit a job in CREATED, ERROR
+    if (job->getState() == BL::Job::CREATED or job->getState() == BL::Job::ERROR)
     { 
       setField("job_name", QString(name.c_str()));
+      _job_name_page->_check_name = false;
     }
 
     if (job->getType() == BL::Job::YACS_SCHEMA)
@@ -241,6 +243,7 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
 : QWizardPage(parent)
 {
   _jobs_manager = jobs_manager;
+  _check_name = true;
   setTitle("Create a new job");
 
   QLabel *label = new QLabel("Enter Job name, you cannot add two jobs with the same name");
@@ -330,7 +333,7 @@ BL::JobNamePage::validatePage()
 
   // Check if job name already exists
   else {
-    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false)
+    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false or _check_name == false)
     {
       return_value = true;
     }

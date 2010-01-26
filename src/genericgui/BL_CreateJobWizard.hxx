@@ -23,7 +23,6 @@
 #include <QtGui>
 
 #include "BL_Traces.hxx"
-#include "BL_JobsManager_QT.hxx"
 #include "BL_SALOMEServices.hxx"
 #include "JM_ResourceCatalog.hxx"
 
@@ -117,6 +116,7 @@ namespace BL{
       QRadioButton * _yacs_schema_button;
       QRadioButton * _command_button;
       QRadioButton * _python_salome_button;
+      bool _check_name;
   };
 
   class ConclusionPage: virtual public QWizardPage
