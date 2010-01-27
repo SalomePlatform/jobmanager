@@ -61,6 +61,8 @@ BL::JobTab::createJobSummaryTab()
   _job_type_label_value = new QLabel("");
   QLabel * job_state_label = new QLabel("State:");
   _job_state_label_value = new QLabel("");
+  QLabel * job_launcher_label = new QLabel("Launcher Id:");
+  _job_launcher_label_value = new QLabel("");
   QLabel * job_resource_label = new QLabel("Resource:");
   _job_resource_label_value = new QLabel("");
   QLabel * job_jobfile_label = new QLabel("Job File:");
@@ -73,9 +75,10 @@ BL::JobTab::createJobSummaryTab()
   values_form->insertRow(0, job_name_label, _job_name_label_value);
   values_form->insertRow(1, job_type_label, _job_type_label_value);
   values_form->insertRow(2, job_state_label, _job_state_label_value);
-  values_form->insertRow(3, job_resource_label, _job_resource_label_value);
-  values_form->insertRow(4, job_jobfile_label, _job_jobfile_label_value);
-  values_form->insertRow(5, job_envfile_label, _job_envfile_label_value);
+  values_form->insertRow(3, job_launcher_label, _job_launcher_label_value);
+  values_form->insertRow(4, job_resource_label, _job_resource_label_value);
+  values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
+  values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
   main_values_box->setLayout(values_form);
 
   QLabel * job_nif_label = new QLabel("Number of Input Files:");
@@ -167,6 +170,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
     else 
       _job_state_label_value->setText("Finished");
 
+    _job_launcher_label_value->setText(QVariant(job->getSalomeLauncherId()).toString());
     _job_jobfile_label_value->setText(QString(job->getJobFile().c_str()));
     _job_envfile_label_value->setText(QString(job->getEnvFile().c_str()));
     if (job->getType() == BL::Job::YACS_SCHEMA)
@@ -244,6 +248,7 @@ BL::JobTab::reset(QString job_name)
   _job_name_label_value->setText("");
   _job_type_label_value->setText("");
   _job_state_label_value->setText("");
+  _job_launcher_label_value->setText("");
   _job_resource_label_value->setText("");
   _job_nif_label_value->setText("");
   _job_nof_label_value->setText("");
