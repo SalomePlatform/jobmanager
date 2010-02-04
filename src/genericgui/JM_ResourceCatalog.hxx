@@ -29,7 +29,7 @@
 
 namespace JM 
 {
-  class ResourceCatalog: public QWidget
+  class ResourceCatalog: public QScrollArea
   {
     Q_OBJECT
 

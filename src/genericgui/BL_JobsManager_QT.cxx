@@ -42,7 +42,7 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
 
   // Widget Part
 
-  QWidget * main_widget = new QWidget(this);
+  QScrollArea * main_widget = new QScrollArea(this);
 
   _load_jobs = new QPushButton("Load Jobs");
   _save_jobs = new QPushButton("Save Jobs");

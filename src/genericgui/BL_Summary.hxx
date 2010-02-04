@@ -25,7 +25,7 @@
 
 namespace BL 
 {
-  class Summary: public QWidget
+  class Summary: public QScrollArea
   {
     Q_OBJECT
 

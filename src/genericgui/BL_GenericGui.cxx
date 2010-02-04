@@ -59,7 +59,8 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _job_tab->setModel(_model);
 
   /* Tab Central Widget */
-  QWidget * central_widget = new QWidget(_tab_parent);
+  //QWidget * central_widget = new QWidget(_tab_parent);
+  QScrollArea * central_widget = new QScrollArea(_tab_parent);
 
   QSplitter * tab_central_widget = new QSplitter(Qt::Vertical, central_widget);
   tab_central_widget->addWidget(_jobs_table);
