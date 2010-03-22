@@ -130,4 +130,5 @@ AC_OUTPUT([ \
   src/standalone/Makefile \
   src/standalone/start_jobmanager.sh \
   src/salomegui/Makefile \
+  doc/Makefile \
 ])
