@@ -20,7 +20,7 @@
 #include "BL_Summary.hxx"
 #include "BL_Traces.hxx"
 
-BL::Summary::Summary(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QScrollArea(parent)
+BL::Summary::Summary(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QWidget(parent)
 {
   DEBTRACE("Creating BL::Summary");
   BL_ASSERT(parent);
