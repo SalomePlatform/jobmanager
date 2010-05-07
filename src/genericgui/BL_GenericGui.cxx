@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -40,6 +40,9 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
 
   // ---- Adding different GUI parts
 
+
+  /* Tab Central Widget */
+
   /* Buttons */
   _buttons = new BL::Buttons(_tab_parent);
   _buttons->setCreateButtonSlot(this, SLOT(create_job()));
@@ -58,38 +61,41 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _job_tab = new BL::JobTab(_tab_parent, _jobs_manager);
   _job_tab->setModel(_model);
 
-  /* Tab Central Widget */
-  //QWidget * central_widget = new QWidget(_tab_parent);
-  QScrollArea * central_widget = new QScrollArea(_tab_parent);
-
-  QSplitter * tab_central_widget = new QSplitter(Qt::Vertical, central_widget);
+  // Central Widget
+  QWidget * central_widget = new QWidget(_tab_parent);
+  QSplitter * tab_central_widget = new QSplitter(Qt::Vertical, _tab_parent);
   tab_central_widget->addWidget(_jobs_table);
   tab_central_widget->addWidget(_job_tab);
   tab_central_widget->setChildrenCollapsible(false);
-
   QVBoxLayout * central_layout = new QVBoxLayout;
   central_layout->addWidget(_buttons);
   central_layout->addWidget(tab_central_widget);
   central_widget->setLayout(central_layout);
 
-  _tab_parent->setCentralWidget(central_widget);
-  // Test tab
-  //QDockWidget * dw_main = new QDockWidget(_tab_parent);
-  //dw_main->setWidget(central_widget);
-  //_tab_parent->addDockWidget(Qt::LeftDockWidgetArea, dw_main);
+  // Adding a scroll area for low resolution
+  QScrollArea * scroll_central_widget = new QScrollArea(_tab_parent);
+  scroll_central_widget->setWidget(central_widget);
+  scroll_central_widget->setWidgetResizable(true);
+  _tab_parent->setCentralWidget(scroll_central_widget);
 
   /* Summary */
   _dw_summary = new QDockWidget(_dock_parent);
   _dw_summary->setWindowTitle("Summary");
   _summary = new BL::Summary(_dw_summary, _jobs_manager);
   _summary->setModel(_model);
-  _dw_summary->setWidget(_summary);
+  QScrollArea * scroll_widget_summary = new QScrollArea(_dw_summary);
+  scroll_widget_summary->setWidget(_summary);
+  scroll_widget_summary->setWidgetResizable(true);
+  _dw_summary->setWidget(scroll_widget_summary);
 
   /* ResourceCatalog */
   _dw_resource_catalog = new QDockWidget(_dock_parent);
   _dw_resource_catalog->setWindowTitle("Resource Catalog");
   _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services);
-  _dw_resource_catalog->setWidget(_resource_catalog);
+  QScrollArea * scroll_widget_resource = new QScrollArea(_dw_resource_catalog);
+  scroll_widget_resource->setWidget(_resource_catalog);
+  scroll_widget_resource->setWidgetResizable(true);
+  _dw_resource_catalog->setWidget(scroll_widget_resource);
 
   /* Main Dock Window */
   _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _jobs_manager);

@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 #include "JM_SalomeResource.hxx"
 #include "JM_EditSalomeResource.hxx"
 
-JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QScrollArea(parent)
+JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
 {
   DEBTRACE("Creating JM::ResourceCatalog");
   BL_ASSERT(parent);
