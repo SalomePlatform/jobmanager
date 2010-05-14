@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 #include "BL_Summary.hxx"
 #include "BL_Traces.hxx"
 
-BL::Summary::Summary(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QScrollArea(parent)
+BL::Summary::Summary(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QWidget(parent)
 {
   DEBTRACE("Creating BL::Summary");
   BL_ASSERT(parent);

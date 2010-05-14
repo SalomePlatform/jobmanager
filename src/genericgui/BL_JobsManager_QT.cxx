@@ -1,4 +1,4 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
 
   // Widget Part
 
-  QScrollArea * main_widget = new QScrollArea(this);
+  QWidget * main_widget = new QWidget(this);
 
   _load_jobs = new QPushButton("Load Jobs");
   _save_jobs = new QPushButton("Save Jobs");
@@ -81,7 +81,10 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
   mainLayout->addWidget(message_box);
   main_widget->setLayout(mainLayout);
 
-  setWidget(main_widget);
+  QScrollArea * scroll_widget = new QScrollArea(this);
+  scroll_widget->setWidget(main_widget);
+  scroll_widget->setWidgetResizable(true);
+  setWidget(scroll_widget);
   setWindowTitle("Job Manager");
 }
 
