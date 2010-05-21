@@ -46,6 +46,9 @@ namespace BL
       GenericGui(BL::MainWindows_Wrap * wrapper);
       virtual ~GenericGui();
 
+      void createDockWidgets();
+      void createCentralWidget();
+
       void showDockWidgets(bool isVisible);
       void createActions();
       void createMenus();
