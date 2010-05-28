@@ -58,11 +58,13 @@ html:
 htmldev:
 		 mkdir -p $@
 
+_static: html/index.html
+
 RSTFILES=          \
 index.rst          
 
 
-EXTRA_DIST+= $(RSTFILES) 
+EXTRA_DIST+= $(RSTFILES) conf.py
 
 install-data-local:
 	$(INSTALL) -d $(DESTDIR)$(jobmanagerdocdir)
