@@ -28,7 +28,8 @@ html/index.html:$(RSTFILES)
 	make htm
 endif
 
-EXTRA_DIST= html htmldev _static
+#EXTRA_DIST= html htmldev _static
+EXTRA_DIST= html html/index.html
 
 jobmanagerdocdir=$(docdir)/gui/JOBMANAGER
 
@@ -55,10 +56,8 @@ latex:
 html:
 		 mkdir -p $@
 
-htmldev:
-		 mkdir -p $@
-
-_static: html/index.html
+#htmldev:
+#		 mkdir -p $@
 
 RSTFILES=          \
 index.rst          
