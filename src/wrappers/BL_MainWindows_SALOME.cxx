@@ -24,6 +24,7 @@ BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
 {
   DEBTRACE("Creating BL::MainWindows_SALOME");
   _actionId = 190;
+  _currentViewId = -1;
 }
 
 void 
@@ -31,14 +32,45 @@ BL::MainWindows_SALOME::initialize(SalomeApp_Application * appli)
 {
   DEBTRACE("Initialize BL::MainWindows_SALOME");
   BL_ASSERT(appli);
-
   _appli = appli;
+}
+
+
+void
+BL::MainWindows_SALOME::createView()
+{
+  DEBTRACE("BL::MainWindows_SALOME CreateView");
   _svm = new SUIT_ViewManager(_appli->activeStudy(), _appli->desktop(), new SUIT_ViewModel());
   _appli->addViewManager(_svm);
   _viewWin = _svm->createViewWindow();
-
+  _currentViewId = _viewWin->getId();
   if (_viewWin && _appli->desktop())
     _viewWin->resize((int)(_appli->desktop()->width() * 0.6), (int)(_appli->desktop()->height() * 0.6 ));
+  DEBTRACE("End of BL::MainWindows_SALOME CreateView");
+}
+
+bool
+BL::MainWindows_SALOME::restoreViewFocus()
+{
+  bool result = false;
+  SUIT_ViewWindow* resWnd = 0;
+
+  // Search window
+  QList<SUIT_ViewWindow*> wndlist = _appli->desktop()->windows();
+  SUIT_ViewWindow* wnd;
+  for (int i = 0; i < wndlist.size(); ++i) 
+   {
+    wnd = wndlist.at(i);
+    if (_currentViewId == wnd->getId()) {resWnd = wnd;}
+    if (resWnd) {break;}
+   }
+
+  if (resWnd)
+   {
+    wnd->setFocus();
+    result = true;
+   }
+  return result;
 }
 
 QString  

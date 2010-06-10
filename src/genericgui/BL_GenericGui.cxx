@@ -28,21 +28,70 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   _job_name_selected = "";
 
   _dock_parent = _wrapper->getDockParent();
-  _tab_parent  = _wrapper->getTabParent();
 
   _salome_services = new BL::SALOMEServices();
   if (_salome_services->initNS() == false)
     DEBMSG("WARNING !!!!! SALOME IS NOT REACHABLE !!!!");
+}
+
+BL::GenericGui::~GenericGui()
+{
+  DEBTRACE("Destroying BL::GenericGui");
+  delete _salome_services;
+}
+
+void 
+BL::GenericGui::createDockWidgets()
+{
+  DEBTRACE("createDockWidgets BL::GenericGui");
   _jobs_manager = new BL::JobsManager_QT(_dock_parent, this, _salome_services);
   _model_manager = new BL::QModelManager(this, _jobs_manager);
-
   _model = _model_manager->getModel();
 
-  // ---- Adding different GUI parts
+  /* Summary */
+  _dw_summary = new QDockWidget(_dock_parent);
+  _dw_summary->setWindowTitle("Summary");
+  _summary = new BL::Summary(_dw_summary, _jobs_manager);
+  _summary->setModel(_model);
+  QScrollArea * scroll_widget_summary = new QScrollArea(_dw_summary);
+  scroll_widget_summary->setWidget(_summary);
+  scroll_widget_summary->setWidgetResizable(true);
+  _dw_summary->setWidget(scroll_widget_summary);
 
+  /* ResourceCatalog */
+  _dw_resource_catalog = new QDockWidget(_dock_parent);
+  _dw_resource_catalog->setWindowTitle("Resource Catalog");
+  _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services);
+  QScrollArea * scroll_widget_resource = new QScrollArea(_dw_resource_catalog);
+  scroll_widget_resource->setWidget(_resource_catalog);
+  scroll_widget_resource->setWidgetResizable(true);
+  _dw_resource_catalog->setWidget(scroll_widget_resource);
 
+  /* Main Dock Window */
+  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _jobs_manager);
+  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_summary);
+  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_resource_catalog);
+  _dock_parent->splitDockWidget(_jobs_manager, _dw_summary, Qt::Vertical);
+  _dock_parent->tabifyDockWidget(_dw_summary, _dw_resource_catalog);
+
+  /* Signals and Slots */
+  // JobsManager -> Model
+  connect(_jobs_manager, SIGNAL(new_job_added(QString)), _model_manager, SLOT(new_job_added(QString)));
+  connect(_jobs_manager, SIGNAL(job_state_changed(QString)), _model_manager, SLOT(job_state_changed(QString)));
+  connect(_jobs_manager, SIGNAL(job_state_changed(QString)), this, SLOT(job_state_changed(QString)));
+  // Model -> summary
+  connect(_model, SIGNAL(rowsInserted(QModelIndex, int, int)), _summary, SLOT(rowsInserted(QModelIndex, int, int)));
+  connect(_model, SIGNAL(rowsRemoved(QModelIndex, int, int)), _summary, SLOT(rowsRemoved(QModelIndex, int, int)));
+  connect(_model, SIGNAL(itemChanged(QStandardItem*)), _summary, SLOT(itemChanged(QStandardItem*)));
+}
+
+void 
+BL::GenericGui::createCentralWidget()
+{
+  DEBTRACE("createCentralWidget BL::GenericGui");
+
+  _tab_parent  = _wrapper->getTabParent();
   /* Tab Central Widget */
-
   /* Buttons */
   _buttons = new BL::Buttons(_tab_parent);
   _buttons->setCreateButtonSlot(this, SLOT(create_job()));
@@ -78,58 +127,15 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   scroll_central_widget->setWidgetResizable(true);
   _tab_parent->setCentralWidget(scroll_central_widget);
 
-  /* Summary */
-  _dw_summary = new QDockWidget(_dock_parent);
-  _dw_summary->setWindowTitle("Summary");
-  _summary = new BL::Summary(_dw_summary, _jobs_manager);
-  _summary->setModel(_model);
-  QScrollArea * scroll_widget_summary = new QScrollArea(_dw_summary);
-  scroll_widget_summary->setWidget(_summary);
-  scroll_widget_summary->setWidgetResizable(true);
-  _dw_summary->setWidget(scroll_widget_summary);
-
-  /* ResourceCatalog */
-  _dw_resource_catalog = new QDockWidget(_dock_parent);
-  _dw_resource_catalog->setWindowTitle("Resource Catalog");
-  _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services);
-  QScrollArea * scroll_widget_resource = new QScrollArea(_dw_resource_catalog);
-  scroll_widget_resource->setWidget(_resource_catalog);
-  scroll_widget_resource->setWidgetResizable(true);
-  _dw_resource_catalog->setWidget(scroll_widget_resource);
-
-  /* Main Dock Window */
-  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _jobs_manager);
-  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_summary);
-  _dock_parent->addDockWidget(Qt::RightDockWidgetArea, _dw_resource_catalog);
-  _dock_parent->splitDockWidget(_jobs_manager, _dw_summary, Qt::Vertical);
-  _dock_parent->tabifyDockWidget(_dw_summary, _dw_resource_catalog);
-
   /* Signals and Slots */
-
-  // JobsManager -> Model
-  connect(_jobs_manager, SIGNAL(new_job_added(QString)), _model_manager, SLOT(new_job_added(QString)));
-  connect(_jobs_manager, SIGNAL(job_state_changed(QString)), _model_manager, SLOT(job_state_changed(QString)));
-  connect(_jobs_manager, SIGNAL(job_state_changed(QString)), this, SLOT(job_state_changed(QString)));
-
-  // Model -> X
-  connect(_model, SIGNAL(rowsInserted(QModelIndex, int, int)), _summary, SLOT(rowsInserted(QModelIndex, int, int)));
-  connect(_model, SIGNAL(rowsRemoved(QModelIndex, int, int)), _summary, SLOT(rowsRemoved(QModelIndex, int, int)));
-  connect(_model, SIGNAL(itemChanged(QStandardItem*)), _summary, SLOT(itemChanged(QStandardItem*)));
+  // Model -> JobTab
   connect(_model, SIGNAL(itemChanged(QStandardItem*)), _job_tab, SLOT(itemChanged(QStandardItem*)));
-
   // TableView -> X
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _job_tab, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), this, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _model_manager, SLOT(job_selected(QModelIndex)));
-
   // Delete Job -> X
   connect(this, SIGNAL(job_deleted(QString)), _job_tab, SLOT(reset(QString)));
-}
-
-BL::GenericGui::~GenericGui()
-{
-  DEBTRACE("Destroying BL::GenericGui");
-  delete _salome_services;
 }
 
 void

@@ -64,12 +64,15 @@ namespace BL
 
       // Usefull methods
       virtual void initialize(SalomeApp_Application * appli);
+      bool restoreViewFocus();
+      void createView();
 
     protected:
       SalomeApp_Application * _appli;
       SalomeApp_Module * _module;
       SUIT_ViewManager * _svm;
       SUIT_ViewWindow  * _viewWin;
+      int _currentViewId;
 
       int _actionId;
       int getActionId() { return _actionId++; }
