@@ -62,15 +62,29 @@ BL::SalomeGui::activateModule(SUIT_Study* theStudy)
   if (!_gengui)
   {
    BL::MainWindows_SALOME::initialize(getApp());
+   BL::MainWindows_SALOME::createView();
    _gengui = new BL::GenericGui(this);
+
+   _gengui->createDockWidgets();
+   _gengui->createCentralWidget();
    _gengui->createActions();
    _gengui->createMenus();
    _gengui->updateButtonsStates();
   }
+  else
+   {
+    // Test main view
+    if (!BL::MainWindows_SALOME::restoreViewFocus())
+     {
+      // We need to recreate QT objects and the view
+      BL::MainWindows_SALOME::createView();
+      _gengui->createCentralWidget();
+     }
+   }
 
-  bool bOk = SalomeApp_Module::activateModule(theStudy);
   setMenuShown(true);
   _gengui->showDockWidgets(true);
+  bool bOk = SalomeApp_Module::activateModule(theStudy);
   return bOk;
 }
 

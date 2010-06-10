@@ -19,6 +19,10 @@
 
 #include "BL_CreateJobWizard.hxx"
 #include "BL_JobsManager_QT.hxx"
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <stdlib.h>
 
 BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALOMEServices * salome_services)
 {
@@ -676,6 +680,17 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
   QPushButton * button_result = new QPushButton("Local Result directory");
   connect(button_result, SIGNAL(clicked()), this, SLOT(choose_local_directory()));
   _result_directory = new QLineEdit(this);
+
+  // Default result directory is home directory (if we found it)
+  // First try -> HOME
+  if (getenv("HOME"))
+    _result_directory->setText(getenv("HOME"));
+  else {
+    // Second try -> getpwuid
+    struct passwd * pass_struct = getpwuid(getuid());
+    if (pass_struct)
+      _result_directory->setText(pass_struct->pw_dir);
+  }
   registerField("result_directory", _result_directory);
 
   QGridLayout * output_box = new QGridLayout;
