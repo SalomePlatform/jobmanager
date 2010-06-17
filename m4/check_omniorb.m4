@@ -25,10 +25,12 @@ AC_REQUIRE([AC_PROG_CXXCPP])dnl
 AC_CHECKING(for omniORB)
 omniORB_ok=yes
 
-if test "x$PYTHON" = "x" 
-then
-  CHECK_PYTHON
-fi
+#VSR: Python is not currently required.
+#Commented to avoid warning message on configure.
+#if test "x$PYTHON" = "x" 
+#then
+#  CHECK_PYTHON
+#fi
 
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
