@@ -32,35 +32,65 @@
 
 namespace BL{
 
+  class SALOMEServices;
+
   class JobsManager
   {
     public:
       JobsManager(BL::SALOMEServices * salome_services);
       virtual ~JobsManager();
 
+      // Add QT observer
       void setObserver(BL::Observer * observer);
 
+      // useful methods
       BL::Job * createJob(const std::string & name);
+      BL::Job * getJob(const std::string & name);
+      std::map<std::string, BL::Job *> & getJobs();
+      bool job_already_exist(const std::string & name);
+
+      // remote methods
       void addJobToLauncher(const std::string & name);
       void removeJob(const std::string & name);
 
-      BL::Job * getJob(const std::string & name);
-      std::map<std::string, BL::Job *> & getJobs();
-
-      bool job_already_exist(const std::string & name);
-
       virtual void start_job(const std::string & name);
-      virtual void refresh_jobs();
-      virtual void get_results_job(const std::string & name);
-
       static void starting_job_thread(void * object_ptr);
+
+      virtual void get_results_job(const std::string & name);
       static void get_results_job_thread(void * object_ptr);
-      static void refresh_job(void * object_ptr);
+
+      virtual void refresh_jobs();
+      static void refresh_jobs_thread(void * object_ptr);
+
+      virtual void load_jobs(const std::string & xml_file);
+      virtual void save_jobs(const std::string & xml_file);
+      static void load_jobs_thread(void * object_ptr);
+      static void save_jobs_thread(void * object_ptr);
+
+      // event from launcher
+      void launcher_event_save_jobs(const std::string & data);
+      void launcher_event_load_jobs(const std::string & data);
+      void launcher_event_new_job(const std::string & data);
+      static void launcher_event_new_job_thread(void * object_ptr);
+      void launcher_event_remove_job(const std::string & data);
+      static void launcher_event_remove_job_thread(void * object_ptr);
 
       struct thread_info
       {
-	BL::JobsManager * object_ptr;
-	std::string job_name;
+        BL::JobsManager * object_ptr;
+        std::string job_name;
+      };
+
+      struct thread_info_file
+      {
+        BL::JobsManager * object_ptr;
+        std::string file_name;
+      };
+
+      struct thread_info_new_job
+      {
+        BL::JobsManager * object_ptr;
+        int job_number;
       };
 
     protected:
@@ -72,8 +102,11 @@ namespace BL{
       _jobs_map _jobs;
       _jobs_map::iterator _jobs_it;
 
-      omni_mutex _thread_mutex;
-      omni_mutex _thread_mutex_results;
+      // Mutex used for the jobs map
+      omni_mutex _thread_mutex_jobs_map;
+
+      // To avoid two jobs with the same name
+      int _name_counter;
   };
 
 }

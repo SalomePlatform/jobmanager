@@ -34,9 +34,9 @@ namespace BL{
   {
     public:
       JobManagerEvent(const std::string & action_i, 
-		      const std::string & event_name_i, 
-		      const std::string & job_name_i, 
-		      const std::string & data_i);
+                      const std::string & event_name_i, 
+                      const std::string & job_name_i, 
+                      const std::string & data_i);
       virtual ~JobManagerEvent();
 
     public:
@@ -48,8 +48,8 @@ namespace BL{
 
   class GenericGui;
   class JobsManager_QT: virtual public QDockWidget,
-			virtual public BL::JobsManager,
-			virtual public BL::Observer
+                        virtual public BL::JobsManager,
+                        virtual public BL::Observer
   {
     Q_OBJECT
 
@@ -64,13 +64,15 @@ namespace BL{
       void restart_job(const std::string & name);
 
       virtual void sendEvent(const std::string & action, 
-			     const std::string & event_name, 
-			     const std::string & job_name, 
-			     const std::string & data);
+                             const std::string & event_name, 
+                             const std::string & job_name, 
+                             const std::string & data);
       bool event(QEvent * e);
 
       void write_normal_text(const QString & text);
       void write_error_text(const QString & text);
+
+      void set_model(QStandardItemModel * model);
 
     protected:
       void create_job_with_wizard(BL::CreateJobWizard & wizard);
@@ -84,6 +86,8 @@ namespace BL{
       void five_minutes_refresh();
       void thirty_minutes_refresh();
       void one_hour_refresh();
+      void load_jobs_button();
+      void save_jobs_button();
 
     signals:
       void new_job_added(const QString & name);
@@ -96,6 +100,7 @@ namespace BL{
       QTimer * _timer;
       QTextEdit * _log;
       BL::GenericGui * _main_gui;
+      QStandardItemModel * _model;
   };
 
 }

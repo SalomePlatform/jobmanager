@@ -30,10 +30,10 @@ namespace BL{
       Observer() {};
       virtual ~Observer() {};
 
-      virtual void sendEvent(const std::string & action, 
-			     const std::string & event_name, 
-			     const std::string & job_name, 
-			     const std::string & data) = 0;
+      virtual void sendEvent(const std::string & action,
+                             const std::string & event_name,
+                             const std::string & job_name,
+                             const std::string & data) = 0;
   };
 
 }

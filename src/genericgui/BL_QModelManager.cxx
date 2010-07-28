@@ -26,6 +26,7 @@ BL::QModelManager::QModelManager(QObject * parent, BL::JobsManager_QT * jobs_man
   _jobs_manager = jobs_manager;
 
   _model = new QStandardItemModel(this);
+  jobs_manager->set_model(_model);
   QStringList headers;
   headers << "Job Name" << "Type" << "State" << "Resource" << "Launcher Id";
   _model->setHorizontalHeaderLabels(headers);
@@ -69,6 +70,10 @@ BL::QModelManager::new_job_added(const QString & name)
     new_job_state = new QStandardItem("Paused");
   else if (job->getState() == BL::Job::ERROR)
     new_job_state = new QStandardItem("Error");
+  else if (job->getState() == BL::Job::FAILED)
+    new_job_state = new QStandardItem("Failed");
+  else if (job->getState() == BL::Job::NOT_CREATED)
+    new_job_state = new QStandardItem("Not Created");
   else 
     new_job_state = new QStandardItem("Finished");
 
@@ -104,6 +109,10 @@ BL::QModelManager::job_state_changed(const QString & name)
     job_state_item->setText("Paused");
   else if (job->getState() == BL::Job::ERROR)
     job_state_item->setText("Error");
+  else if (job->getState() == BL::Job::FAILED)
+    job_state_item->setText("Failed");
+  else if (job->getState() == BL::Job::NOT_CREATED)
+    job_state_item->setText("Not Created");
   else 
     job_state_item->setText("Finished");
 }
@@ -112,6 +121,18 @@ void
 BL::QModelManager::deleteJob(int row)
 {
   _model->removeRow(row);
+}
+
+void
+BL::QModelManager::deleteJob(const QString & name)
+{
+  QList<QStandardItem *> list = _model->findItems(name);
+  if (list.size() != 1)
+  {
+    DEBMSG("WARNING LIST IS NOT ONLY ONE !");
+  }
+  if (list.size() > 0)
+    _model->removeRow(list[0]->row());
 }
 
 void

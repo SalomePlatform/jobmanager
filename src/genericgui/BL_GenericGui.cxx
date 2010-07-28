@@ -244,6 +244,20 @@ BL::GenericGui::delete_job()
 }
 
 void
+BL::GenericGui::delete_job_external(const QString & name)
+{
+  _jobs_manager->delete_job(name);
+  _model_manager->deleteJob(name);
+  emit job_deleted(name);
+  if (name == _job_name_selected)
+  {
+    _row_selected = -1;
+    _job_name_selected = "";
+    updateButtonsStates();
+  }
+}
+
+void
 BL::GenericGui::delete_job_internal()
 {
   _jobs_manager->delete_job(_job_name_selected);
@@ -359,7 +373,7 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_start_button();
 	_delete_job_action->setEnabled(true);
 	_buttons->enable_delete_button();
-	_get_results_job_action->setEnabled(false);
+	_get_results_job_action->setEnabled(true);
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
@@ -372,6 +386,28 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(true);
 	_buttons->enable_get_results_button();
+	_restart_job_action->setEnabled(true);
+	_buttons->enable_restart_button();
+	break;
+
+      case BL::Job::FAILED:
+	_start_job_action->setEnabled(false);
+	_buttons->disable_start_button();
+	_delete_job_action->setEnabled(true);
+	_buttons->enable_delete_button();
+	_get_results_job_action->setEnabled(true);
+	_buttons->disable_get_results_button();
+	_restart_job_action->setEnabled(true);
+	_buttons->enable_restart_button();
+	break;
+
+      case BL::Job::NOT_CREATED:
+	_start_job_action->setEnabled(false);
+	_buttons->disable_start_button();
+	_delete_job_action->setEnabled(true);
+	_buttons->enable_delete_button();
+	_get_results_job_action->setEnabled(false);
+	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
 	break;

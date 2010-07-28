@@ -39,42 +39,44 @@ namespace BL{
 
       enum JobType {YACS_SCHEMA, COMMAND, PYTHON_SALOME};
       void setType(BL::Job::JobType type);
+      void setType(const std::string & type);
       BL::Job::JobType getType();
 
-      void setJobFile(std::string & job_file);
+      void setJobFile(const std::string & job_file);
       std::string & getJobFile();
 
-      void setEnvFile(std::string & env_file);
+      void setEnvFile(const std::string & env_file);
       std::string & getEnvFile();
 
       struct BatchParam
       {
-	std::string batch_directory;
-	std::string maximum_duration;
-	std::string expected_memory;
-	int nb_proc;
+        std::string batch_directory;
+        std::string maximum_duration;
+        std::string expected_memory;
+        int nb_proc;
       };
       void setBatchParameters(BL::Job::BatchParam & param);
       BL::Job::BatchParam & getBatchParameters();
 
       struct FilesParam
       {
-	std::string result_directory;
-	std::list<std::string> input_files_list;
-	std::list<std::string> output_files_list;
+        std::string result_directory;
+        std::list<std::string> input_files_list;
+        std::list<std::string> output_files_list;
       };
       void setFilesParameters(BL::Job::FilesParam & param);
       BL::Job::FilesParam & getFilesParameters();
 
-      void setResource(std::string & resource);
+      void setResource(const std::string & resource);
       std::string & getResource();
 
-      void setBatchQueue(std::string & queue);
+      void setBatchQueue(const std::string & queue);
       std::string & getBatchQueue();
 
-      enum State {CREATED, IN_PROCESS, QUEUED, RUNNING, PAUSED, FINISHED, ERROR};
+      enum State {CREATED, IN_PROCESS, QUEUED, RUNNING, PAUSED, FINISHED, ERROR, FAILED, NOT_CREATED};
       void setState(BL::Job::State state);
       BL::Job::State getState();
+      std::string setStringState(const std::string & state);
 
       enum ThreadState {NOTHING, STARTING}; 
       void setThreadState(BL::Job::ThreadState state);
@@ -82,7 +84,6 @@ namespace BL{
 
       void setSalomeLauncherId(int id);
       int getSalomeLauncherId();
-
 
     private:
       BL::Job::State _state;
@@ -93,7 +94,7 @@ namespace BL{
       BL::Job::JobType _type;
       std::string _job_file;
       std::string _env_file;
-  
+
       BL::Job::BatchParam _batch_params;
       BL::Job::FilesParam _files_params;
       std::string _resource_choosed;

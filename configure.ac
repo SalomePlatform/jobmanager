@@ -122,6 +122,7 @@ fi
 
 AC_OUTPUT([ \
   Makefile \
+  idl/Makefile \
   src/Makefile \
   src/bases/Makefile \
   src/engine/Makefile \

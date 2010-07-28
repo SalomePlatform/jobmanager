@@ -39,6 +39,7 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
   DEBTRACE("Creating BL::JobsManager_QT");
   _main_gui = main_gui;
   setObserver(this);
+  _model = NULL;
 
   // Widget Part
 
@@ -46,8 +47,9 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
 
   _load_jobs = new QPushButton("Load Jobs");
   _save_jobs = new QPushButton("Save Jobs");
-  _load_jobs->setEnabled(false);
-  _save_jobs->setEnabled(false);
+  connect(_load_jobs, SIGNAL(clicked()), this, SLOT(load_jobs_button()));
+  connect(_save_jobs, SIGNAL(clicked()), this, SLOT(save_jobs_button()));
+
   _auto_refresh_jobs = new QPushButton("Auto Refresh: no");
   _timer = new QTimer(this);
   _timer->stop();
@@ -91,6 +93,42 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
 BL::JobsManager_QT::~JobsManager_QT()
 {
   DEBTRACE("Destroying BL::JobsManager_QT");
+}
+
+void
+BL::JobsManager_QT::set_model(QStandardItemModel * model)
+{
+  _model = model;
+}
+
+void
+BL::JobsManager_QT::load_jobs_button()
+{
+  DEBTRACE("load_jobs");
+  QString jobs_file = QFileDialog::getOpenFileName(this,
+                                                   tr("Choose an xml jobs file"), "",
+                                                   tr("xml (*.xml);;All Files (*)"));
+  if (jobs_file == "")
+  {
+    write_normal_text("Load jobs action cancelled\n");
+  }
+  else
+    load_jobs(jobs_file.toStdString());
+}
+
+void
+BL::JobsManager_QT::save_jobs_button()
+{
+  DEBTRACE("save_jobs");
+  QString jobs_file = QFileDialog::getSaveFileName(this,
+                                                   tr("Choose an xml jobs file"), "",
+                                                   tr("xml (*.xml);;All Files (*)"));
+  if (jobs_file == "")
+  {
+    write_normal_text("Save jobs action cancelled\n");
+  }
+  else
+    save_jobs(jobs_file.toStdString());
 }
 
 void
@@ -366,6 +404,50 @@ BL::JobsManager_QT::event(QEvent * e)
       write_error_text(" ***\n");
     }
   }
+  else if (event->action == "save_jobs")
+  {
+    if (event->event_name == "Error")
+    {
+      write_error_text("Error in saving jobs: \n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+    else
+    {
+      QString str((event->data).c_str());
+      write_normal_text("Jobs saved in file " + str + "\n");
+    }
+  }
+  else if (event->action == "load_jobs")
+  {
+    if (event->event_name == "Error")
+    {
+      write_error_text("Error in loading jobs: \n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+    else
+    {
+      QString str((event->data).c_str());
+      write_normal_text("Jobs loaded from file " + str + "\n");
+    }
+  }
+  else if (event->action == "add_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("New job added " + str + "\n");
+      emit new_job_added(str);
+    }
+  }
+  else if (event->action == "to_remove_job")
+  {
+    if (event->event_name == "Ok")
+      _main_gui->delete_job_external((event->job_name).c_str());
+  }
   else
   {
     QString str((event->action).c_str());
@@ -389,9 +471,11 @@ BL::JobsManager_QT::write_normal_text(const QString & text)
 void 
 BL::JobsManager_QT::write_error_text(const QString & text)
 {
+  _log->setReadOnly(false);
   QTextCursor cursor = _log->textCursor();
   QTextCharFormat text_format;
   text_format.setForeground(Qt::red);
   cursor.insertText(text, text_format);
   _log->setTextCursor(cursor);
+  _log->setReadOnly(true);
 }

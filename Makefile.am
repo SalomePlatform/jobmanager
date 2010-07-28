@@ -19,6 +19,6 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src doc
+SUBDIRS = idl src doc
 
 EXTRA_DIST = build_configure

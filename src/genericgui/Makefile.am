@@ -45,6 +45,7 @@ libBL_GenericGui_la_CXXFLAGS = $(qt4_cppflags) \
 			       -I$(top_srcdir)/src/engine \
 			       -I$(KERNEL_ROOT_DIR)/include/salome \
 			       $(OMNIORB_INCLUDES) \
+			       -I../../idl \
 			       -I$(top_srcdir)/src/wrappers
 
 libBL_GenericGui_la_LDFLAGS = $(qt4_ldflags) 

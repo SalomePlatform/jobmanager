@@ -18,6 +18,7 @@
 //
 
 #include "BL_SALOMEServices.hxx"
+#include <sstream>
 
 static std::ostream & 
 operator<<(std::ostream & os, const CORBA::Exception & e)
@@ -40,6 +41,7 @@ BL::SALOMEServices::SALOMEServices()
   _salome_naming_service = NULL;
   _lcc = NULL;
   _state = false;
+  _manager = NULL;
 }
 
 BL::SALOMEServices::~SALOMEServices()
@@ -64,6 +66,7 @@ BL::SALOMEServices::initNS()
     DEBMSG("SALOME Launcher is not reachable!")
     return_value = false;
   }
+  _salome_launcher->addObserver(_this());
 
   obj = _salome_naming_service->Resolve("/ResourcesManager");
   _resources_manager = Engines::ResourcesManager::_narrow(obj);
@@ -104,8 +107,8 @@ BL::SALOMEServices::getResourceList()
     {
       for (int i = 0; i < resourceList->length(); i++)
       {
-	const char* aResource = (*resourceList)[i];
-	resource_list.push_back(aResource);
+        const char* aResource = (*resourceList)[i];
+        resource_list.push_back(aResource);
       }
       delete resourceList;
     }
@@ -243,6 +246,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   }
 
   // Files
+  job_parameters->job_name = CORBA::string_dup(job->getName().c_str());
   job_parameters->job_file = CORBA::string_dup(job->getJobFile().c_str());
   job_parameters->env_file = CORBA::string_dup(job->getEnvFile().c_str());
   BL::Job::FilesParam files = job->getFilesParameters();
@@ -401,4 +405,146 @@ BL::SALOMEServices::get_results_job(BL::Job * job)
     ret = "SALOME System Exception - see logs";
   }
   return ret;
+}
+
+std::string
+BL::SALOMEServices::save_jobs(const std::string & file_name)
+{
+  CORBA::String_var file = CORBA::string_dup(file_name.c_str());
+  std::string ret = "";
+  try
+  {
+    _salome_launcher->saveJobs(file);
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in saveJobs !");
+    ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive CORBA System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "CORBA System Exception - see SALOME logs";
+  }
+  return ret;
+}
+
+std::string
+BL::SALOMEServices::load_jobs(const std::string & file_name)
+{
+  CORBA::String_var file = CORBA::string_dup(file_name.c_str());
+  std::string ret = "";
+  try
+  {
+    _salome_launcher->loadJobs(file);
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in loadJobs !");
+    ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive CORBA System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "CORBA System Exception - see SALOME logs";
+  }
+  return ret;
+}
+
+void
+BL::SALOMEServices::notify(const char* event_name, const char * event_data)
+{
+  DEBMSG("Launcher event received " << event_name << " " << event_data);
+
+  std::string event(event_name);
+  std::string data(event_data);
+
+  if (event == "SAVE_JOBS")
+  {
+    _manager->launcher_event_save_jobs(data);
+  }
+  else if (event == "LOAD_JOBS")
+  {
+    _manager->launcher_event_load_jobs(data);
+  }
+  else if (event == "NEW_JOB")
+  {
+    _manager->launcher_event_new_job(data);
+  }
+  else if (event == "REMOVE_JOB")
+  {
+    _manager->launcher_event_remove_job(data);
+  }
+  else
+  {
+    DEBMSG("Unkown launcher event received");
+  }
+}
+
+BL::Job * 
+BL::SALOMEServices::get_new_job(int job_number)
+{
+  DEBMSG("Start of BL::SALOMEServices::get_new_job");
+  BL::Job * job_return = NULL;
+  Engines::JobParameters * job_parameters = NULL;
+  try
+  {
+    job_parameters = _salome_launcher->getJobParameters(job_number);
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in saveJobs !");
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive CORBA System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+  }
+
+  if (job_parameters)
+  {
+    job_return = new BL::Job();
+    job_return->setSalomeLauncherId(job_number);
+
+    job_return->setName(job_parameters->job_name.in());
+    job_return->setType(job_parameters->job_type.in());
+    job_return->setJobFile(job_parameters->job_file.in());
+    job_return->setEnvFile(job_parameters->env_file.in());
+    job_return->setBatchQueue(job_parameters->queue.in());
+
+    BL::Job::FilesParam param;
+    param.result_directory = job_parameters->result_directory.in();
+    for (CORBA::ULong i = 0; i < job_parameters->in_files.length(); i++)
+      param.input_files_list.push_back(job_parameters->in_files[i].in());
+    for (CORBA::ULong i = 0; i < job_parameters->out_files.length(); i++)
+      param.output_files_list.push_back(job_parameters->out_files[i].in());
+    job_return->setFilesParameters(param);
+
+    BL::Job::BatchParam batch_param;
+    batch_param.batch_directory = job_parameters->work_directory.in();
+    batch_param.maximum_duration = job_parameters->maximum_duration.in();
+    batch_param.nb_proc = job_parameters->resource_required.nb_proc;
+    std::ostringstream mem_stream;
+    mem_stream << job_parameters->resource_required.mem_mb << "mb";
+    batch_param.expected_memory = mem_stream.str();
+    job_return->setBatchParameters(batch_param);
+
+    job_return->setResource(job_parameters->resource_required.name.in());
+
+    // Get current state
+    std::string result_job = job_return->setStringState(refresh_job(job_return));
+    if (result_job == "new_state") {}
+    else if (result_job != "")
+    {
+      // Error in getting state
+      DEBMSG("Error in getting state of the new job!");
+      delete job_return;
+      job_return = NULL;
+    }
+    delete job_parameters;
+  }
+
+  return job_return;
 }

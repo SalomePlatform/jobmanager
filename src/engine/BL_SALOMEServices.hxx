@@ -26,12 +26,18 @@
 #include "SALOME_NamingService.hxx"
 #include "SALOME_LifeCycleCORBA.hxx"
 #include "SALOME_ContainerManager.hh"
+#include "BL_JobsManager.hxx"
 
 #include <map>
 #include <list>
 #include <string>
 
+#include "JOBMANAGER_IDL.hh"
+
+
 namespace BL{
+
+  class JobsManager;
 
   struct ResourceDescr
   {
@@ -52,7 +58,8 @@ namespace BL{
     std::string iprotocol;
   };
 
-  class SALOMEServices
+  class SALOMEServices :
+    public POA_JOBMANAGER::LauncherObserver
   {
     public:
       SALOMEServices();
@@ -60,10 +67,15 @@ namespace BL{
 
       bool initNS();
 
+      void set_manager(BL::JobsManager * manager) {_manager = manager;}
+
       std::list<std::string> getResourceList();
       BL::ResourceDescr getResourceDescr(const std::string& name);
       void addResource(BL::ResourceDescr & new_resource);
       void removeResource(const std::string & name);
+
+      std::string save_jobs(const std::string & file_name);
+      std::string load_jobs(const std::string & file_name);
 
       std::string create_job(BL::Job * job);
       std::string start_job(BL::Job * job);
@@ -71,12 +83,18 @@ namespace BL{
       std::string delete_job(BL::Job * job);
       std::string get_results_job(BL::Job * job);
 
+      BL::Job * get_new_job(int job_number);
+
+      virtual void notify(const char* event_name, const char * event_data);
+
     private:
       CORBA::ORB_var _orb;
       SALOME_NamingService * _salome_naming_service;
       SALOME_LifeCycleCORBA * _lcc;
       Engines::SalomeLauncher_var _salome_launcher;
       Engines::ResourcesManager_var _resources_manager;
+
+      BL::JobsManager * _manager;
 
       bool _state;
   };

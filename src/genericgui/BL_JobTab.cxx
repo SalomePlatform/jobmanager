@@ -167,6 +167,10 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _job_state_label_value->setText("Paused");
     else if (job->getState() == BL::Job::ERROR)
       _job_state_label_value->setText("Error");
+    else if (job->getState() == BL::Job::FAILED)
+      _job_state_label_value->setText("Failed");
+    else if (job->getState() == BL::Job::NOT_CREATED)
+      _job_state_label_value->setText("Not Created");
     else 
       _job_state_label_value->setText("Finished");
 
@@ -237,6 +241,10 @@ BL::JobTab::itemChanged(QStandardItem * item)
       _job_state_label_value->setText("Paused");
     else if (job->getState() == BL::Job::ERROR)
       _job_state_label_value->setText("Error");
+    else if (job->getState() == BL::Job::FAILED)
+      _job_state_label_value->setText("Failed");
+    else if (job->getState() == BL::Job::NOT_CREATED)
+      _job_state_label_value->setText("Not Created");
     else 
       _job_state_label_value->setText("Finished");
   }

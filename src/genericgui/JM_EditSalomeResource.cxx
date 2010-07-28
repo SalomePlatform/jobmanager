@@ -20,8 +20,8 @@
 #include "JM_EditSalomeResource.hxx"
 #include "BL_Traces.hxx"
 
-JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
-				   const std::string & resource_name) : QDialog(parent)
+JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices * salome_services,
+                                           const std::string & resource_name) : QDialog(parent)
 {
   DEBTRACE("Creating JM::EditSalomeResource");
   BL_ASSERT(parent);
@@ -33,7 +33,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   //setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
   // Widget code
-  
+
   // Part 1
   QGroupBox * main_groupBox = new QGroupBox("Main values");
   QLabel * name_label = new QLabel("Name:");
@@ -120,6 +120,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _batch_line->addItem("lsf");
   _batch_line->addItem("sge");
   _batch_line->addItem("ssh");
+  _batch_line->addItem("ccc");
   _batch_line->setCurrentIndex(-1);
 
   QLabel * mpiImpl_label = new QLabel("MPI impl:");
@@ -211,6 +212,8 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(2);
   else if (batch == "ssh")
     _batch_line->setCurrentIndex(3);
+  else if (batch == "ccc")
+    _batch_line->setCurrentIndex(4);
   else  
     _batch_line->setCurrentIndex(-1);
   
@@ -270,8 +273,8 @@ JM::EditSalomeResource::add_component()
 {
   bool ok;
   QString text = QInputDialog::getText(this, "Add a component",
-				       "Component name:", QLineEdit::Normal,
-				       "", &ok);
+                                       "Component name:", QLineEdit::Normal,
+                                       "", &ok);
   if (ok && !text.isEmpty())
     _componentList->addItem(text);
 }

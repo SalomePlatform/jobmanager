@@ -29,6 +29,7 @@ nodist_libJOBMANAGER_la_SOURCES = $(MOC_FILES)
 
 libJOBMANAGER_la_CXXFLAGS = $(qt4_cppflags) \
 				$(OMNIORB_INCLUDES) \
+			        -I../../idl \
 				-I$(KERNEL_ROOT_DIR)/include/salome \
 				-I$(GUI_ROOT_DIR)/include/salome \
 				-I$(top_srcdir)/src/genericgui \
@@ -41,6 +42,8 @@ libJOBMANAGER_la_LDFLAGS  = -L$(GUI_ROOT_DIR)/lib/salome \
 				$(qt4_ldflags)
 
 libJOBMANAGER_la_LIBADD  = $(qt4_libs) \
+			   $(top_builddir)/idl/libJOBMANAGER_IDL.la \
+			   @OMNIORB_LIBS@ \
 			       $(top_builddir)/src/bases/libBL_Bases.la \
 			       $(top_builddir)/src/engine/libBL_Engine.la \
 			       $(top_builddir)/src/genericgui/libBL_GenericGui.la \

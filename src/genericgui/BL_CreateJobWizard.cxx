@@ -80,8 +80,11 @@ BL::CreateJobWizard::clone(const std::string & name)
   {
     BL::Job * job = _jobs_manager->getJob(name);
 
-    // We can only edit a job in CREATED, ERROR
-    if (job->getState() == BL::Job::CREATED or job->getState() == BL::Job::ERROR)
+    // We can only edit a job in CREATED, ERROR, FAILED and NOT_CREATED
+    if (job->getState() == BL::Job::CREATED ||
+        job->getState() == BL::Job::ERROR   ||
+        job->getState() == BL::Job::FAILED  ||
+        job->getState() == BL::Job::NOT_CREATED)
     { 
       setField("job_name", QString(name.c_str()));
       _job_name_page->_check_name = false;
@@ -379,7 +382,6 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   label->setWordWrap(true);
 
   QPushButton * yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
-  yacs_file_button->show();
   connect(yacs_file_button, SIGNAL(clicked()), this, SLOT(choose_file()));
 
   _yacs_file_text = new QLineEdit(this);
@@ -388,7 +390,6 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   _yacs_file_text->setReadOnly(true);
 
   QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
-  command_env_file_button->show();
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
   registerField("env_yacs_file", _line_env_file);
@@ -463,14 +464,12 @@ BL::CommandMainPage::CommandMainPage(QWidget * parent)
 
   // command
   QPushButton * command_file_button = new QPushButton(tr("Choose a command file"));
-  command_file_button->show();
   connect(command_file_button, SIGNAL(clicked()), this, SLOT(choose_command_file()));
   _line_command = new QLineEdit(this);
   registerField("command", _line_command);
   _line_command->setReadOnly(true);
 
   QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
-  command_env_file_button->show();
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
   registerField("env_command_file", _line_env_file);
@@ -917,14 +916,12 @@ BL::PythonSalomeMainPage::PythonSalomeMainPage(QWidget * parent)
 
   // PythonSalome
   QPushButton * PythonSalome_file_button = new QPushButton(tr("Choose a Python file"));
-  PythonSalome_file_button->show();
   connect(PythonSalome_file_button, SIGNAL(clicked()), this, SLOT(choose_PythonSalome_file()));
   _line_PythonSalome = new QLineEdit(this);
   registerField("PythonSalome", _line_PythonSalome);
   _line_PythonSalome->setReadOnly(true);
 
   QPushButton * PythonSalome_env_file_button = new QPushButton(tr("Choose an environnement file"));
-  PythonSalome_env_file_button->show();
   connect(PythonSalome_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
   registerField("env_PythonSalome_file", _line_env_file);

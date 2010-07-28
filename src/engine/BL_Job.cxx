@@ -70,10 +70,27 @@ BL::Job::getName()
   return _name;
 }
 
-void 
+void
 BL::Job::setType(BL::Job::JobType type)
 {
   _type = type;
+}
+
+void
+BL::Job::setType(const std::string & type)
+{
+  if (type == "command")
+  {
+    setType(BL::Job::COMMAND);
+  }
+  else if (type == "yacs_file")
+  {
+    setType(BL::Job::YACS_SCHEMA);
+  }
+  else if (type == "python_salome")
+  {
+    setType(BL::Job::PYTHON_SALOME);
+  }
 }
 
 BL::Job::JobType
@@ -83,7 +100,7 @@ BL::Job::getType()
 }
 
 void 
-BL::Job::setJobFile(std::string & job_file)
+BL::Job::setJobFile(const std::string & job_file)
 {
   _job_file = job_file;
 }
@@ -95,7 +112,7 @@ BL::Job::getJobFile()
 }
 
 void 
-BL::Job::setEnvFile(std::string & env_file)
+BL::Job::setEnvFile(const std::string & env_file)
 {
   _env_file = env_file;
 }
@@ -136,7 +153,7 @@ BL::Job::getFilesParameters()
 }
 
 void
-BL::Job::setResource(std::string & resource)
+BL::Job::setResource(const std::string & resource)
 {
   _resource_choosed = resource;
 }
@@ -148,7 +165,7 @@ BL::Job::getResource()
 }
 
 void
-BL::Job::setBatchQueue(std::string & queue)
+BL::Job::setBatchQueue(const std::string & queue)
 {
   _batch_queue = queue;
 }
@@ -169,6 +186,105 @@ BL::Job::State
 BL::Job::getState()
 {
   return _state;
+}
+
+std::string
+BL::Job::setStringState(const std::string & state)
+{
+  std::string result("");
+
+  // Check if state is an error
+  if (state != "CREATED"     &&
+      state != "IN_PROCESS"  &&
+      state != "QUEUED"      &&
+      state != "RUNNING"     &&
+      state != "PAUSED"      &&
+      state != "FINISHED"    &&
+      state != "FAILED"      &&
+      state != "NOT_CREATED" &&
+      state != "ERROR"
+     )
+  {
+    DEBTRACE("Error state in setStringState");
+    result = state;
+  }
+
+  if (result == "")
+  {
+    if (state == "CREATED")
+    {
+      if (_state != BL::Job::CREATED)
+      {
+        setState(BL::Job::CREATED);
+        result = "new_state";
+      }
+    }
+    else if (state == "NOT_CREATED")
+    {
+      if (_state != BL::Job::NOT_CREATED)
+      {
+        setState(BL::Job::NOT_CREATED);
+        result = "new_state";
+      }
+    }
+    else if (state == "QUEUED")
+    {
+      if (_state != BL::Job::QUEUED)
+      {
+        setState(BL::Job::QUEUED);
+        result = "new_state";
+      }
+    }
+    else if (state == "IN_PROCESS")
+    {
+      if (_state != BL::Job::IN_PROCESS)
+      {
+        setState(BL::Job::IN_PROCESS);
+        result = "new_state";
+      }
+    }
+    else if (state == "RUNNING")
+    {
+      if (_state != BL::Job::RUNNING)
+      {
+        setState(BL::Job::RUNNING);
+        result = "new_state";
+      }
+    }
+    else if (state == "PAUSED")
+    {
+      if (_state != BL::Job::PAUSED)
+      {
+        setState(BL::Job::PAUSED);
+        result = "new_state";
+      }
+    }
+    else if (state == "FINISHED")
+    {
+      if (_state != BL::Job::FINISHED)
+      {
+        setState(BL::Job::FINISHED);
+        result = "new_state";
+      }
+    }
+    else if (state == "ERROR")
+    {
+      if (_state != BL::Job::ERROR)
+      {
+        setState(BL::Job::ERROR);
+        result = "new_state";
+      }
+    }
+    else if (state == "FAILED")
+    {
+      if (_state != BL::Job::FAILED)
+      {
+        setState(BL::Job::FAILED);
+        result = "new_state";
+      }
+    }
+  }
+  return result;
 }
 
 void 

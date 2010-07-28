@@ -1,4 +1,4 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2010  EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -17,41 +17,14 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _BL_QMODELMANAGER_HXX_
-#define _BL_QMODELMANAGER_HXX_
+#ifndef _JOBMANAGER_IDL_
+#define _JOBMANAGER_IDL_
 
-#include <QtGui>
+#include "SALOME_ContainerManager.idl"
 
-#include "BL_Job.hxx"
-#include "BL_JobsManager_QT.hxx"
-
-namespace BL{
-
-  class QModelManager: virtual public QObject
-  {
-    Q_OBJECT
-
-    public:
-      QModelManager(QObject * parent, BL::JobsManager_QT * jobs_manager);
-      virtual ~QModelManager();
-      
-      QStandardItemModel * getModel();
-
-      void deleteJob(int row);
-      void deleteJob(const QString & name);
-
-    public slots:
-      void new_job_added(const QString & name);
-      void job_state_changed(const QString & name);
-      void job_selected(const QModelIndex & index);
-    
-    private:
-      QStandardItemModel * _model;
-      BL::JobsManager_QT * _jobs_manager;
-      
-  };
-
-}
+module JOBMANAGER
+{
+  interface LauncherObserver : Engines::SalomeLauncherObserver {};
+};
 
 #endif
-
