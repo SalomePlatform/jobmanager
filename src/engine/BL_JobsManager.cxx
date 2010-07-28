@@ -187,17 +187,17 @@ BL::JobsManager::starting_job_thread(void * object_ptr)
   // End
   if (result == "")
   {
-    if (object->_observer)
-      object->_observer->sendEvent("start_job", "Ok", job_name, "");
     job->setState(BL::Job::QUEUED);
     job->setThreadState(BL::Job::NOTHING);
+    if (object->_observer)
+      object->_observer->sendEvent("start_job", "Ok", job_name, "");
   }
   else
   {
-    if (object->_observer)
-      object->_observer->sendEvent("start_job", "Error", job_name, result);
     job->setState(BL::Job::ERROR);
     job->setThreadState(BL::Job::NOTHING);
+    if (object->_observer)
+      object->_observer->sendEvent("start_job", "Error", job_name, result);
   }
   object->_thread_mutex.unlock();
 }
