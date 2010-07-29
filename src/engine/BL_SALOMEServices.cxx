@@ -67,6 +67,7 @@ BL::SALOMEServices::initNS()
     return_value = false;
   }
   _salome_launcher->addObserver(_this());
+  _remove_ref(); // POA will automatically destroy the object
 
   obj = _salome_naming_service->Resolve("/ResourcesManager");
   _resources_manager = Engines::ResourcesManager::_narrow(obj);
