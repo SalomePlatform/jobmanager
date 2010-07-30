@@ -84,8 +84,12 @@ BL::GenericGui::createDockWidgets()
   connect(_model, SIGNAL(rowsRemoved(QModelIndex, int, int)), _summary, SLOT(rowsRemoved(QModelIndex, int, int)));
   connect(_model, SIGNAL(itemChanged(QStandardItem*)), _summary, SLOT(itemChanged(QStandardItem*)));
 
+  // Init at the end to be able to get jobs already in Launcher
   if (_salome_services->initNS() == false)
     DEBMSG("WARNING !!!!! SALOME IS NOT REACHABLE !!!!");
+  // refresh at the beacause we need that _salome_services be
+  // initialized
+  _resource_catalog->refresh_resource_list();
 }
 
 void 
