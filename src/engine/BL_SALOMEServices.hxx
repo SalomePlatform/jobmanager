@@ -66,6 +66,7 @@ namespace BL{
       virtual ~SALOMEServices();
 
       bool initNS();
+      void end();
 
       void set_manager(BL::JobsManager * manager) {_manager = manager;}
 

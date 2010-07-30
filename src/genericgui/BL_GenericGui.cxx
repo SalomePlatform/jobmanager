@@ -32,13 +32,12 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   // _salome_services is a servant
   // POA wil destroy it at the end of the application
   _salome_services = new BL::SALOMEServices();
-  if (_salome_services->initNS() == false)
-    DEBMSG("WARNING !!!!! SALOME IS NOT REACHABLE !!!!");
 }
 
 BL::GenericGui::~GenericGui()
 {
   DEBTRACE("Destroying BL::GenericGui");
+  _salome_services->end();
 }
 
 void 
@@ -84,6 +83,9 @@ BL::GenericGui::createDockWidgets()
   connect(_model, SIGNAL(rowsInserted(QModelIndex, int, int)), _summary, SLOT(rowsInserted(QModelIndex, int, int)));
   connect(_model, SIGNAL(rowsRemoved(QModelIndex, int, int)), _summary, SLOT(rowsRemoved(QModelIndex, int, int)));
   connect(_model, SIGNAL(itemChanged(QStandardItem*)), _summary, SLOT(itemChanged(QStandardItem*)));
+
+  if (_salome_services->initNS() == false)
+    DEBMSG("WARNING !!!!! SALOME IS NOT REACHABLE !!!!");
 }
 
 void 

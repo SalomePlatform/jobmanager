@@ -44,8 +44,13 @@ BL::SALOMEServices::SALOMEServices()
   _manager = NULL;
 }
 
-BL::SALOMEServices::~SALOMEServices()
+BL::SALOMEServices::~SALOMEServices() {}
+
+void
+BL::SALOMEServices::end()
 {
+  if (!CORBA::is_nil(_salome_launcher))
+    _salome_launcher->removeObserver(_this());
   if (_salome_naming_service)
     delete _salome_naming_service;
   if (_lcc)
