@@ -82,10 +82,14 @@ BL::JobsManager::addJobToLauncher(const std::string & name)
     // TODO: SHOULD SEND an exeception...
     DEBMSG("[addJobToLauncher] failed, job was not found");
   }
-  _thread_mutex_jobs_map.unlock();
-
   std::string result = "";
   result = _salome_services->create_job(_jobs_it->second);
+
+  // Unlock is here to be sure that
+  // method setSalomeLauncherId is called if
+  // the creation is successfull
+  _thread_mutex_jobs_map.unlock();
+
   if (_observer)
     if (result != "")
     {
