@@ -11,5 +11,7 @@ Welcome to JOBMANAGER's module documentation!
 .. toctree::
    :maxdepth: 2
 
+   intro
+
 * :ref:`search`
 
