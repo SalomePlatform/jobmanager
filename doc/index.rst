@@ -12,6 +12,7 @@ Welcome to JOBMANAGER's module documentation!
    :maxdepth: 2
 
    intro
+   resource
 
 * :ref:`search`
 
