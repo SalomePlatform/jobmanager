@@ -62,7 +62,9 @@ html:
 RSTFILES=          \
 index.rst          \
 intro.rst          \
-resource.rst
+resource.rst       \
+job.rst            \
+jobmanager_gui.rst
 
 
 EXTRA_DIST+= $(RSTFILES) conf.py

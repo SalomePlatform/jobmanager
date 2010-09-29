@@ -12,6 +12,8 @@ Welcome to JOBMANAGER's module documentation!
    :maxdepth: 2
 
    intro
+   job
+   jobmanager_gui
    resource
 
 * :ref:`search`

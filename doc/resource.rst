@@ -117,14 +117,14 @@ shows all the informations of a resource.
 
   **JOBMANAGER resource panel**
 
-Two scenarios with a SALOME resource
-++++++++++++++++++++++++++++++++++++
+Two usage scenarios of SALOME's resource with the JOBMANAGER
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 This section describes to common scenarios for understanding how to describe
 a resource for the JOBMANAGER.
 
-Use an interactive resource
----------------------------
+Using an interactive resource
+-----------------------------
 
 In this scenario, you need to launch a job into your computer or an interactive computer
 available in your network.
@@ -143,8 +143,8 @@ To launch a **SALOME** command job you also need to fill the following attribute
 
 - **applipath**
 
-Use a cluster managed by batch system
--------------------------------------
+Using a cluster managed by batch system
+---------------------------------------
 
 In this scenario, you need to launch a job into a cluster managed by a batch system.
 
