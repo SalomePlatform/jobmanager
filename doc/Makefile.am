@@ -29,7 +29,7 @@ html/index.html:$(RSTFILES)
 endif
 
 #EXTRA_DIST= html htmldev _static
-EXTRA_DIST= html html/index.html
+EXTRA_DIST= html html/index.html _static images
 
 jobmanagerdocdir=$(docdir)/gui/JOBMANAGER
 
@@ -60,7 +60,9 @@ html:
 #		 mkdir -p $@
 
 RSTFILES=          \
-index.rst          
+index.rst          \
+intro.rst          \
+resource.rst
 
 
 EXTRA_DIST+= $(RSTFILES) conf.py
