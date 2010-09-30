@@ -20,7 +20,7 @@ The JOBMANAGER module permits to define three types of jobs:
 - Python scripts launched in a SALOME session
 - YACS schemas
 
-The module handle different types of computers:
+The module handle different types of computational resources:
 
 - Interactive computers (rsh, ssh)
 - Clusters managed by batch systems like PBS, LSF or SGE

@@ -1,5 +1,5 @@
-Managing SALOME resource with the JOBAMANAGER
-=============================================
+Managing SALOME resources with the JOBAMANAGER
+==============================================
 
 The JOBAMANAGER provides a GUI to manage SALOME resources.
 Later in the chapter, we use resource for SALOME resource.
