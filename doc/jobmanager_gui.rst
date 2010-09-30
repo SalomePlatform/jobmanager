@@ -1,8 +1,53 @@
 Using the JOBMANAGER GUI
 ========================
 
-Managing a job with the GUI
+Job management with the GUI
 ---------------------------
+
+This section describes the parts (part 1 and 2 described in the introduction) of the JOBMANAGER GUI 
+dedicated to the management of jobs.
+
+JOBMANAGER provides some buttons to manage the user job list (see figure :ref:`figure_jobmanager_main_buttons`).
+
+.. _figure_jobmanager_main_buttons:
+
+.. figure:: images/jobmanager_main_buttons.png
+  :align: center
+
+  **Main buttons for job management and job list**
+
+The description of each button (framed in blue in the figure) is given in the table below. 
+
+======================== ============================ ================================================================
+**Button**               **Condition of activation**  **Description**
+======================== ============================ ================================================================
+**Create a job**         Always activated             Launch the job wizard to create a job.
+**Edit/Clone a job**     Job selected                 Edit a job in *created* or *Error* or *Failed* or *Not Created*.
+                                                      Clone a job in other state.
+**Start a job**          Job selected and job state   Start a job.
+                         equals to *Created*
+**Restart a job**        Job selected and job state   Restart a job.
+                         equals to *Finish* or 
+                         *Failed*
+**Delete a job**         Job selected                 Delete a job.
+**Get job results**      Job selected and job state   Get job results in the result directory.
+                         equals to *Finish* or 
+                         *Failed*
+**Refresh jobs**         Always activated             Update jobs state.
+======================== ============================ ================================================================
+
+**Tip:** You could use Auto Refresh button in part 3 to enable an automatic refresh.
+
+When a job selected, the part 2 is filled with all the informations that the JOBMANAGER has on the job. The figure
+:ref:`figure_jobmanager_job_focus` shows this part of the GUI. It contains to tabs, the first tab provides the main informations and the run informations.
+The second shows the input and output file list of the job.
+
+.. _figure_jobmanager_job_focus:
+
+.. figure:: images/jobmanager_job_focus.png
+  :align: center
+
+  **Job widget informations**
 
 Job creation workflow
 ---------------------
