@@ -15,6 +15,7 @@ Welcome to JOBMANAGER's module documentation!
    job
    jobmanager_gui
    resource
+   advanced
 
 * :ref:`search`
 

@@ -64,7 +64,8 @@ index.rst          \
 intro.rst          \
 resource.rst       \
 job.rst            \
-jobmanager_gui.rst
+jobmanager_gui.rst \
+advanced.rst
 
 
 EXTRA_DIST+= $(RSTFILES) conf.py
