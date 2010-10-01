@@ -3,44 +3,44 @@ Main JOBMANAGER concept: Job
 
 This chapter explains the main JOBMANAGER concept: a job. 
 
-What is a job ?
-+++++++++++++++
+What is a job?
+++++++++++++++
 
-A job is a work that a user want to perform on a computation resource (single computer or a cluster).
-The JOBMANAGER different types of job depending of what is the user want to do.
+A job is a work that a user wants to perform on a computation resource (single computer or a cluster).
+The JOBMANAGER provides different types of job depending of what a user wants to do.
 
-There is three types of described in the table below.
+There are three types of described in the table below.
 
 ======================== ==============================================================================
 **Type of job**          **Description**
 ======================== ==============================================================================
-**Command script**       It's a shell script containing the users commands. This kind of job is not 
-                         related. It could be used to launch any codes.
-**SALOME Python script** It's Python script that will be launched into a SALOME session dedicated to 
+**Command script**       It's a shell script containing the user's commands. This kind of job is not 
+                         related to SALOME. It could be used to launch any codes.
+**SALOME Python script** It's a Python script that will be launched into a SALOME session dedicated to 
                          this script.
-**YACS schema**          It's YACS schema that will be launched into a SALOME session dedicated to this
+**YACS schema**          It's a YACS schema that will be launched into a SALOME session dedicated to this
                          schema.
 ======================== ==============================================================================
 
 Job content description
 +++++++++++++++++++++++
 
-All types of job share some attributes. There could be specific attribute for some types of job. It will
-be indicated in this documentation if there is some specific attributes. A job has to kinds of attributes:
+All types of job share some attributes. There could be specific attributes for some types of jobs. These exceptions
+will be indicated in the future in this documentation. A job has two kinds of attributes:
 attributes that describes the job himself, and attributes that describes the computation requirements.
 
-The first table below describes the attributes of the job.
+The first table below describes the attributes of a job.
 
 ======================== ================ ==============================================================================
 **Attribute**            **Mandatory**    **Description**
 ======================== ================ ==============================================================================
 **Name**                 Yes              This is the name of the job. It's unique into a SALOME session.
-**Type**                 Yes              This is the type of the job. Currently there is three types: *command*,
+**Type**                 Yes              This is the type of the job. Currently, there are three types: *command*,
                                           *python_salome* and *yacs_file*.
-**Job file**             Yes              This is the name with the location of the file containing the job's data.
+**Job file**             Yes              This is the name, with the location, of the file containing the job's data.
                                           Depending of the type it could a *shell* script, a *Python script* or
-                                          a *YACS schema*.
-**Env file**             No               An environnement file could be attached to the job. It will be executed before
+                                          a *YACS schema*, e.g. **/home/user/work.sh**.
+**Env file**             No               An environment file could be attached to the job. It will be executed before
                                           the job.
 **Input files**          No               A list of files or directories in the user computer that have to copied into 
                                           the job's *work directory*.
@@ -58,10 +58,10 @@ The second table below describes the attributes of computation requirements.
 ======================== ==============================================================================
 **Attribute**            **Description**
 ======================== ==============================================================================
-**Maximum duration**     It's maximum expected duration of the job. When a batch manager is used, this
-                         time is interpreted as a **walltime** and not a **cputime**.
-**Number of cpu**        It's the number of cpus/cores resquested.
-**Memory**               It's the amoun of memory per cpu/core expected.
+**Maximum duration**     It's the maximum expected duration of the job. When a batch manager is used, this
+                         time is interpreted as a **walltime** and not as a **cputime**.
+**Number of cpu**        It's the number of cpus/cores requested.
+**Memory**               It's the amount of memory per cpu/core expected.
 ======================== ==============================================================================
 
 Job's states
@@ -74,14 +74,14 @@ A job could have many states in the JOBMANAGER. The table below describes the no
 ======================== ==============================================================================
 **Created**              The job is correctly created and could be launched.
 **In_Process**           It's a transient state between *Created* and *Queued*.
-**Queued**               The job is queued into the resource batch manager.
+**Queued**               The job is queued into the resource's batch manager.
 **Paused**               The job is paused. Currently the JOBMANAGER GUI does not allow to paused a 
                          job.
 **Running**              The job is running on the resource.
-**Finished**             The job has run an it's finished.
+**Finished**             The job has run and it's finished.
 ======================== ==============================================================================
 
-The table below describes the errors states.
+The table below describes the error states.
 
 ======================== ==============================================================================
 **State**                **Description**
@@ -90,7 +90,7 @@ The table below describes the errors states.
                          It's often a problem with the selected resource.
 **Failed**               This state means that the execution of the job in the resource failed.
 **Error**                This state is used when a job is loaded and that it cannot be followed. It
-                         mainly happens when a job into a *ssh* resource is running. if the list is 
-                         saved, it will an error when the list will be loaded. *ssh* resource cannot
-                         be followed.
+                         mainly happens when a job was launched into a *ssh* resource. If the list is
+                         saved, an error will happen when the list is loaded (*ssh* resource cannot
+                         be followed).
 ======================== ==============================================================================

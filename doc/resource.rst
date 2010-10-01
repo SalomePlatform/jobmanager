@@ -7,22 +7,22 @@ Later in the chapter, we use resource for SALOME resource.
 Definition of a SALOME resource
 +++++++++++++++++++++++++++++++
 
-A resource is the SALOME abstraction for managing computers.
-A resource contains three different kinds of informations:
+A resource is the SALOME abstraction for computer.
+A resource contains three different kinds of information:
 
 - A name.
 - A physical description of the computer.
-- A description of SALOME installation in this computer.
+- A description of a SALOME installation in the computer.
 
-A resource's name could be different from the computer name since you could
-have different SALOME installation in the computer.
+A resource's name could be different from the computer name since 
+different SALOME installation could coexist in the computer.
 
 Physical description of the computer
 ------------------------------------
 
 A resource contains a physical description of the computer.
-These informations are used by the resource manager (service provided
-by the KERNEL) to choose and to user a resource when a container (in YACS)
+These information are used by the resource manager (service provided
+by the KERNEL) to choose and use a resource when a container (in YACS)
 or a job (in JOBMANAGER) has to be launched.
 
 The description of each attribute is given in the table below. 
@@ -33,16 +33,16 @@ The description of each attribute is given in the table below.
 **Attribute**              **Mandatory**    **Description**
 ========================== ================ =============================================================
 **hostname**               Yes              It's the network name of the computer. If the computer is a 
-                                            cluster, you have to give the frontal computer name.
+                                            cluster, you have to give the frontal node name.
 **protocol**               Yes              Network protocol to use for creating connections 
                                             (ssh or rsh).
 **username**               Yes              User name to use for creating connections.
 **batch**                  Yes              Type of batch system installed in the resource. Use *ssh* if
                                             the resource is a single computer.
-**iprotocol**              Yes              Internal protocol to use on a cluster.
+**iprotocol**              Yes              Internal protocol to use on a cluster (ssh or rsh).
 **mpiImpl**                No               MPI implementation to use.
 
-**OS**                     No               It's the operating system name, ex: Linux, Windows, Debian.
+**OS**                     No               It's the operating system name, e.g.: Linux, Windows.
 **nb_node**                No               It's the amount of node of the computer.
 **nb_proc_per_node**       No               It's the amount or processor or core of your computer.
 **mem_mb**                 No               It's the amount of memory in megabytes per node.
@@ -55,7 +55,7 @@ SALOME installation description
 A resource could contain a SALOME installation description.
 The description of each attribute is given in the table below.
 
-**Warning:** Attribute **applipath** is *mandatory* with JOBMANAGER SALOME related jobs.
+**Warning:** Attribute **applipath** is *mandatory* with JOBMANAGER SALOME related type of job.
 
 ========================== =============================================================
 **Attribute**              **Description**
@@ -66,15 +66,15 @@ The description of each attribute is given in the table below.
                            application.
 ========================== =============================================================
 
-Where is the resource file ?
-----------------------------
+Where is the resource file?
+---------------------------
 
 Resources are located into a XML resource file. SALOME tries to find this file
 in three different locations:
 
 1. If **USER_CATALOG_RESOURCES_FILE** env file is defined, SALOME uses this file.
-2. If not in the SALOME application directory: $APPLIPATH/CatalogResources.xml.
-3. If not in the directory of the installation of SALOME KERNEL: 
+2. If not, in the SALOME application directory: $APPLIPATH/CatalogResources.xml.
+3. If not, in the directory of the installation of SALOME KERNEL: 
    $KERNEL_ROOT_DIR/share/salome/resources/kernel/CatalogResources.xml.
 
 By default, the resource manager creates a resource with the name and the hostname of the user computer.
@@ -82,9 +82,9 @@ By default, the resource manager creates a resource with the name and the hostna
 JOBMANAGER resource management GUI
 ++++++++++++++++++++++++++++++++++
 
-The JOBMANAGER provides a panel to manage the resources. This panel is showned in the 
+The JOBMANAGER provides a panel to manage user's resources. This panel is shown in the 
 figure :ref:`figure_jobmanager_resource_1`. The panel provides some buttons and a list
-that shows the aviable resources. You can select one resource to enable buttons.
+that shows the available resources. You have to select one resource to enable some buttons.
 
 .. _figure_jobmanager_resource_1:
 
@@ -108,7 +108,7 @@ The description of each button is given in the table below.
 ========================== =============================================================
 
 The figure :ref:`figure_jobmanager_resource_2` shows the panel of a resource. This panel
-shows all the informations of a resource.
+shows all the information of a resource.
 
 .. _figure_jobmanager_resource_2:
 
@@ -136,15 +136,15 @@ To launch a **command** job you need to fill the following attributes:
 - **username**
 - **batch** = *ssh*
 
-**Warning:** You have configure your ssh for allowing ssh commands without asking 
-interactives password (RSA or DSA keys).
+**Warning:** You have to configure ssh for allowing ssh commands without asking 
+interactive password (RSA or DSA keys).
 
-To launch a **SALOME** command job you also need to fill the following attributes:
+To launch a **SALOME** type of job, you also need to fill the following attributes:
 
 - **applipath**
 
-Using a cluster managed by batch system
----------------------------------------
+Using a cluster managed by a batch system
+-----------------------------------------
 
 In this scenario, you need to launch a job into a cluster managed by a batch system.
 
@@ -157,8 +157,8 @@ To launch a **command** job you need to fill the following attributes:
 - **iprotocol**
 - **nb_proc_per_node**
 
-**Warning:** You have configure your ssh for allowing ssh commands without asking 
-interactives password (RSA or DSA keys) between your computer and the cluster and between
+**Warning:** You have to configure ssh for allowing ssh commands without asking 
+interactive password (RSA or DSA keys) between your computer and the cluster and between
 the cluster's nodes.
 
 To launch a **SALOME** command job you also need to fill the following attributes:
