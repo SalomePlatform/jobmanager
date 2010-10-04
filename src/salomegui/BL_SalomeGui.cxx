@@ -41,6 +41,9 @@ BL::SalomeGui::initialize(CAM_Application* app)
    DEBTRACE("Entering in initialize");
    SalomeApp_Module::initialize(app); // MANDATORY -> Otherwise SISEGV...
    connect( getApp(), SIGNAL(studyClosed()), this, SLOT(studyClosed()));
+   if ( app && app->desktop() )
+     connect( app->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+              this, SLOT(onWindowActivated( SUIT_ViewWindow* )) );
 }
 
 void
@@ -51,6 +54,7 @@ BL::SalomeGui::studyClosed()
     _gengui->deleteDockWidget();
     delete _gengui;
     _gengui = NULL;
+    _viewWin = NULL;
   }
 }
 
@@ -105,6 +109,18 @@ BL::SalomeGui::deactivateModule(SUIT_Study* theStudy)
     _gengui->showDockWidgets(false);
   bool bOk = SalomeApp_Module::deactivateModule(theStudy);
   return bOk;
+}
+
+void 
+BL::SalomeGui::onWindowActivated( SUIT_ViewWindow* svw)
+{
+  DEBTRACE("BL::SalomeGui::onWindowActivated");
+  DEBTRACE("activeModule()->moduleName() " << (getApp()->activeModule() ? getApp()->activeModule()->moduleName().toStdString() : "") );
+  
+  if (_viewWin) // Be sure to have a _viewWindow
+    if (svw->getId() == _viewWin->getId()) // Same Id ?
+      if (getApp()->activeModule() && getApp()->activeModule()->moduleName().compare("JobManager") != 0) // JobManager already activated ?
+        getApp()->activateModule("JobManager");
 }
 
 // --- Export the module
