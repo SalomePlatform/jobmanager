@@ -46,6 +46,9 @@ namespace BL
       bool activateModule( SUIT_Study* theStudy);
       void studyClosed();
 
+    protected slots:
+      void onWindowActivated( SUIT_ViewWindow* svw);
+
     protected:
       BL::GenericGui * _gengui;
   };
