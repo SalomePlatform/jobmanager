@@ -1,7 +1,7 @@
-Managing SALOME resources with the JOBAMANAGER
-==============================================
+Managing SALOME resources with the JOBMANAGER
+=============================================
 
-The JOBAMANAGER provides a GUI to manage SALOME resources.
+The JOBMANAGER provides a GUI to manage SALOME resources.
 Later in the chapter, we use resource for SALOME resource.
 
 Definition of a SALOME resource
@@ -21,7 +21,7 @@ Physical description of the computer
 ------------------------------------
 
 A resource contains a physical description of the computer.
-These information are used by the resource manager (service provided
+These informations are used by the resource manager (service provided
 by the KERNEL) to choose and use a resource when a container (in YACS)
 or a job (in JOBMANAGER) has to be launched.
 
