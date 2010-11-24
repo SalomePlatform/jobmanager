@@ -28,6 +28,7 @@ dist_libJOBMANAGER_la_SOURCES = BL_SalomeGui.hxx BL_SalomeGui.cxx
 nodist_libJOBMANAGER_la_SOURCES = $(MOC_FILES)
 
 libJOBMANAGER_la_CXXFLAGS = $(qt4_cppflags) \
+				$(BOOST_CPPFLAGS) \
 				$(OMNIORB_INCLUDES) \
 				-I$(KERNEL_ROOT_DIR)/include/salome \
 				-I$(GUI_ROOT_DIR)/include/salome \
