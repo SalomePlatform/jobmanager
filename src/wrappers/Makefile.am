@@ -44,7 +44,7 @@ libBL_Wrappers_SALOME_la_SOURCES = BL_MainWindows_Wrap.hxx \
 nodist_libBL_Wrappers_SALOME_la_SOURCES =
 
 libBL_Wrappers_SALOME_la_CXXFLAGS = $(qt4_cppflags) -I$(top_srcdir)/src/bases \
-				    $(OMNIORB_INCLUDES) \
+				    $(OMNIORB_INCLUDES) $(BOOST_CPPFLAGS) \
 				    -I$(KERNEL_ROOT_DIR)/include/salome \
 				    -I$(GUI_ROOT_DIR)/include/salome
 

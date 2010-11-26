@@ -76,6 +76,7 @@ AM_PROG_LIBTOOL
 AC_CHECK_LIB(dl,dlopen)
 I2_CHECK_QT4
 AC_CHECK_OMNIORB
+CHECK_BOOST
 
 # Optional products
 CHECK_SPHINX
@@ -98,6 +99,7 @@ echo
 echo "Mandatory products:"
 echo "  Qt4 (graphic interface)  : $qt_ok"
 echo "  OmniOrb (CORBA) ........ : $omniORB_ok"
+echo "  Boost           ........ : $boost_ok"
 echo "  SALOME KERNEL .......... : $Kernel_ok"
 echo "  SALOME GUI ............. : $SalomeGUI_ok"
 echo
