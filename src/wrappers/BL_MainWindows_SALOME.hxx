@@ -33,7 +33,7 @@
 namespace BL
 {
   class MainWindows_SALOME : virtual public MainWindows_Wrap, 
-			     virtual public SalomeApp_Module
+                             virtual public SalomeApp_Module
   {
     public:
       MainWindows_SALOME(const QString & module_name);
@@ -50,14 +50,14 @@ namespace BL
       virtual QMainWindow * getTabParent();
 
       virtual QAction* createAction(const QString& toolTip,
-				    const QIcon& icon,
-				    const QString& menu,
-				    const QString& status,
-				    const int shortCut,
-				    QObject* parent =0,
-				    bool checkable = false,
-				    QObject* receiver =0,
-				    const char* member =0);
+                                    const QIcon& icon,
+                                    const QString& menu,
+                                    const QString& status,
+                                    const int shortCut,
+                                    QObject* parent =0,
+                                    bool checkable = false,
+                                    QObject* receiver =0,
+                                    const char* member =0);
 
       virtual int createTopMenu(const QString & menu_name);
       virtual void addActionToMenu(QAction * action, int menu_id);

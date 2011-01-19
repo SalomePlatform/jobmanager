@@ -25,6 +25,7 @@ BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
   DEBTRACE("Creating BL::MainWindows_SALOME");
   _actionId = 190;
   _currentViewId = -1;
+  _svm = 0;
 }
 
 void 
@@ -40,12 +41,20 @@ void
 BL::MainWindows_SALOME::createView()
 {
   DEBTRACE("BL::MainWindows_SALOME CreateView");
-  _svm = new SUIT_ViewManager(_appli->activeStudy(), _appli->desktop(), new SUIT_ViewModel());
-  _appli->addViewManager(_svm);
-  _viewWin = _svm->createViewWindow();
+  QString vmType = "JobManager View";
+
+  // Get JobManager View Manager
+  _svm = _appli->getViewManager( vmType, true );
+  if (!_svm) {
+    // view manager not found
+    QTextEdit* w = new QTextEdit;
+    _svm = _appli->createViewManager( vmType, w );
+  }
+
+  // Create a view
+  _viewWin = _svm->getActiveView();
+  _viewWin->setClosable( false );
   _currentViewId = _viewWin->getId();
-  if (_viewWin && _appli->desktop())
-    _viewWin->resize((int)(_appli->desktop()->width() * 0.6), (int)(_appli->desktop()->height() * 0.6 ));
   DEBTRACE("End of BL::MainWindows_SALOME CreateView");
 }
 
@@ -84,7 +93,8 @@ void
 BL::MainWindows_SALOME::viewManagers(QStringList& list) const
 {
   DEBTRACE("Entering in BL::SalomeGui::viewManagers");
-  list.append(_svm->getType());
+  if (_svm)
+    list.append(_svm->getType());
 }
 
 
