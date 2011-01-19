@@ -132,7 +132,7 @@ BL::MainWindows_SALOME::createAction(const QString& toolTip,
 int
 BL::MainWindows_SALOME::createTopMenu(const QString & menu_name)
 {
-  return createMenu(menu_name, -1);
+  return createMenu(menu_name, -1, -1, 30 );
 }
 
 void 
