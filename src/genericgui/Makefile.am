@@ -33,12 +33,14 @@ libBL_GenericGui_la_SOURCES = BL_GenericGui.hxx BL_GenericGui.cxx \
 			      JM_SalomeResource.hxx JM_SalomeResource.cxx \
 			      JM_EditSalomeResource.hxx JM_EditSalomeResource.cxx
 
-nodist_libBL_GenericGui_la_SOURCES = BL_GenericGui_moc.cxx BL_JobsTable_moc.cxx \
+MOC_FILES =                          BL_GenericGui_moc.cxx BL_JobsTable_moc.cxx \
 				     BL_JobTab_moc.cxx  \
 				     BL_Buttons_moc.cxx BL_JobsManager_QT_moc.cxx \
 				     BL_QModelManager_moc.cxx BL_CreateJobWizard_moc.cxx \
 				     BL_Summary_moc.cxx JM_ResourceCatalog_moc.cxx \
 				     JM_SalomeResource_moc.cxx JM_EditSalomeResource_moc.cxx
+
+nodist_libBL_GenericGui_la_SOURCES = $(MOC_FILES)
 
 libBL_GenericGui_la_CXXFLAGS = $(qt4_cppflags) \
 			       -I$(top_srcdir)/src/bases \

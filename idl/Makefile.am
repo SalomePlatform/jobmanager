@@ -14,8 +14,14 @@ nodist_salomeinclude_HEADERS    = JOBMANAGER_IDL.hh
 libJOBMANAGER_IDL_la_CXXFLAGS     = -I. @KERNEL_CXXFLAGS@ @OMNIORB_CXXFLAGS@ @OMNIORB_INCLUDES@
 libJOBMANAGER_IDL_la_LIBADD       = $(KERNEL_LIBS)
 
+OMNIORB_IDLCXXFLAGS = @OMNIORB_IDLCXXFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
+
 %SK.cc %.hh : %.idl
-	$(OMNIORB_IDL) -bcxx @OMNIORB_IDLCXXFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome $<
+	$(OMNIORB_IDL) -bcxx @OMNIORB_IDLCXXFLAGS@ $<
+
+# E.A. : IDLPYFLAGS is just to compile with cmake (parsed in am2cmake).
+
+IDLPYFLAGS = @IDLPYFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
 
 CLEANFILES = *.hh *SK.cc *.py *.hxx *.cxx
 
