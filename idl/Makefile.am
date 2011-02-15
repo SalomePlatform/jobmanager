@@ -17,7 +17,7 @@ libJOBMANAGER_IDL_la_LIBADD       = $(KERNEL_LIBS)
 OMNIORB_IDLCXXFLAGS = @OMNIORB_IDLCXXFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
 
 %SK.cc %.hh : %.idl
-	$(OMNIORB_IDL) -bcxx @OMNIORB_IDLCXXFLAGS@ $<
+	$(OMNIORB_IDL) -bcxx $(OMNIORB_IDLCXXFLAGS) $<
 
 # E.A. : IDLPYFLAGS is just to compile with cmake (parsed in am2cmake).
 
