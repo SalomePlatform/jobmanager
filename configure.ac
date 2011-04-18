@@ -21,7 +21,7 @@
 # --
 # -----------------------------------------------------------------------------
 #
-AC_INIT([JOBMANAGER project], [6.2.0], [andre.ribes@edf.fr], [JobManager-Module])
+AC_INIT([JOBMANAGER project], [6.3.0], [andre.ribes@edf.fr], [JobManager-Module])
 AM_INIT_AUTOMAKE([tar-pax])
 AC_CONFIG_HEADER(jobmanager_config.h)
 
@@ -29,7 +29,7 @@ AC_CONFIG_HEADER(jobmanager_config.h)
 MODULE_NAME=jobmanager
 AC_SUBST(MODULE_NAME)
 
-XVERSION=0x001
+XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
 
 RELEASE=$VERSION
