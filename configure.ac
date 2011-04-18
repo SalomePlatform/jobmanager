@@ -21,7 +21,7 @@
 # --
 # -----------------------------------------------------------------------------
 #
-AC_INIT([JOBMANAGER project], [6.2.0], [andre.ribes@edf.fr], [JobManager-Module])
+AC_INIT([JOBMANAGER project], [6.3.0], [andre.ribes@edf.fr], [JobManager-Module])
 AM_INIT_AUTOMAKE([tar-pax])
 AC_CONFIG_HEADER(jobmanager_config.h)
 
