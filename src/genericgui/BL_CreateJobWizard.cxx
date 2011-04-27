@@ -356,10 +356,10 @@ BL::JobNamePage::validatePage()
   return return_value;
 }
 
-int 
+int
 BL::JobNamePage::nextId() const
 {
-  if (_yacs_schema_button->isChecked()) 
+  if (_yacs_schema_button->isChecked())
   {
     return BL::CreateJobWizard::Page_YACSSchema;
   } 
@@ -367,7 +367,7 @@ BL::JobNamePage::nextId() const
   {
     return BL::CreateJobWizard::Page_Command_Main_Definitions;
   }
-  else if (_python_salome_button->isChecked())
+  else
   {
     return BL::CreateJobWizard::Page_PythonSalome_Main_Definitions;
   }
