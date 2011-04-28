@@ -99,19 +99,25 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
 
+  // Specific values
+  _batch_queue_label = new QLabel("Batch queue:");
+  _batch_queue_value = new QLabel("");
+  _ll_jobtype_label = new QLabel("LoadLeveler JobType:");
+  _ll_jobtype_value = new QLabel("");
+
   QGroupBox * run_values_box = new QGroupBox("Run values");
-  QFormLayout * run_values_form = new QFormLayout;
-  run_values_form->insertRow(0, job_nif_label, _job_nif_label_value);
-  run_values_form->insertRow(1, job_nof_label, _job_nof_label_value);
-  run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
-  run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
-  QFormLayout * other_run_values_form = new QFormLayout;
-  other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
-  other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
-  other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
+  _run_values_form = new QFormLayout;
+  _run_values_form->insertRow(0, job_nif_label, _job_nif_label_value);
+  _run_values_form->insertRow(1, job_nof_label, _job_nof_label_value);
+  _run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
+  _run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
+  _other_run_values_form = new QFormLayout;
+  _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
+  _other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
+  _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
   QHBoxLayout * box_layout = new QHBoxLayout();
-  box_layout->addLayout(run_values_form);
-  box_layout->addLayout(other_run_values_form);
+  box_layout->addLayout(_run_values_form);
+  box_layout->addLayout(_other_run_values_form);
   run_values_box->setLayout(box_layout);
 
   QVBoxLayout * mainLayout = new QVBoxLayout();
@@ -233,6 +239,16 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _yacs_dump_state_value->setText(QVariant(job->getDumpYACSState()).toString());
       _main_values_form->insertRow(7, _yacs_dump_state_label, _yacs_dump_state_value);
     }
+    if (job->getBatchQueue() != "")
+    {
+      _batch_queue_value->setText(QVariant(job->getBatchQueue().c_str()).toString());
+      _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _batch_queue_label, _batch_queue_value);
+    }
+    if (job->getLoadLevelerJobType() != "")
+    {
+      _ll_jobtype_value->setText(QVariant(job->getLoadLevelerJobType().c_str()).toString());
+      _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _ll_jobtype_label, _ll_jobtype_value);
+    }
   }
   else
     DEBTRACE ("itemFromIndex returns 0 !");
@@ -290,11 +306,9 @@ BL::JobTab::reset(QString job_name)
   _input_files_list->clear();
   _output_files_list->clear();
 
-  // Specific parameters management
-  DEBTRACE("_yacs_dump_state_value->text():--" << _yacs_dump_state_value->text().toStdString() << "--");
-  if (_yacs_dump_state_value->text() != "")
-  {
-    _yacs_dump_state_value->setText("");
-    createJobSummaryTab();
-  }
+  _yacs_dump_state_value->setText("");
+  _batch_queue_value->setText("");
+  _ll_jobtype_value->setText("");
+
+  createJobSummaryTab();
 }

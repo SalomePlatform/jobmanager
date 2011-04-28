@@ -76,6 +76,9 @@ namespace BL{
       void setBatchQueue(const std::string & queue);
       std::string & getBatchQueue();
 
+      void setLoadLevelerJobType(const std::string & jobtype);
+      std::string & getLoadLevelerJobType();
+
       enum State {CREATED, IN_PROCESS, QUEUED, RUNNING, PAUSED, FINISHED, ERROR, FAILED, NOT_CREATED};
       void setState(BL::Job::State state);
       BL::Job::State getState();
@@ -103,6 +106,7 @@ namespace BL{
       BL::Job::FilesParam _files_params;
       std::string _resource_choosed;
       std::string _batch_queue;
+      std::string _ll_jobtype;
 
       int _salome_launcher_id;
   };

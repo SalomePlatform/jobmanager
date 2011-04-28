@@ -56,6 +56,7 @@ namespace BL{
       QListWidget * _output_files_list;
 
       BL::JobNamePage * _job_name_page;
+      BL::SALOMEServices * _salome_services;
 
     public:
       // Results
@@ -81,6 +82,7 @@ namespace BL{
 
       bool start_job;
       int dump_yacs_state;
+      std::string ll_jobtype;
 
     public:
       enum {Page_JobName,
@@ -184,6 +186,7 @@ namespace BL{
 
       virtual int nextId() const;
       virtual bool validatePage();
+      virtual void initializePage();
 
     public slots:
       void itemSelected(QListWidgetItem * item);
@@ -192,6 +195,10 @@ namespace BL{
       JM::ResourceCatalog * _resource_list;
       QLineEdit * _resource_choosed;
       BL::SALOMEServices * _salome_services;
+
+      QLabel * _ll_label;
+      QLineEdit * _ll_value;
+      QGridLayout * _main_layout;
   };
 
   class YACSSchemaPage: virtual public QWizardPage

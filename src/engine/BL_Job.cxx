@@ -36,6 +36,7 @@ BL::Job::Job()
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::Job(const std::string & name)
@@ -55,6 +56,7 @@ BL::Job::Job(const std::string & name)
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::~Job()
@@ -188,6 +190,18 @@ std::string &
 BL::Job::getBatchQueue()
 {
   return _batch_queue;
+}
+
+void
+BL::Job::setLoadLevelerJobType(const std::string & jobtype)
+{
+  _ll_jobtype = jobtype;
+}
+
+std::string &
+BL::Job::getLoadLevelerJobType()
+{
+  return _ll_jobtype;
 }
 
 void 

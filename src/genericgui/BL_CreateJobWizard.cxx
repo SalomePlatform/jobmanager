@@ -30,6 +30,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   BL_ASSERT(jobs_manager);
   BL_ASSERT(salome_services);
   _jobs_manager = jobs_manager;
+  _salome_services = salome_services;
 
   job_name = "";
   yacs_file = "";
@@ -48,6 +49,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   start_job = false;
   dump_yacs_state = -1;
+  ll_jobtype = "";
 
   setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
 
@@ -158,6 +160,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     setField("result_directory", QString(files_params.result_directory.c_str()));
     setField("resource_choosed", QString(job->getResource().c_str()));
     setField("batch_queue", QString(job->getBatchQueue().c_str()));
+    setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
   }
 }
 
@@ -247,7 +250,20 @@ BL::CreateJobWizard::end(int result)
 
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
-    batch_queue = f_batch_queue.toStdString(); 
+    batch_queue = f_batch_queue.toStdString();
+
+    // LoadLeveler JobType
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
+    std::string batch = resource_descr.batch.c_str();
+    if (batch == "ll")
+    {
+      QString f_ll_jobtype = field("ll_jobtype").toString();
+      ll_jobtype = f_ll_jobtype.toStdString();
+    }
+    else
+    {
+      ll_jobtype = "";
+    }
 
     start_job = field("start_job").toBool();
   }
@@ -892,17 +908,36 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
   QLineEdit * _bqLineEdit = new QLineEdit(this);
   registerField("batch_queue", _bqLineEdit);
 
-  QGridLayout * main_layout = new QGridLayout;
-  main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
-  main_layout->addWidget(resource_label, 1, 0);
-  main_layout->addWidget(_resource_choosed, 1, 1);
-  main_layout->addWidget(bqLabel, 2, 0);
-  main_layout->addWidget(_bqLineEdit, 2, 1);
-  setLayout(main_layout);
+  _ll_label = new QLabel("LoadLeveler JobType:", this);
+  _ll_value = new QLineEdit(this);
+  registerField("ll_jobtype", _ll_value);
+  _ll_label->hide();
+  _ll_value->hide();
+
+  _main_layout = new QGridLayout;
+  _main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
+  _main_layout->addWidget(resource_label, 1, 0);
+  _main_layout->addWidget(_resource_choosed, 1, 1);
+  _main_layout->addWidget(bqLabel, 2, 0);
+  _main_layout->addWidget(_bqLineEdit, 2, 1);
+  setLayout(_main_layout);
+
 };
 
 BL::ResourcePage::~ResourcePage()
 {}
+
+void
+BL::ResourcePage::initializePage()
+{
+  if (field("ll_jobtype").toString() != "")
+  {
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+}
 
 bool
 BL::ResourcePage::validatePage()
@@ -913,6 +948,18 @@ BL::ResourcePage::validatePage()
     QMessageBox::warning(NULL, "Resource Error", "Please choose a resource");
     return false;
   }
+
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    QString ll_jobtype = field("ll_jobtype").toString();
+    if (ll_jobtype == "")
+    {
+      QMessageBox::warning(NULL, "LoadLeveler Error", "Please define a LoadLeveler JobType");
+      return false;
+    }
+  }
   return true;
 }
 
@@ -922,6 +969,24 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
   _resource_choosed->setReadOnly(false);
   _resource_choosed->setText(item->text());
   _resource_choosed->setReadOnly(true);
+
+  //Specific parameters for LoadLeveler
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(item->text().toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+  else
+  {
+    _main_layout->removeWidget(_ll_value);
+    _main_layout->removeWidget(_ll_label);
+    _ll_label->hide();
+    _ll_value->hide();
+  }
 }
 
 int 
