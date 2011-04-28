@@ -389,19 +389,24 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   QLabel *label = new QLabel("In this step you have to configure your YACS execution");
   label->setWordWrap(true);
 
+  QGroupBox * files_param_box = new QGroupBox("YACS job files");
   QPushButton * yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
   connect(yacs_file_button, SIGNAL(clicked()), this, SLOT(choose_file()));
-
   _yacs_file_text = new QLineEdit(this);
   _yacs_file_text->setText("");
   registerField("yacs_file", _yacs_file_text);
   _yacs_file_text->setReadOnly(true);
-
   QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
   registerField("env_yacs_file", _line_env_file);
   _line_env_file->setReadOnly(true);
+  QGridLayout * files_layout = new QGridLayout;
+  files_layout->addWidget(yacs_file_button, 0, 0);
+  files_layout->addWidget(_yacs_file_text, 0, 1);
+  files_layout->addWidget(command_env_file_button, 1, 0);
+  files_layout->addWidget(_line_env_file, 1, 1);
+  files_param_box->setLayout(files_layout);
 
   QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
   QLabel * label_dump =  new QLabel("Dump YACS state each secs (0 disable this feature)");
@@ -418,13 +423,9 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
-  QGridLayout *layout = new QGridLayout;
-  layout->addWidget(yacs_file_button, 0, 0);
-  layout->addWidget(_yacs_file_text, 0, 1);
-  layout->addWidget(command_env_file_button, 1, 0);
-  layout->addWidget(_line_env_file, 1, 1);
-  main_layout->insertLayout(-1, layout);
+  main_layout->addWidget(files_param_box);
   main_layout->addWidget(spec_param_box);
+
   setLayout(main_layout);
 };
 
