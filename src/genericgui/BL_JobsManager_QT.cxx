@@ -253,6 +253,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
     // YACS schema job
     new_job->setType(BL::Job::YACS_SCHEMA);
     new_job->setJobFile(wizard.yacs_file);
+    new_job->setDumpYACSState(wizard.dump_yacs_state);
   }
   else if (wizard.command != "")
   {

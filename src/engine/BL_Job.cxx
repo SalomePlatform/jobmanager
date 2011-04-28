@@ -35,6 +35,7 @@ BL::Job::Job()
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
 }
 
 BL::Job::Job(const std::string & name)
@@ -53,6 +54,7 @@ BL::Job::Job(const std::string & name)
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
 }
 
 BL::Job::~Job()
@@ -97,6 +99,18 @@ BL::Job::JobType
 BL::Job::getType()
 {
   return _type;
+}
+
+void
+BL::Job::setDumpYACSState(const int & dump_yacs_state)
+{
+  _dump_yacs_state = dump_yacs_state;
+}
+
+int
+BL::Job::getDumpYACSState()
+{
+  return _dump_yacs_state;
 }
 
 void 

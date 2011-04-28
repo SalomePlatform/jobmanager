@@ -31,9 +31,6 @@ BL::JobTab::JobTab(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QTabWid
 
   createJobSummaryTab();
   createJobFilesTab();
-
-  addTab(_summary_tab, "Job Summary");
-  addTab(_files_tab, "Job Files");
 }
 
 BL::JobTab::~JobTab()
@@ -70,16 +67,21 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_envfile_label = new QLabel("Env File:");
   _job_envfile_label_value = new QLabel("");
 
+
+  // Specific values
+  _yacs_dump_state_label = new QLabel("YACS dump state:");
+  _yacs_dump_state_value = new QLabel("");
+
   QGroupBox * main_values_box = new QGroupBox("Main values");
-  QFormLayout * values_form = new QFormLayout;
-  values_form->insertRow(0, job_name_label, _job_name_label_value);
-  values_form->insertRow(1, job_type_label, _job_type_label_value);
-  values_form->insertRow(2, job_state_label, _job_state_label_value);
-  values_form->insertRow(3, job_launcher_label, _job_launcher_label_value);
-  values_form->insertRow(4, job_resource_label, _job_resource_label_value);
-  values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
-  values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
-  main_values_box->setLayout(values_form);
+  _main_values_form = new QFormLayout;
+  _main_values_form->insertRow(0, job_name_label, _job_name_label_value);
+  _main_values_form->insertRow(1, job_type_label, _job_type_label_value);
+  _main_values_form->insertRow(2, job_state_label, _job_state_label_value);
+  _main_values_form->insertRow(3, job_launcher_label, _job_launcher_label_value);
+  _main_values_form->insertRow(4, job_resource_label, _job_resource_label_value);
+  _main_values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
+  _main_values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
+  main_values_box->setLayout(_main_values_form);
 
   QLabel * job_nif_label = new QLabel("Number of Input Files:");
   _job_nif_label_value = new QLabel("");
@@ -116,13 +118,17 @@ BL::JobTab::createJobSummaryTab()
   mainLayout->addWidget(main_values_box);
   mainLayout->addWidget(run_values_box);
   _summary_tab->setLayout(mainLayout);
+
+  removeTab(0);
+  insertTab(0, _summary_tab, "Job Summary");
+  setCurrentIndex(0);
 }
 
 void
 BL::JobTab::createJobFilesTab()
 {
   _files_tab = new QWidget(this);
-  
+
   _input_files_list = new QListWidget(this);
   _input_files_list->setSelectionMode(QAbstractItemView::NoSelection);
   QGroupBox * input_files_box = new QGroupBox("Input Files");
@@ -141,6 +147,8 @@ BL::JobTab::createJobFilesTab()
   mainLayout->addWidget(input_files_box);
   mainLayout->addWidget(output_files_box);
   _files_tab->setLayout(mainLayout);
+
+  insertTab(1, _files_tab, "Job Files");
 }
 
 void
@@ -152,6 +160,10 @@ BL::JobTab::job_selected(const QModelIndex & index)
   if (item)
   {
     BL::Job * job = _jobs_manager->getJob(item_name->text().toStdString());
+
+    // create a new tab
+    // to be replaced if it is too long
+    createJobSummaryTab();
 
     _job_name_label_value->setText(QString(job->getName().c_str()));
 
@@ -214,6 +226,13 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _output_files_list->addItem(QString(file.c_str()));
     }
 
+    // Specific parameters management
+    if (job->getDumpYACSState() > 0)
+    {
+      // Add widget in the layout
+      _yacs_dump_state_value->setText(QVariant(job->getDumpYACSState()).toString());
+      _main_values_form->insertRow(7, _yacs_dump_state_label, _yacs_dump_state_value);
+    }
   }
   else
     DEBTRACE ("itemFromIndex returns 0 !");
@@ -270,4 +289,12 @@ BL::JobTab::reset(QString job_name)
 
   _input_files_list->clear();
   _output_files_list->clear();
+
+  // Specific parameters management
+  DEBTRACE("_yacs_dump_state_value->text():--" << _yacs_dump_state_value->text().toStdString() << "--");
+  if (_yacs_dump_state_value->text() != "")
+  {
+    _yacs_dump_state_value->setText("");
+    createJobSummaryTab();
+  }
 }

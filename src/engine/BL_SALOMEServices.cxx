@@ -251,6 +251,21 @@ BL::SALOMEServices::create_job(BL::Job * job)
     job_parameters->job_type = CORBA::string_dup("python_salome");
   }
 
+  // Specific parameters
+  if (job->getType() == BL::Job::YACS_SCHEMA)
+  {
+    if (job->getDumpYACSState() > 0)
+    {
+      job_parameters->specific_parameters.length(job_parameters->specific_parameters.length() + 1);
+      std::ostringstream oss;
+      oss << job->getDumpYACSState();
+      Engines::Parameter_var new_parameter = new Engines::Parameter;
+      new_parameter->name = CORBA::string_dup("EnableDumpYACS");
+      new_parameter->value = CORBA::string_dup(oss.str().c_str());
+      job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
+    }
+  }
+
   // Files
   job_parameters->job_name = CORBA::string_dup(job->getName().c_str());
   job_parameters->job_file = CORBA::string_dup(job->getJobFile().c_str());
@@ -538,6 +553,19 @@ BL::SALOMEServices::get_new_job(int job_number)
     job_return->setBatchParameters(batch_param);
 
     job_return->setResource(job_parameters->resource_required.name.in());
+
+    // Specific parameters
+    for (CORBA::ULong i = 0; i < job_parameters->specific_parameters.length(); i++)
+    {
+      if (std::string(job_parameters->specific_parameters[i].name.in()) == "EnableDumpYACS")
+      {
+        std::string user_value = job_parameters->specific_parameters[i].value.in();
+        std::istringstream iss(user_value);
+        int value;
+        iss >> value;
+        job_return->setDumpYACSState(value);
+      }
+    }
 
     // Get current state
     std::string result_job = job_return->setStringState(refresh_job(job_return));

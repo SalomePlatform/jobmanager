@@ -47,6 +47,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   batch_queue = "";
 
   start_job = false;
+  dump_yacs_state = -1;
 
   setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
 
@@ -95,6 +96,12 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("yacs_file", QString(job->getJobFile().c_str()));
       _job_name_page->_yacs_schema_button->click();
       setField("env_yacs_file", QString(job->getEnvFile().c_str()));
+      if (job->getDumpYACSState() != -1)
+      {
+        QString value;
+        value.setNum(job->getDumpYACSState());
+        setField("dump_yacs_state", value);
+      }
     }
     else if (job->getType() == BL::Job::COMMAND)
     {
@@ -174,15 +181,16 @@ BL::CreateJobWizard::end(int result)
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
     yacs_file = f_yacs_file.toStdString();
-    
+    dump_yacs_state = field("dump_yacs_state").toInt();
+
     // Command Panel
     QString f_command = field("command").toString();
     command = f_command.toStdString();
-    
+
     // Command Panel
     QString f_python_salome_file = field("PythonSalome").toString();
     python_salome_file = f_python_salome_file.toStdString();
-    
+
     QString f_env_file;
     if (yacs_file != "")
       f_env_file = field("env_yacs_file").toString();
@@ -376,9 +384,9 @@ BL::JobNamePage::nextId() const
 BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
 : QWizardPage(parent)
 {
-  setTitle("Choose YACS Schema");
+  setTitle("Configure YACS Execution");
 
-  QLabel *label = new QLabel("In this step you have to choose what YACS Schema you want to execute");
+  QLabel *label = new QLabel("In this step you have to configure your YACS execution");
   label->setWordWrap(true);
 
   QPushButton * yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
@@ -395,6 +403,19 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   registerField("env_yacs_file", _line_env_file);
   _line_env_file->setReadOnly(true);
 
+  QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
+  QLabel * label_dump =  new QLabel("Dump YACS state each secs (0 disable this feature)");
+  QLabel * label_dump_warning = new QLabel("(WARNING: can only be used with SALOME >= 6.3.0)");
+  QSpinBox * spin_dump = new QSpinBox(this);
+  spin_dump->setMinimum(0);
+  spin_dump->setMaximum(1000000);
+  registerField("dump_yacs_state", spin_dump);
+  QGridLayout * specific_layout = new QGridLayout;
+  specific_layout->addWidget(label_dump, 0, 0);
+  specific_layout->addWidget(spin_dump, 0, 1);
+  specific_layout->addWidget(label_dump_warning, 1, 0);
+  spec_param_box->setLayout(specific_layout);
+
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
   QGridLayout *layout = new QGridLayout;
@@ -403,6 +424,7 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   layout->addWidget(command_env_file_button, 1, 0);
   layout->addWidget(_line_env_file, 1, 1);
   main_layout->insertLayout(-1, layout);
+  main_layout->addWidget(spec_param_box);
   setLayout(main_layout);
 };
 

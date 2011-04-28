@@ -60,7 +60,7 @@ namespace BL{
     public:
       // Results
       std::string job_name;
-      
+
       std::string yacs_file;
       std::string command;
       std::string python_salome_file;
@@ -80,16 +80,17 @@ namespace BL{
       std::string batch_queue;
 
       bool start_job;
+      int dump_yacs_state;
 
     public:
-      enum {Page_JobName, 
-	    Page_YACSSchema,
-	    Page_Command_Main_Definitions,
-	    Page_PythonSalome_Main_Definitions,
-	    Page_BatchParameters, 
-	    Page_Files, 
-	    Page_Resource, 
-	    Page_Conclusion};
+      enum {Page_JobName,
+            Page_YACSSchema,
+            Page_Command_Main_Definitions,
+            Page_PythonSalome_Main_Definitions,
+            Page_BatchParameters,
+            Page_Files,
+            Page_Resource,
+            Page_Conclusion};
   };
 
   class JobNamePage: virtual public QWizardPage

@@ -50,7 +50,11 @@ namespace BL
       BL::JobsManager_QT * _jobs_manager;
 
       QWidget * _summary_tab;
+      QWidget * _files_tab;
+
       // Main Values
+      QGroupBox * _main_values_box;
+      QFormLayout * _main_values_form;
       QLabel * _job_name_label_value;
       QLabel * _job_type_label_value;
       QLabel * _job_state_label_value;
@@ -68,7 +72,9 @@ namespace BL
       QLabel * _job_em_label_value;
       QLabel * _job_nop_label_value;
 
-      QWidget * _files_tab;
+      // Specific Values
+      QLabel * _yacs_dump_state_label;
+      QLabel * _yacs_dump_state_value;
 
       QListWidget * _input_files_list;
       QListWidget * _output_files_list;

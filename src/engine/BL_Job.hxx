@@ -48,6 +48,9 @@ namespace BL{
       void setEnvFile(const std::string & env_file);
       std::string & getEnvFile();
 
+      void setDumpYACSState(const int & dump_yacs_state);
+      int getDumpYACSState();
+
       struct BatchParam
       {
         std::string batch_directory;
@@ -88,6 +91,7 @@ namespace BL{
     private:
       BL::Job::State _state;
       BL::Job::ThreadState _thread_state;
+      int _dump_yacs_state;
 
       std::string _name;
 
