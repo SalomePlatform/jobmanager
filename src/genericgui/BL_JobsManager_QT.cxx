@@ -120,9 +120,26 @@ void
 BL::JobsManager_QT::save_jobs_button()
 {
   DEBTRACE("save_jobs");
-  QString jobs_file = QFileDialog::getSaveFileName(this,
-                                                   tr("Choose an xml jobs file"), "",
-                                                   tr("xml (*.xml);;All Files (*)"));
+  QFileDialog dialog(this, "Save jobs file");
+  QStringList filters;
+  filters << "XML files (*.xml)"
+          << "Any files (*)";
+  dialog.setFileMode(QFileDialog::AnyFile);
+  dialog.setFilters(filters);
+  dialog.selectFilter("(*.xml)");
+  dialog.setDefaultSuffix("xml");
+  dialog.setConfirmOverwrite(true);
+  dialog.setAcceptMode(QFileDialog::AcceptSave);
+  QString jobs_file("");
+  QStringList fileNames;
+  fileNames.clear();
+  if (bool ret = dialog.exec())
+  {
+    DEBTRACE(ret << " " << dialog.confirmOverwrite());
+    fileNames = dialog.selectedFiles();
+    if (!fileNames.isEmpty())
+      jobs_file= fileNames.first();
+  }
   if (jobs_file == "")
   {
     write_normal_text("Save jobs action cancelled\n");

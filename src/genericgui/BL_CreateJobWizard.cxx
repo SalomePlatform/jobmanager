@@ -904,7 +904,7 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
   _resource_choosed->setReadOnly(true);
   registerField("resource_choosed", _resource_choosed);
 
-  QLabel * bqLabel = new QLabel("Batch Queue (optional):");
+  QLabel * bqLabel = new QLabel("Batch Queue (could be optional):");
   QLineEdit * _bqLineEdit = new QLineEdit(this);
   registerField("batch_queue", _bqLineEdit);
 
