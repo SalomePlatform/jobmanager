@@ -121,6 +121,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _batch_line->addItem("sge");
   _batch_line->addItem("ssh");
   _batch_line->addItem("ccc");
+  _batch_line->addItem("slurm");
   _batch_line->addItem("ll");
   _batch_line->setCurrentIndex(-1);
 
@@ -130,7 +131,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _mpiImpl_line->addItem("mpich1");
   _mpiImpl_line->addItem("mpich2");
   _mpiImpl_line->addItem("openmpi");
-  _mpiImpl_line->addItem("slurm");
+  _mpiImpl_line->addItem("slurmmpi");
   _mpiImpl_line->addItem("prun");
   _mpiImpl_line->setCurrentIndex(-1);
 
@@ -215,8 +216,10 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(3);
   else if (batch == "ccc")
     _batch_line->setCurrentIndex(4);
-  else if (batch == "ll")
+  else if (batch == "slurm")
     _batch_line->setCurrentIndex(5);
+  else if (batch == "ll")
+    _batch_line->setCurrentIndex(6);
   else  
     _batch_line->setCurrentIndex(-1);
   
@@ -229,7 +232,7 @@ JM::EditSalomeResource::get_infos()
     _mpiImpl_line->setCurrentIndex(2);
   else if (mpiImpl == "openmpi")
     _mpiImpl_line->setCurrentIndex(3);
-  else if (mpiImpl == "slurm")
+  else if (mpiImpl == "slurmmpi")
     _mpiImpl_line->setCurrentIndex(4);
   else if (mpiImpl == "prun")
     _mpiImpl_line->setCurrentIndex(5);
