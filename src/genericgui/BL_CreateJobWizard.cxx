@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_CreateJobWizard.hxx"
@@ -30,6 +30,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   BL_ASSERT(jobs_manager);
   BL_ASSERT(salome_services);
   _jobs_manager = jobs_manager;
+  _salome_services = salome_services;
 
   job_name = "";
   yacs_file = "";
@@ -47,6 +48,8 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   batch_queue = "";
 
   start_job = false;
+  dump_yacs_state = -1;
+  ll_jobtype = "";
 
   setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
 
@@ -95,6 +98,12 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("yacs_file", QString(job->getJobFile().c_str()));
       _job_name_page->_yacs_schema_button->click();
       setField("env_yacs_file", QString(job->getEnvFile().c_str()));
+      if (job->getDumpYACSState() != -1)
+      {
+        QString value;
+        value.setNum(job->getDumpYACSState());
+        setField("dump_yacs_state", value);
+      }
     }
     else if (job->getType() == BL::Job::COMMAND)
     {
@@ -151,6 +160,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     setField("result_directory", QString(files_params.result_directory.c_str()));
     setField("resource_choosed", QString(job->getResource().c_str()));
     setField("batch_queue", QString(job->getBatchQueue().c_str()));
+    setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
   }
 }
 
@@ -174,15 +184,16 @@ BL::CreateJobWizard::end(int result)
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
     yacs_file = f_yacs_file.toStdString();
-    
+    dump_yacs_state = field("dump_yacs_state").toInt();
+
     // Command Panel
     QString f_command = field("command").toString();
     command = f_command.toStdString();
-    
+
     // Command Panel
     QString f_python_salome_file = field("PythonSalome").toString();
     python_salome_file = f_python_salome_file.toStdString();
-    
+
     QString f_env_file;
     if (yacs_file != "")
       f_env_file = field("env_yacs_file").toString();
@@ -239,7 +250,20 @@ BL::CreateJobWizard::end(int result)
 
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
-    batch_queue = f_batch_queue.toStdString(); 
+    batch_queue = f_batch_queue.toStdString();
+
+    // LoadLeveler JobType
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
+    std::string batch = resource_descr.batch.c_str();
+    if (batch == "ll")
+    {
+      QString f_ll_jobtype = field("ll_jobtype").toString();
+      ll_jobtype = f_ll_jobtype.toStdString();
+    }
+    else
+    {
+      ll_jobtype = "";
+    }
 
     start_job = field("start_job").toBool();
   }
@@ -356,10 +380,10 @@ BL::JobNamePage::validatePage()
   return return_value;
 }
 
-int 
+int
 BL::JobNamePage::nextId() const
 {
-  if (_yacs_schema_button->isChecked()) 
+  if (_yacs_schema_button->isChecked())
   {
     return BL::CreateJobWizard::Page_YACSSchema;
   } 
@@ -367,7 +391,7 @@ BL::JobNamePage::nextId() const
   {
     return BL::CreateJobWizard::Page_Command_Main_Definitions;
   }
-  else if (_python_salome_button->isChecked())
+  else
   {
     return BL::CreateJobWizard::Page_PythonSalome_Main_Definitions;
   }
@@ -376,33 +400,48 @@ BL::JobNamePage::nextId() const
 BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
 : QWizardPage(parent)
 {
-  setTitle("Choose YACS Schema");
+  setTitle("Configure YACS Execution");
 
-  QLabel *label = new QLabel("In this step you have to choose what YACS Schema you want to execute");
+  QLabel *label = new QLabel("In this step you have to configure your YACS execution");
   label->setWordWrap(true);
 
+  QGroupBox * files_param_box = new QGroupBox("YACS job files");
   QPushButton * yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
   connect(yacs_file_button, SIGNAL(clicked()), this, SLOT(choose_file()));
-
   _yacs_file_text = new QLineEdit(this);
   _yacs_file_text->setText("");
   registerField("yacs_file", _yacs_file_text);
   _yacs_file_text->setReadOnly(true);
-
   QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
   connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
   _line_env_file = new QLineEdit(this);
   registerField("env_yacs_file", _line_env_file);
   _line_env_file->setReadOnly(true);
+  QGridLayout * files_layout = new QGridLayout;
+  files_layout->addWidget(yacs_file_button, 0, 0);
+  files_layout->addWidget(_yacs_file_text, 0, 1);
+  files_layout->addWidget(command_env_file_button, 1, 0);
+  files_layout->addWidget(_line_env_file, 1, 1);
+  files_param_box->setLayout(files_layout);
+
+  QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
+  QLabel * label_dump =  new QLabel("Dump YACS state each secs (0 disable this feature)");
+  QLabel * label_dump_warning = new QLabel("(WARNING: can only be used with SALOME >= 6.3.0)");
+  QSpinBox * spin_dump = new QSpinBox(this);
+  spin_dump->setMinimum(0);
+  spin_dump->setMaximum(1000000);
+  registerField("dump_yacs_state", spin_dump);
+  QGridLayout * specific_layout = new QGridLayout;
+  specific_layout->addWidget(label_dump, 0, 0);
+  specific_layout->addWidget(spin_dump, 0, 1);
+  specific_layout->addWidget(label_dump_warning, 1, 0);
+  spec_param_box->setLayout(specific_layout);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
-  QGridLayout *layout = new QGridLayout;
-  layout->addWidget(yacs_file_button, 0, 0);
-  layout->addWidget(_yacs_file_text, 0, 1);
-  layout->addWidget(command_env_file_button, 1, 0);
-  layout->addWidget(_line_env_file, 1, 1);
-  main_layout->insertLayout(-1, layout);
+  main_layout->addWidget(files_param_box);
+  main_layout->addWidget(spec_param_box);
+
   setLayout(main_layout);
 };
 
@@ -865,21 +904,40 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
   _resource_choosed->setReadOnly(true);
   registerField("resource_choosed", _resource_choosed);
 
-  QLabel * bqLabel = new QLabel("Batch Queue (optional):");
+  QLabel * bqLabel = new QLabel("Batch Queue (could be optional):");
   QLineEdit * _bqLineEdit = new QLineEdit(this);
   registerField("batch_queue", _bqLineEdit);
 
-  QGridLayout * main_layout = new QGridLayout;
-  main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
-  main_layout->addWidget(resource_label, 1, 0);
-  main_layout->addWidget(_resource_choosed, 1, 1);
-  main_layout->addWidget(bqLabel, 2, 0);
-  main_layout->addWidget(_bqLineEdit, 2, 1);
-  setLayout(main_layout);
+  _ll_label = new QLabel("LoadLeveler JobType:", this);
+  _ll_value = new QLineEdit(this);
+  registerField("ll_jobtype", _ll_value);
+  _ll_label->hide();
+  _ll_value->hide();
+
+  _main_layout = new QGridLayout;
+  _main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
+  _main_layout->addWidget(resource_label, 1, 0);
+  _main_layout->addWidget(_resource_choosed, 1, 1);
+  _main_layout->addWidget(bqLabel, 2, 0);
+  _main_layout->addWidget(_bqLineEdit, 2, 1);
+  setLayout(_main_layout);
+
 };
 
 BL::ResourcePage::~ResourcePage()
 {}
+
+void
+BL::ResourcePage::initializePage()
+{
+  if (field("ll_jobtype").toString() != "")
+  {
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+}
 
 bool
 BL::ResourcePage::validatePage()
@@ -890,6 +948,18 @@ BL::ResourcePage::validatePage()
     QMessageBox::warning(NULL, "Resource Error", "Please choose a resource");
     return false;
   }
+
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    QString ll_jobtype = field("ll_jobtype").toString();
+    if (ll_jobtype == "")
+    {
+      QMessageBox::warning(NULL, "LoadLeveler Error", "Please define a LoadLeveler JobType");
+      return false;
+    }
+  }
   return true;
 }
 
@@ -899,6 +969,24 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
   _resource_choosed->setReadOnly(false);
   _resource_choosed->setText(item->text());
   _resource_choosed->setReadOnly(true);
+
+  //Specific parameters for LoadLeveler
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(item->text().toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+  else
+  {
+    _main_layout->removeWidget(_ll_value);
+    _main_layout->removeWidget(_ll_label);
+    _ll_label->hide();
+    _ll_value->hide();
+  }
 }
 
 int 

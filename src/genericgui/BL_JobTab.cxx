@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_JobTab.hxx"
@@ -31,9 +31,6 @@ BL::JobTab::JobTab(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QTabWid
 
   createJobSummaryTab();
   createJobFilesTab();
-
-  addTab(_summary_tab, "Job Summary");
-  addTab(_files_tab, "Job Files");
 }
 
 BL::JobTab::~JobTab()
@@ -70,16 +67,21 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_envfile_label = new QLabel("Env File:");
   _job_envfile_label_value = new QLabel("");
 
+
+  // Specific values
+  _yacs_dump_state_label = new QLabel("YACS dump state:");
+  _yacs_dump_state_value = new QLabel("");
+
   QGroupBox * main_values_box = new QGroupBox("Main values");
-  QFormLayout * values_form = new QFormLayout;
-  values_form->insertRow(0, job_name_label, _job_name_label_value);
-  values_form->insertRow(1, job_type_label, _job_type_label_value);
-  values_form->insertRow(2, job_state_label, _job_state_label_value);
-  values_form->insertRow(3, job_launcher_label, _job_launcher_label_value);
-  values_form->insertRow(4, job_resource_label, _job_resource_label_value);
-  values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
-  values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
-  main_values_box->setLayout(values_form);
+  _main_values_form = new QFormLayout;
+  _main_values_form->insertRow(0, job_name_label, _job_name_label_value);
+  _main_values_form->insertRow(1, job_type_label, _job_type_label_value);
+  _main_values_form->insertRow(2, job_state_label, _job_state_label_value);
+  _main_values_form->insertRow(3, job_launcher_label, _job_launcher_label_value);
+  _main_values_form->insertRow(4, job_resource_label, _job_resource_label_value);
+  _main_values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
+  _main_values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
+  main_values_box->setLayout(_main_values_form);
 
   QLabel * job_nif_label = new QLabel("Number of Input Files:");
   _job_nif_label_value = new QLabel("");
@@ -97,32 +99,42 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
 
+  // Specific values
+  _batch_queue_label = new QLabel("Batch queue:");
+  _batch_queue_value = new QLabel("");
+  _ll_jobtype_label = new QLabel("LoadLeveler JobType:");
+  _ll_jobtype_value = new QLabel("");
+
   QGroupBox * run_values_box = new QGroupBox("Run values");
-  QFormLayout * run_values_form = new QFormLayout;
-  run_values_form->insertRow(0, job_nif_label, _job_nif_label_value);
-  run_values_form->insertRow(1, job_nof_label, _job_nof_label_value);
-  run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
-  run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
-  QFormLayout * other_run_values_form = new QFormLayout;
-  other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
-  other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
-  other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
+  _run_values_form = new QFormLayout;
+  _run_values_form->insertRow(0, job_nif_label, _job_nif_label_value);
+  _run_values_form->insertRow(1, job_nof_label, _job_nof_label_value);
+  _run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
+  _run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
+  _other_run_values_form = new QFormLayout;
+  _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
+  _other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
+  _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
   QHBoxLayout * box_layout = new QHBoxLayout();
-  box_layout->addLayout(run_values_form);
-  box_layout->addLayout(other_run_values_form);
+  box_layout->addLayout(_run_values_form);
+  box_layout->addLayout(_other_run_values_form);
   run_values_box->setLayout(box_layout);
 
   QVBoxLayout * mainLayout = new QVBoxLayout();
   mainLayout->addWidget(main_values_box);
   mainLayout->addWidget(run_values_box);
   _summary_tab->setLayout(mainLayout);
+
+  removeTab(0);
+  insertTab(0, _summary_tab, "Job Summary");
+  setCurrentIndex(0);
 }
 
 void
 BL::JobTab::createJobFilesTab()
 {
   _files_tab = new QWidget(this);
-  
+
   _input_files_list = new QListWidget(this);
   _input_files_list->setSelectionMode(QAbstractItemView::NoSelection);
   QGroupBox * input_files_box = new QGroupBox("Input Files");
@@ -141,6 +153,8 @@ BL::JobTab::createJobFilesTab()
   mainLayout->addWidget(input_files_box);
   mainLayout->addWidget(output_files_box);
   _files_tab->setLayout(mainLayout);
+
+  insertTab(1, _files_tab, "Job Files");
 }
 
 void
@@ -152,6 +166,10 @@ BL::JobTab::job_selected(const QModelIndex & index)
   if (item)
   {
     BL::Job * job = _jobs_manager->getJob(item_name->text().toStdString());
+
+    // create a new tab
+    // to be replaced if it is too long
+    createJobSummaryTab();
 
     _job_name_label_value->setText(QString(job->getName().c_str()));
 
@@ -214,6 +232,23 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _output_files_list->addItem(QString(file.c_str()));
     }
 
+    // Specific parameters management
+    if (job->getDumpYACSState() > 0)
+    {
+      // Add widget in the layout
+      _yacs_dump_state_value->setText(QVariant(job->getDumpYACSState()).toString());
+      _main_values_form->insertRow(7, _yacs_dump_state_label, _yacs_dump_state_value);
+    }
+    if (job->getBatchQueue() != "")
+    {
+      _batch_queue_value->setText(QVariant(job->getBatchQueue().c_str()).toString());
+      _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _batch_queue_label, _batch_queue_value);
+    }
+    if (job->getLoadLevelerJobType() != "")
+    {
+      _ll_jobtype_value->setText(QVariant(job->getLoadLevelerJobType().c_str()).toString());
+      _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _ll_jobtype_label, _ll_jobtype_value);
+    }
   }
   else
     DEBTRACE ("itemFromIndex returns 0 !");
@@ -270,4 +305,10 @@ BL::JobTab::reset(QString job_name)
 
   _input_files_list->clear();
   _output_files_list->clear();
+
+  _yacs_dump_state_value->setText("");
+  _batch_queue_value->setText("");
+  _ll_jobtype_value->setText("");
+
+  createJobSummaryTab();
 }

@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef _BL_CREATEJOBWIZARD_HXX_
@@ -56,11 +56,12 @@ namespace BL{
       QListWidget * _output_files_list;
 
       BL::JobNamePage * _job_name_page;
+      BL::SALOMEServices * _salome_services;
 
     public:
       // Results
       std::string job_name;
-      
+
       std::string yacs_file;
       std::string command;
       std::string python_salome_file;
@@ -80,16 +81,18 @@ namespace BL{
       std::string batch_queue;
 
       bool start_job;
+      int dump_yacs_state;
+      std::string ll_jobtype;
 
     public:
-      enum {Page_JobName, 
-	    Page_YACSSchema,
-	    Page_Command_Main_Definitions,
-	    Page_PythonSalome_Main_Definitions,
-	    Page_BatchParameters, 
-	    Page_Files, 
-	    Page_Resource, 
-	    Page_Conclusion};
+      enum {Page_JobName,
+            Page_YACSSchema,
+            Page_Command_Main_Definitions,
+            Page_PythonSalome_Main_Definitions,
+            Page_BatchParameters,
+            Page_Files,
+            Page_Resource,
+            Page_Conclusion};
   };
 
   class JobNamePage: virtual public QWizardPage
@@ -183,6 +186,7 @@ namespace BL{
 
       virtual int nextId() const;
       virtual bool validatePage();
+      virtual void initializePage();
 
     public slots:
       void itemSelected(QListWidgetItem * item);
@@ -191,6 +195,10 @@ namespace BL{
       JM::ResourceCatalog * _resource_list;
       QLineEdit * _resource_choosed;
       BL::SALOMEServices * _salome_services;
+
+      QLabel * _ll_label;
+      QLineEdit * _ll_value;
+      QGridLayout * _main_layout;
   };
 
   class YACSSchemaPage: virtual public QWizardPage

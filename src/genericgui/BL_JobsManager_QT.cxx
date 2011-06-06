@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_JobsManager_QT.hxx"
@@ -120,9 +120,26 @@ void
 BL::JobsManager_QT::save_jobs_button()
 {
   DEBTRACE("save_jobs");
-  QString jobs_file = QFileDialog::getSaveFileName(this,
-                                                   tr("Choose an xml jobs file"), "",
-                                                   tr("xml (*.xml);;All Files (*)"));
+  QFileDialog dialog(this, "Save jobs file");
+  QStringList filters;
+  filters << "XML files (*.xml)"
+          << "Any files (*)";
+  dialog.setFileMode(QFileDialog::AnyFile);
+  dialog.setFilters(filters);
+  dialog.selectFilter("(*.xml)");
+  dialog.setDefaultSuffix("xml");
+  dialog.setConfirmOverwrite(true);
+  dialog.setAcceptMode(QFileDialog::AcceptSave);
+  QString jobs_file("");
+  QStringList fileNames;
+  fileNames.clear();
+  if (bool ret = dialog.exec())
+  {
+    DEBTRACE(ret << " " << dialog.confirmOverwrite());
+    fileNames = dialog.selectedFiles();
+    if (!fileNames.isEmpty())
+      jobs_file= fileNames.first();
+  }
   if (jobs_file == "")
   {
     write_normal_text("Save jobs action cancelled\n");
@@ -253,6 +270,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
     // YACS schema job
     new_job->setType(BL::Job::YACS_SCHEMA);
     new_job->setJobFile(wizard.yacs_file);
+    new_job->setDumpYACSState(wizard.dump_yacs_state);
   }
   else if (wizard.command != "")
   {
@@ -282,6 +300,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   new_job->setFilesParameters(files_params);
   new_job->setResource(wizard.resource_choosed);
   new_job->setBatchQueue(wizard.batch_queue);
+  new_job->setLoadLevelerJobType(wizard.ll_jobtype);
 
   // End
   addJobToLauncher(wizard.job_name);

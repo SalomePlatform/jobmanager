@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "JM_EditSalomeResource.hxx"
@@ -121,6 +121,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _batch_line->addItem("sge");
   _batch_line->addItem("ssh");
   _batch_line->addItem("ccc");
+  _batch_line->addItem("slurm");
   _batch_line->addItem("ll");
   _batch_line->setCurrentIndex(-1);
 
@@ -130,7 +131,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _mpiImpl_line->addItem("mpich1");
   _mpiImpl_line->addItem("mpich2");
   _mpiImpl_line->addItem("openmpi");
-  _mpiImpl_line->addItem("slurm");
+  _mpiImpl_line->addItem("slurmmpi");
   _mpiImpl_line->addItem("prun");
   _mpiImpl_line->setCurrentIndex(-1);
 
@@ -215,8 +216,10 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(3);
   else if (batch == "ccc")
     _batch_line->setCurrentIndex(4);
-  else if (batch == "ll")
+  else if (batch == "slurm")
     _batch_line->setCurrentIndex(5);
+  else if (batch == "ll")
+    _batch_line->setCurrentIndex(6);
   else  
     _batch_line->setCurrentIndex(-1);
   
@@ -229,7 +232,7 @@ JM::EditSalomeResource::get_infos()
     _mpiImpl_line->setCurrentIndex(2);
   else if (mpiImpl == "openmpi")
     _mpiImpl_line->setCurrentIndex(3);
-  else if (mpiImpl == "slurm")
+  else if (mpiImpl == "slurmmpi")
     _mpiImpl_line->setCurrentIndex(4);
   else if (mpiImpl == "prun")
     _mpiImpl_line->setCurrentIndex(5);

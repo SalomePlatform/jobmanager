@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_Job.hxx"
@@ -35,6 +35,8 @@ BL::Job::Job()
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::Job(const std::string & name)
@@ -53,6 +55,8 @@ BL::Job::Job(const std::string & name)
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::~Job()
@@ -97,6 +101,18 @@ BL::Job::JobType
 BL::Job::getType()
 {
   return _type;
+}
+
+void
+BL::Job::setDumpYACSState(const int & dump_yacs_state)
+{
+  _dump_yacs_state = dump_yacs_state;
+}
+
+int
+BL::Job::getDumpYACSState()
+{
+  return _dump_yacs_state;
 }
 
 void 
@@ -174,6 +190,18 @@ std::string &
 BL::Job::getBatchQueue()
 {
   return _batch_queue;
+}
+
+void
+BL::Job::setLoadLevelerJobType(const std::string & jobtype)
+{
+  _ll_jobtype = jobtype;
+}
+
+std::string &
+BL::Job::getLoadLevelerJobType()
+{
+  return _ll_jobtype;
 }
 
 void 

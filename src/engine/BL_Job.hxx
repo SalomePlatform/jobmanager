@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef _BL_JOB_HXX_
@@ -48,6 +48,9 @@ namespace BL{
       void setEnvFile(const std::string & env_file);
       std::string & getEnvFile();
 
+      void setDumpYACSState(const int & dump_yacs_state);
+      int getDumpYACSState();
+
       struct BatchParam
       {
         std::string batch_directory;
@@ -73,6 +76,9 @@ namespace BL{
       void setBatchQueue(const std::string & queue);
       std::string & getBatchQueue();
 
+      void setLoadLevelerJobType(const std::string & jobtype);
+      std::string & getLoadLevelerJobType();
+
       enum State {CREATED, IN_PROCESS, QUEUED, RUNNING, PAUSED, FINISHED, ERROR, FAILED, NOT_CREATED};
       void setState(BL::Job::State state);
       BL::Job::State getState();
@@ -88,6 +94,7 @@ namespace BL{
     private:
       BL::Job::State _state;
       BL::Job::ThreadState _thread_state;
+      int _dump_yacs_state;
 
       std::string _name;
 
@@ -99,6 +106,7 @@ namespace BL{
       BL::Job::FilesParam _files_params;
       std::string _resource_choosed;
       std::string _batch_queue;
+      std::string _ll_jobtype;
 
       int _salome_launcher_id;
   };

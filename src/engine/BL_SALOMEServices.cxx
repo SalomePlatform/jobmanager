@@ -1,20 +1,20 @@
-//  Copyright (C) 2009-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_SALOMEServices.hxx"
@@ -249,6 +249,29 @@ BL::SALOMEServices::create_job(BL::Job * job)
   else if (job->getType() == BL::Job::PYTHON_SALOME)
   {
     job_parameters->job_type = CORBA::string_dup("python_salome");
+  }
+
+  // Specific parameters
+  if (job->getType() == BL::Job::YACS_SCHEMA)
+  {
+    if (job->getDumpYACSState() > 0)
+    {
+      job_parameters->specific_parameters.length(job_parameters->specific_parameters.length() + 1);
+      std::ostringstream oss;
+      oss << job->getDumpYACSState();
+      Engines::Parameter_var new_parameter = new Engines::Parameter;
+      new_parameter->name = CORBA::string_dup("EnableDumpYACS");
+      new_parameter->value = CORBA::string_dup(oss.str().c_str());
+      job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
+    }
+  }
+  if (job->getLoadLevelerJobType() != "")
+  {
+    job_parameters->specific_parameters.length(job_parameters->specific_parameters.length() + 1);
+    Engines::Parameter_var new_parameter = new Engines::Parameter;
+    new_parameter->name = CORBA::string_dup("LoalLevelerJobType");
+    new_parameter->value = CORBA::string_dup(job->getLoadLevelerJobType().c_str());
+    job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
   }
 
   // Files
@@ -538,6 +561,24 @@ BL::SALOMEServices::get_new_job(int job_number)
     job_return->setBatchParameters(batch_param);
 
     job_return->setResource(job_parameters->resource_required.name.in());
+
+    // Specific parameters
+    for (CORBA::ULong i = 0; i < job_parameters->specific_parameters.length(); i++)
+    {
+      if (std::string(job_parameters->specific_parameters[i].name.in()) == "EnableDumpYACS")
+      {
+        std::string user_value = job_parameters->specific_parameters[i].value.in();
+        std::istringstream iss(user_value);
+        int value;
+        iss >> value;
+        job_return->setDumpYACSState(value);
+      }
+      if (std::string(job_parameters->specific_parameters[i].name.in()) == "LoalLevelerJobType")
+      {
+        std::string user_value = job_parameters->specific_parameters[i].value.in();
+        job_return->setLoadLevelerJobType(user_value);
+      }
+    }
 
     // Get current state
     std::string result_job = job_return->setStringState(refresh_job(job_return));
