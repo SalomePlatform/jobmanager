@@ -41,13 +41,13 @@ ALLSPHINXOPTS   = -d doctrees $(PAPEROPT_a4) $(SPHINXOPTS) $(SOURCEDIR)
 
 htm:
 	mkdir -p html doctrees
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) html
+	$(SPHINXBUILD) -c $(top_builddir)/doc -b html $(ALLSPHINXOPTS) html
 	@echo
 	@echo "Build finished. The HTML pages are in html."
 
 latex:
 	mkdir -p latex doctrees
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) latex
+	$(SPHINXBUILD) -c $(top_builddir)/doc -b latex $(ALLSPHINXOPTS) latex
 	@echo
 	@echo "Build finished; the LaTeX files are in latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
@@ -68,7 +68,7 @@ jobmanager_gui.rst \
 advanced.rst
 
 
-EXTRA_DIST+= $(RSTFILES) conf.py
+EXTRA_DIST+= $(RSTFILES)
 
 install-data-local:
 	$(INSTALL) -d $(DESTDIR)$(jobmanagerdocdir)
