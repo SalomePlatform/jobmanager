@@ -235,16 +235,16 @@ BL::JobsManager::refresh_jobs_thread(void * object_ptr)
         {
           std::string result_launcher = object->_salome_services->refresh_job(job);
           std::string result_job = job->setStringState(result_launcher);
-          if (result_job == "new_state")
-          {
-            if (object->_observer)
-              object->_observer->sendEvent("refresh_job", "Ok", job->getName(), "new state");
-          }
-          else if (result_job != "")
+          if (result_job == "RefreshError")
           {
             // Error using launcher...
             if (object->_observer)
               object->_observer->sendEvent("refresh_job", "Error", job->getName(), result_launcher);
+          }
+          else if (result_job != "")
+          {
+            if (object->_observer)
+              object->_observer->sendEvent("refresh_job", "Ok", job->getName(), result_job);
           }
         }
       }
