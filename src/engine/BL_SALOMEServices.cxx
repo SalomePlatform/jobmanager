@@ -582,8 +582,8 @@ BL::SALOMEServices::get_new_job(int job_number)
 
     // Get current state
     std::string result_job = job_return->setStringState(refresh_job(job_return));
-    if (result_job == "new_state") {}
-    else if (result_job != "")
+    if (result_job != "RefreshError") {}
+    else
     {
       // Error in getting state
       DEBMSG("Error in getting state of the new job!");

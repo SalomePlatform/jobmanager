@@ -234,7 +234,7 @@ BL::Job::setStringState(const std::string & state)
      )
   {
     DEBTRACE("Error state in setStringState");
-    result = state;
+    result = "RefreshError";
   }
 
   if (result == "")
@@ -244,7 +244,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::CREATED)
       {
         setState(BL::Job::CREATED);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "NOT_CREATED")
@@ -252,7 +252,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::NOT_CREATED)
       {
         setState(BL::Job::NOT_CREATED);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "QUEUED")
@@ -260,7 +260,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::QUEUED)
       {
         setState(BL::Job::QUEUED);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "IN_PROCESS")
@@ -268,7 +268,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::IN_PROCESS)
       {
         setState(BL::Job::IN_PROCESS);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "RUNNING")
@@ -276,7 +276,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::RUNNING)
       {
         setState(BL::Job::RUNNING);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "PAUSED")
@@ -284,7 +284,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::PAUSED)
       {
         setState(BL::Job::PAUSED);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "FINISHED")
@@ -292,7 +292,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::FINISHED)
       {
         setState(BL::Job::FINISHED);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "ERROR")
@@ -300,7 +300,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::ERROR)
       {
         setState(BL::Job::ERROR);
-        result = "new_state";
+        result = state;
       }
     }
     else if (state == "FAILED")
@@ -308,7 +308,7 @@ BL::Job::setStringState(const std::string & state)
       if (_state != BL::Job::FAILED)
       {
         setState(BL::Job::FAILED);
-        result = "new_state";
+        result = state;
       }
     }
   }

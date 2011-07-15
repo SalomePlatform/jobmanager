@@ -22,7 +22,7 @@
 # --
 # -----------------------------------------------------------------------------
 #
-AC_INIT([JOBMANAGER project], [6.3.0], [andre.ribes@edf.fr], [JobManager-Module])
+AC_INIT([JOBMANAGER project], [6.3.1], [andre.ribes@edf.fr], [JobManager-Module])
 AM_INIT_AUTOMAKE([tar-pax])
 AC_CONFIG_HEADER(jobmanager_config.h)
 
@@ -30,6 +30,8 @@ AC_CONFIG_HEADER(jobmanager_config.h)
 MODULE_NAME=jobmanager
 AC_SUBST(MODULE_NAME)
 
+SHORT_VERSION=`echo $VERSION | awk -F. '{printf("%d.%d",$1,$2)}'`
+AC_SUBST(SHORT_VERSION)
 XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
 
@@ -135,4 +137,5 @@ AC_OUTPUT([ \
   src/standalone/start_jobmanager.sh \
   src/salomegui/Makefile \
   doc/Makefile \
+  doc/conf.py \
 ])

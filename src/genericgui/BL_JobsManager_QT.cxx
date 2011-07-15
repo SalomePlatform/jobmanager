@@ -232,7 +232,7 @@ BL::JobsManager_QT::edit_clone_job(const std::string & name)
   // Check if the job has the same name
   if (name == wizard.job_name)
   {
-    DEBTRACE("Job " << name << " has been changed");
+    DEBTRACE("Job " << name << " has been edited");
     _main_gui->delete_job_internal();
   }
 
@@ -378,8 +378,10 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " state changed\n");
+      QString name((event->job_name).c_str());
+      QString state((event->data).c_str());
+      state = state.toLower();
+      write_normal_text("Job " + name + " new state is " + state + "\n");
       emit job_state_changed(QString((event->job_name).c_str()));
     }
     else

@@ -161,9 +161,18 @@ void
 BL::GenericGui::showDockWidgets(bool isVisible)
 {
   DEBTRACE("BL::GenericGui::showDockWidgets " << isVisible);
-  if (_jobs_manager) _jobs_manager->setVisible(isVisible);
-  if (_dw_summary) _dw_summary->setVisible(isVisible);
-  if (_dw_resource_catalog) _dw_resource_catalog->setVisible(isVisible);
+  if (_jobs_manager) {
+    _jobs_manager->setVisible(isVisible);
+    _jobs_manager->toggleViewAction()->setVisible(isVisible);
+  }
+  if (_dw_summary) {
+    _dw_summary->setVisible(isVisible);
+    _dw_summary->toggleViewAction()->setVisible(isVisible);
+  }
+  if (_dw_resource_catalog) {
+    _dw_resource_catalog->setVisible(isVisible);
+    _dw_resource_catalog->toggleViewAction()->setVisible(isVisible);
+  }    
 }
 
 void
