@@ -30,7 +30,7 @@ nodist_libJOBMANAGER_la_SOURCES = $(MOC_FILES)
 libJOBMANAGER_la_CXXFLAGS = $(qt4_cppflags) \
 				$(BOOST_CPPFLAGS) \
 				$(OMNIORB_INCLUDES) \
-			        -I../../idl \
+			        -I$(top_builddir)/idl \
 				-I$(KERNEL_ROOT_DIR)/include/salome \
 				-I$(GUI_ROOT_DIR)/include/salome \
 				-I$(top_srcdir)/src/genericgui \
@@ -51,7 +51,8 @@ libJOBMANAGER_la_LIBADD  = $(qt4_libs) \
 			       $(top_builddir)/src/wrappers/libBL_Wrappers_SALOME.la \
 			       -lSalomeApp
 
-salomeinclude_HEADERS = BL_SalomeGui.hxx
+salomeinclude_HEADERS = BL_SalomeGui.hxx \
+			JOBMANAGER_version.h
 
 # resources files
 LIBICONS = SalomeApp.xml jobmanager.png

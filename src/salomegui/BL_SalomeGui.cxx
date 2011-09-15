@@ -18,6 +18,7 @@
 //
 
 #include "BL_SalomeGui.hxx"
+#include "JOBMANAGER_version.h"
 
 BL::SalomeGui::SalomeGui() : MainWindows_SALOME("JobManager"), 
 			     SalomeApp_Module("JobManager"), 
@@ -130,5 +131,10 @@ extern "C"
   CAM_Module* createModule()
   {
     return new BL::SalomeGui();
+  }
+
+  char* getModuleVersion()
+  {
+      return (char*)JOBMANAGER_VERSION_STR;
   }
 }
