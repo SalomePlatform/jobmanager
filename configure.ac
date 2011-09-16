@@ -137,6 +137,7 @@ AC_OUTPUT([ \
   src/standalone/start_jobmanager.sh \
   src/salomegui/Makefile \
   src/salomegui/JOBMANAGER_version.h \
+  src/salomegui/resources/SalomeApp.xml \
   doc/Makefile \
   doc/conf.py \
 ])

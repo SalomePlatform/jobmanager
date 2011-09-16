@@ -24,13 +24,14 @@
     <parameter name="name" value="JobManager"/>
     <parameter name="icon" value="jobmanager.png"/>
     <parameter name="documentation" value="jobmanager_help"/>
+    <parameter name="version" value="@VERSION@"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="JOBMANAGER" value="${JOBMANAGER_ROOT_DIR}/share/salome/resources/jobmanager"/>
+    <parameter name="JOBMANAGER" value="%JOBMANAGER_ROOT_DIR%/share/salome/resources/jobmanager"/>
   </section>
   <section name="jobmanager_help">
     <parameter name="sub_menu"     value="%1 module"/>
-    <parameter name="User's Guide" value="${JOBMANAGER_ROOT_DIR}/share/doc/salome/gui/JOBMANAGER/index.html"/>
+    <parameter name="User's Guide" value="%JOBMANAGER_ROOT_DIR%/share/doc/salome/gui/JOBMANAGER/index.html"/>
   </section>
 </document>
