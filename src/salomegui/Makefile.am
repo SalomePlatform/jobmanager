@@ -56,10 +56,11 @@ salomeinclude_HEADERS = BL_SalomeGui.hxx \
 
 # resources files
 LIBICONS = jobmanager.png
-LIBRES = $(top_builddir)/src/salomegui/resources/SalomeApp.xml
+
+nodist_salomeres_SCRIPTS = resources/SalomeApp.xml
 
 dist_salomeres_DATA = ${ICONS}
-ICONS = $(LIBICONS:%=resources/%) $(LIBRES)
+ICONS = $(LIBICONS:%=resources/%)
 
 # --------------------------------------------
 # *.h --> *_moc.cxx
