@@ -19,37 +19,50 @@
 
 #include "BL_Buttons.hxx"
 
-BL::Buttons::Buttons(QWidget * parent) : QGroupBox(parent)
+BL::Buttons::Buttons(QWidget * parent) : QWidget(parent)
 {
   DEBTRACE("Creating BL::Buttons");
 
-  setTitle("Actions");
+  _create_button      = new QPushButton("Create", this);
+  _start_button       = new QPushButton("Start", this);
+  _get_results_button = new QPushButton("Get Results", this);
 
-  _create_button = new QPushButton("Create a Job", this);
-  _edit_clone_button = new QPushButton("Edit/Clone a Job", this);
-  _start_button = new QPushButton("Start a Job", this);
-  _restart_button = new QPushButton("Restart a Job", this);
-  _delete_button = new QPushButton("Delete a Job", this);
-  _get_results_button = new QPushButton("Get Job Results", this);
-  _refresh_button = new QPushButton("Refresh Jobs", this);
 
+  _stop_button       = new QPushButton("Stop", this);
+  _delete_button     = new QPushButton("Delete", this);
+  _restart_button    = new QPushButton("Restart", this);
+  _edit_clone_button = new QPushButton("Edit/Clone", this);
+
+  _refresh_button    = new QPushButton("Refresh Jobs", this);
+
+  QGroupBox * main_buttons = new QGroupBox(this);
+  main_buttons->setTitle("Main");
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(_create_button);
-  mainLayout->addWidget(_edit_clone_button);
   mainLayout->addWidget(_start_button);
-  mainLayout->addWidget(_restart_button);
-  mainLayout->addWidget(_delete_button);
   mainLayout->addWidget(_get_results_button);
-  mainLayout->addWidget(_refresh_button);
-  mainLayout->setSpacing(0); // Space between buttons
+  main_buttons->setLayout(mainLayout);
 
-  setLayout(mainLayout);
+  QGroupBox * manage_buttons = new QGroupBox(this);
+  manage_buttons->setTitle("Management");
+  QHBoxLayout *manageLayout = new QHBoxLayout;
+  manageLayout->addWidget(_stop_button);
+  manageLayout->addWidget(_delete_button);
+  manageLayout->addWidget(_restart_button);
+  manageLayout->addWidget(_edit_clone_button);
+  manage_buttons->setLayout(manageLayout);
 
-  //QSizePolicy poli;
-  //poli.setControlType(QSizePolicy::PushButton);
-  //poli.setVerticalPolicy(QSizePolicy::Fixed);
-  //poli.setHorizontalPolicy(QSizePolicy::Fixed);
-  //setSizePolicy(poli);
+  QGroupBox * refresh_buttons = new QGroupBox(this);
+  refresh_buttons->setTitle("Refresh");
+  QHBoxLayout *refreshLayout = new QHBoxLayout;
+  refreshLayout->addWidget(_refresh_button);
+  refresh_buttons->setLayout(refreshLayout);
+
+  QGridLayout * gridLayout = new QGridLayout;
+  gridLayout->addWidget(main_buttons, 0 ,0);
+  gridLayout->addWidget(manage_buttons, 0 ,1);
+  gridLayout->addWidget(refresh_buttons, 0 , 2);
+  setLayout(gridLayout);
 }
 
 BL::Buttons::~Buttons()
@@ -79,6 +92,12 @@ void
 BL::Buttons::setReStartButtonSlot(QObject * receiver, const char * name)
 {
   connect(_restart_button, SIGNAL(clicked()), receiver, name);
+}
+
+void
+BL::Buttons::setStopButtonSlot(QObject * receiver, const char * name)
+{
+  connect(_stop_button, SIGNAL(clicked()), receiver, name);
 }
 
 void
@@ -133,6 +152,18 @@ void
 BL::Buttons::disable_restart_button()
 {
   _restart_button->setEnabled(false);
+}
+
+void 
+BL::Buttons::enable_stop_button()
+{
+  _stop_button->setEnabled(true);
+}
+
+void 
+BL::Buttons::disable_stop_button()
+{
+  _stop_button->setEnabled(false);
 }
 
 void 

@@ -26,7 +26,7 @@
 
 namespace BL 
 {
-  class Buttons: public QGroupBox
+  class Buttons: public QWidget
   {
     Q_OBJECT
 
@@ -38,6 +38,7 @@ namespace BL
       void setEditCloneButtonSlot(QObject * receiver, const char * name);
       void setStartButtonSlot(QObject * receiver, const char * name);
       void setReStartButtonSlot(QObject * receiver, const char * name);
+      void setStopButtonSlot(QObject * receiver, const char * name);
       void setDeleteButtonSlot(QObject * receiver, const char * name);
       void setRefreshButtonSlot(QObject * receiver, const char * name);
       void setGetResultsButtonSlot(QObject * receiver, const char * name);
@@ -50,6 +51,9 @@ namespace BL
 
       void enable_restart_button();
       void disable_restart_button();
+
+      void enable_stop_button();
+      void disable_stop_button();
 
       void enable_delete_button();
       void disable_delete_button();
@@ -65,6 +69,7 @@ namespace BL
       QPushButton * _delete_button;
       QPushButton * _get_results_button;
       QPushButton * _refresh_button;
+      QPushButton * _stop_button;
   };
 }
 

@@ -66,6 +66,7 @@ namespace BL
       void restart_job();
       void delete_job();
       void refresh_job();
+      void stop_job();
       void get_results_job();
       void job_selected(const QModelIndex & index);
       void job_state_changed(const QString & name);
@@ -95,6 +96,7 @@ namespace BL
       QAction * _start_job_action;
       QAction * _restart_job_action;
       QAction * _delete_job_action;
+      QAction * _stop_job_action;
       QAction * _get_results_job_action;
       QAction * _refresh_job_action;
 

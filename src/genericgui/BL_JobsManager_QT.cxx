@@ -425,6 +425,22 @@ BL::JobsManager_QT::event(QEvent * e)
       write_error_text(" ***\n");
     }
   }
+  else if (event->action == "stop_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " is stopped\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error when trying to stop job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
   else if (event->action == "save_jobs")
   {
     if (event->event_name == "Error")

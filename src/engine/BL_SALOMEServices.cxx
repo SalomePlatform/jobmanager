@@ -410,6 +410,28 @@ BL::SALOMEServices::delete_job(BL::Job * job)
 }
 
 std::string
+BL::SALOMEServices::stop_job(BL::Job * job)
+{
+  std::string ret = "";
+  try
+  {
+    _salome_launcher->stopJob(job->getSalomeLauncherId());
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in stopJob !");
+    ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
+  }
+  return ret;
+}
+
+std::string
 BL::SALOMEServices::get_results_job(BL::Job * job)
 {
   std::string ret = "";
@@ -505,6 +527,10 @@ BL::SALOMEServices::notify(const char* event_name, const char * event_data)
   else if (event == "REMOVE_JOB")
   {
     _manager->launcher_event_remove_job(data);
+  }
+  else if (event == "UPDATE_JOB_STATE")
+  {
+    _manager->launcher_event_update_job_state(data);
   }
   else
   {

@@ -203,6 +203,55 @@ BL::JobsManager::starting_job_thread(void * object_ptr)
 }
 
 void
+BL::JobsManager::stop_job(const std::string & name)
+{
+  DEBTRACE("stop_job BL::JobsManager called");
+
+  _thread_mutex_jobs_map.lock();
+  // Check job exits
+  _jobs_it = _jobs.find(name);
+  if (_jobs_it == _jobs.end())
+  {
+    DEBTRACE("BL::JobsManager::stop_job job unknown: " << name);
+    _thread_mutex_jobs_map.unlock();
+    return;
+  }
+  else
+  {
+    // Prepare Info for thread
+    BL::JobsManager::thread_info * ti = new thread_info();
+    ti->object_ptr = this;
+    ti->job_name = name;
+    omni_thread::create(BL::JobsManager::stop_job_thread, ti);
+  }
+}
+
+void 
+BL::JobsManager::stop_job_thread(void * object_ptr)
+{
+  DEBTRACE("stop_job_thread BL::JobsManager called");
+  BL::JobsManager::thread_info * ti = reinterpret_cast<BL::JobsManager::thread_info*>(object_ptr);
+  BL::JobsManager * object = ti->object_ptr;
+  std::string job_name =  ti->job_name;
+  BL::Job * job = object->getJob(job_name);
+
+  std::string result = object->_salome_services->stop_job(job);
+
+  // End
+  if (result == "")
+  {
+    if (object->_observer)
+      object->_observer->sendEvent("stop_job", "Ok", job_name, "");
+  }
+  else
+  {
+    if (object->_observer)
+      object->_observer->sendEvent("stop_job", "Error", job_name, result);
+  }
+  object->_thread_mutex_jobs_map.unlock();
+}
+
+void
 BL::JobsManager::refresh_jobs()
 {
   DEBTRACE("refresh_jobs BL::JobsManager called");
@@ -399,6 +448,12 @@ BL::JobsManager::launcher_event_new_job(const std::string & data)
     ti->job_number = job_number;
     omni_thread::create(BL::JobsManager::launcher_event_new_job_thread, ti);
   }
+}
+
+void
+BL::JobsManager::launcher_event_update_job_state(const std::string & data)
+{
+  refresh_jobs();
 }
 
 void

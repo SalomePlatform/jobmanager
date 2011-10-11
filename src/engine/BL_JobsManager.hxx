@@ -56,6 +56,9 @@ namespace BL{
       virtual void start_job(const std::string & name);
       static void starting_job_thread(void * object_ptr);
 
+      virtual void stop_job(const std::string & name);
+      static void stop_job_thread(void * object_ptr);
+
       virtual void get_results_job(const std::string & name);
       static void get_results_job_thread(void * object_ptr);
 
@@ -74,6 +77,7 @@ namespace BL{
       static void launcher_event_new_job_thread(void * object_ptr);
       void launcher_event_remove_job(const std::string & data);
       static void launcher_event_remove_job_thread(void * object_ptr);
+      void launcher_event_update_job_state(const std::string & data);
 
       struct thread_info
       {

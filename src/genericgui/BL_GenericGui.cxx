@@ -106,6 +106,7 @@ BL::GenericGui::createCentralWidget()
   _buttons->setStartButtonSlot(this, SLOT(start_job()));
   _buttons->setReStartButtonSlot(this, SLOT(restart_job()));
   _buttons->setDeleteButtonSlot(this, SLOT(delete_job()));
+  _buttons->setStopButtonSlot(this, SLOT(stop_job()));
   _buttons->setRefreshButtonSlot(this, SLOT(refresh_job()));
   _buttons->setGetResultsButtonSlot(this, SLOT(get_results_job()));
 
@@ -186,6 +187,7 @@ BL::GenericGui::createActions()
   _delete_job_action = _wrapper->createAction("Delete a Job", QIcon(), "Delete a Job", "Delete a Job", 0, _dock_parent, false, this, SLOT(delete_job()));
   _refresh_job_action = _wrapper->createAction("Refresh Jobs", QIcon(), "Refresh Jobs", "Refresh Jobs", 0, _dock_parent, false, this, SLOT(refresh_job()));
   _get_results_job_action = _wrapper->createAction("Get Job Results", QIcon(), "Get Job Results", "Get Job Results", 0, _dock_parent, false, this, SLOT(refresh_job()));
+  _stop_job_action = _wrapper->createAction("Stop a Job", QIcon(), "Stop a Job", "Stop a Job", 0, _dock_parent, false, this, SLOT(stop_job()));
 }
 
 void
@@ -197,6 +199,7 @@ BL::GenericGui::createMenus()
   _wrapper->addActionToMenu(_edit_clone_job_action, menu_id);
   _wrapper->addActionToMenu(_start_job_action, menu_id);
   _wrapper->addActionToMenu(_restart_job_action, menu_id);
+  _wrapper->addActionToMenu(_stop_job_action, menu_id);
   _wrapper->addActionToMenu(_delete_job_action, menu_id);
   _wrapper->addActionToMenu(_get_results_job_action, menu_id);
   _wrapper->addActionToMenu(_refresh_job_action, menu_id);
@@ -247,12 +250,20 @@ BL::GenericGui::get_results_job()
 }
 
 void
+BL::GenericGui::stop_job()
+{
+  DEBTRACE("Stop Job Slot BL::GenericGui");
+  _jobs_manager->stop_job(_job_name_selected.toStdString());
+}
+
+
+void
 BL::GenericGui::delete_job()
 {
   DEBTRACE("Delete Job Slot BL::GenericGui");
   int ret = QMessageBox::warning(NULL, "Delete a job", "Do you really want to delete this job ?",
-				 QMessageBox::Ok|QMessageBox::Cancel,
-				 QMessageBox::Ok);
+                                 QMessageBox::Ok|QMessageBox::Cancel,
+                                 QMessageBox::Ok);
   if (ret == QMessageBox::Ok)
   {
     delete_job_internal();
@@ -319,6 +330,8 @@ BL::GenericGui::updateButtonsStates()
     _buttons->disable_edit_clone_button();
     _restart_job_action->setEnabled(false);
     _buttons->disable_restart_button();
+    _stop_job_action->setEnabled(false);
+    _buttons->disable_stop_button();
   }
   else if (_job_name_selected != "" and _row_selected != -1)
   {
@@ -338,6 +351,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(false);
 	_buttons->disable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
 
       case BL::Job::IN_PROCESS:
@@ -349,6 +364,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(false);
 	_buttons->disable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
 
       case BL::Job::QUEUED:
@@ -360,6 +377,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(false);
 	_buttons->disable_restart_button();
+        _stop_job_action->setEnabled(true);
+        _buttons->enable_stop_button();
 	break;
 
       case BL::Job::RUNNING:
@@ -371,6 +390,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(false);
 	_buttons->disable_restart_button();
+        _stop_job_action->setEnabled(true);
+        _buttons->enable_stop_button();
 	break;
 
       case BL::Job::PAUSED:
@@ -382,6 +403,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(false);
 	_buttons->disable_restart_button();
+        _stop_job_action->setEnabled(true);
+        _buttons->enable_stop_button();
 	break;
 
       case BL::Job::ERROR:
@@ -393,6 +416,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
 
       case BL::Job::FINISHED:
@@ -404,6 +429,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->enable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
 
       case BL::Job::FAILED:
@@ -412,9 +439,11 @@ BL::GenericGui::updateButtonsStates()
 	_delete_job_action->setEnabled(true);
 	_buttons->enable_delete_button();
 	_get_results_job_action->setEnabled(true);
-	_buttons->disable_get_results_button();
+	_buttons->enable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
 
       case BL::Job::NOT_CREATED:
@@ -426,6 +455,8 @@ BL::GenericGui::updateButtonsStates()
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
+        _stop_job_action->setEnabled(false);
+        _buttons->disable_stop_button();
 	break;
     }
   }
