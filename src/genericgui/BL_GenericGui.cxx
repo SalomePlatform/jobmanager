@@ -251,7 +251,19 @@ void
 BL::GenericGui::stop_job()
 {
   DEBTRACE("Stop Job Slot BL::GenericGui");
-  _jobs_manager->stop_job(_job_name_selected.toStdString());
+  if (!_jobs_table->isMultipleSelected())
+  {
+    _jobs_manager->stop_job(_job_name_selected.toStdString());
+  }
+  else
+  {
+    QModelIndexList selected_rows = _jobs_table->selectionModel()->selectedRows();
+    for (int i = 0; i < selected_rows.length(); ++i)
+    {
+      QString job_name = _model->itemFromIndex(selected_rows[i])->text();
+      _jobs_manager->stop_job(job_name.toStdString());
+    }
+  }
 }
 
 
