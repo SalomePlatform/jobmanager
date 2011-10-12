@@ -41,6 +41,7 @@ namespace BL
 
     public slots:
       void job_selected(const QModelIndex & index);
+      void job_activated(const QModelIndex & index);
       void itemChanged(QStandardItem * item);
       void reset(QString job_name);
 

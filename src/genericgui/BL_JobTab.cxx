@@ -158,6 +158,13 @@ BL::JobTab::createJobFilesTab()
 }
 
 void
+BL::JobTab::job_activated(const QModelIndex & index)
+{
+  DEBTRACE("BL::JobTab::job_activated slot");
+  job_selected(index);
+}
+
+void
 BL::JobTab::job_selected(const QModelIndex & index)
 {
   DEBTRACE("BL::JobTab::job_selected slot");

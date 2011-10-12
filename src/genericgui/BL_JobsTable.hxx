@@ -35,6 +35,8 @@ namespace BL
     protected:
       QWidget* _parent;
 
+    protected slots:
+      void currentChanged(const QModelIndex & current, const QModelIndex & previous);
   };
 }
 

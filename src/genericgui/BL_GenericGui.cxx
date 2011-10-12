@@ -141,7 +141,8 @@ BL::GenericGui::createCentralWidget()
   // TableView -> X
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _job_tab, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), this, SLOT(job_selected(QModelIndex)));
-  connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _model_manager, SLOT(job_selected(QModelIndex)));
+  connect(_jobs_table, SIGNAL(activated(QModelIndex)), this, SLOT(job_activated(QModelIndex)));
+  connect(_jobs_table, SIGNAL(activated(QModelIndex)), _job_tab, SLOT(job_activated(QModelIndex)));
   // Delete Job -> X
   connect(this, SIGNAL(job_deleted(QString)), _job_tab, SLOT(reset(QString)));
 }
@@ -304,6 +305,13 @@ BL::GenericGui::job_selected(const QModelIndex & index)
   _row_selected = item->row();
   _job_name_selected = item_name->text();
   updateButtonsStates();
+}
+
+void
+BL::GenericGui::job_activated(const QModelIndex & index)
+{
+  DEBTRACE("BL::GenericGui::job_activated slot");
+  job_selected(index);
 }
 
 void 

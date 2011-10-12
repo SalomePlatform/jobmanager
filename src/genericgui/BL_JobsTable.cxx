@@ -30,9 +30,11 @@ BL::JobsTable::JobsTable(QWidget *parent) : QTableView(parent)
   setShowGrid(false);
   setCornerButtonEnabled(false);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
   setAlternatingRowColors(true);
   setSortingEnabled(true);
+
+  setSelectionBehavior(QAbstractItemView::SelectRows);
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   QHeaderView * header_view = verticalHeader();
   header_view->setClickable(false);
@@ -41,4 +43,11 @@ BL::JobsTable::JobsTable(QWidget *parent) : QTableView(parent)
 BL::JobsTable::~JobsTable()
 {
   DEBTRACE("Destroying BL::JobsTable");
+}
+
+void
+BL::JobsTable::currentChanged(const QModelIndex & current, const QModelIndex & previous)
+{
+  DEBTRACE("BL::JobsTable currentChanged");
+  activated(current);
 }

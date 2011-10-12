@@ -69,6 +69,7 @@ namespace BL
       void stop_job();
       void get_results_job();
       void job_selected(const QModelIndex & index);
+      void job_activated(const QModelIndex & index);
       void job_state_changed(const QString & name);
       void updateButtonsStates();
 

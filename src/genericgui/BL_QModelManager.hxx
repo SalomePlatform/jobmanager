@@ -43,7 +43,6 @@ namespace BL{
     public slots:
       void new_job_added(const QString & name);
       void job_state_changed(const QString & name);
-      void job_selected(const QModelIndex & index);
     
     private:
       QStandardItemModel * _model;

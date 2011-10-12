@@ -134,25 +134,3 @@ BL::QModelManager::deleteJob(const QString & name)
   if (list.size() > 0)
     _model->removeRow(list[0]->row());
 }
-
-void
-BL::QModelManager::job_selected(const QModelIndex & index)
-{
-  DEBTRACE("BL::QModelManager::job_selected slot");
-  QStandardItem * item = _model->itemFromIndex(index);
-  int row = item->row();
-
-  // Algo un peu bourrin....
-  for (int i = 0; i < _model->rowCount(); i++)
-    for (int j = 0; j < _model->columnCount(); j++)
-    {
-      _model->item(i,j)->setBackground(QBrush(Qt::white));
-      _model->item(i,j)->setForeground(QBrush(Qt::black));
-    }
-
-  for (int j = 0; j < _model->columnCount(); j++)
-  {
-    _model->item(row,j)->setBackground(QBrush(Qt::darkBlue));
-    _model->item(row,j)->setForeground(QBrush(Qt::white));
-  }
-}
