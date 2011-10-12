@@ -40,11 +40,12 @@ namespace BL
 				    const QIcon& icon,
 				    const QString& menu,
 				    const QString& status,
-				    const int shortCut,
+				    const int accel,
 				    QObject* parent =0,
 				    bool checkable = false,
 				    QObject* receiver =0,
-				    const char* member =0) = 0;
+				    const char* member =0,
+                                    const QString& shortCut=QString()) = 0;
 
       virtual int createTopMenu(const QString & menu_name) = 0;
       virtual void addActionToMenu(QAction * action, int menu_id) = 0;

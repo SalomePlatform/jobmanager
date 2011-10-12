@@ -121,13 +121,14 @@ BL::MainWindows_SALOME::createAction(const QString& toolTip,
 				     const QIcon& icon,
 				     const QString& menu,
 				     const QString& status,
-				     const int shortCut,
+				     const int accel,
 				     QObject* parent,
 				     bool checkable,
 				     QObject* receiver,
-				     const char* member)
+				     const char* member,
+                                     const QString & shortCut)
 {
-  return SalomeApp_Module::createAction(getActionId(), toolTip, icon, menu, status, shortCut, parent, checkable, receiver, member);
+  return SalomeApp_Module::createAction(getActionId(), toolTip, icon, menu, status, accel, parent, checkable, receiver, member, shortCut);
 }
 
 int

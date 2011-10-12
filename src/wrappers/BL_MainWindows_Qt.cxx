@@ -49,11 +49,12 @@ BL::MainWindows_Qt::createAction(const QString& toolTip,
 				 const QIcon& icon,
 				 const QString& menu,
 				 const QString& status,
-				 const int shortCut,
+				 const int accel,
 				 QObject* parent,
 				 bool checkable,
 				 QObject* receiver,
-				 const char* member)
+				 const char* member,
+                                 const QString& shortCut)
 {
   QAction * action = new QAction(icon, menu, parent);
   action->setStatusTip(status);

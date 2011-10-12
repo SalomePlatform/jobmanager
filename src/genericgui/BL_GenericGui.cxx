@@ -184,7 +184,7 @@ BL::GenericGui::createActions()
   _edit_clone_job_action = _wrapper->createAction("Edit/Clone a Job", QIcon(), "Edit/Clone a Job", "Edit/Clone a Job", 0, _dock_parent, false, this, SLOT(edit_clone_job()));
   _start_job_action = _wrapper->createAction("Start a Job", QIcon(), "Start a Job", "Start a Job", 0, _dock_parent, false, this, SLOT(start_job()));
   _restart_job_action = _wrapper->createAction("Restart a Job", QIcon(), "Restart a Job", "Restart a Job", 0, _dock_parent, false, this, SLOT(restart_job()));
-  _delete_job_action = _wrapper->createAction("Delete a Job", QIcon(), "Delete a Job", "Delete a Job", 0, _dock_parent, false, this, SLOT(delete_job()));
+  _delete_job_action = _wrapper->createAction("Delete a Job", QIcon(), "Delete a Job", "Delete a Job", Qt::Key_Delete, _dock_parent, false, this, SLOT(delete_job()));
   _refresh_job_action = _wrapper->createAction("Refresh Jobs", QIcon(), "Refresh Jobs", "Refresh Jobs", 0, _dock_parent, false, this, SLOT(refresh_job()));
   _get_results_job_action = _wrapper->createAction("Get Job Results", QIcon(), "Get Job Results", "Get Job Results", 0, _dock_parent, false, this, SLOT(refresh_job()));
   _stop_job_action = _wrapper->createAction("Stop a Job", QIcon(), "Stop a Job", "Stop a Job", 0, _dock_parent, false, this, SLOT(stop_job()));
