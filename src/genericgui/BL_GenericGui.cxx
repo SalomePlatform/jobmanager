@@ -244,7 +244,19 @@ void
 BL::GenericGui::get_results_job()
 {
   DEBTRACE("Get Results Job Slot BL::GenericGui");
-  _jobs_manager->get_results_job(_job_name_selected.toStdString());
+  if (!_jobs_table->isMultipleSelected())
+  {
+    _jobs_manager->get_results_job(_job_name_selected.toStdString());
+  }
+  else
+  {
+    QModelIndexList selected_rows = _jobs_table->selectionModel()->selectedRows();
+    for (int i = 0; i < selected_rows.length(); ++i)
+    {
+      QString job_name = _model->itemFromIndex(selected_rows[i])->text();
+    _jobs_manager->get_results_job(job_name.toStdString());
+    }
+  }
 }
 
 void
@@ -403,8 +415,6 @@ BL::GenericGui::updateButtonsStates()
     for (int i = 0; i < selected_rows.length(); ++i)
     {
       QString job_name = _model->itemFromIndex(selected_rows[i])->text();
-      DEBTRACE(job_name.toStdString());
-
       BL::Job * job = _jobs_manager->getJob(job_name.toStdString());
       BL::Job::State job_state = job->getState();
       if (job_state != BL::Job::QUEUED  &&
@@ -423,8 +433,27 @@ BL::GenericGui::updateButtonsStates()
       _buttons->disable_stop_button();
     }
 
-    _get_results_job_action->setEnabled(false);
-    _buttons->disable_get_results_button();
+    // Enable get_results ?
+    bool enable_results = true;
+    for (int i = 0; i < selected_rows.length(); ++i)
+    {
+      QString job_name = _model->itemFromIndex(selected_rows[i])->text();
+      BL::Job * job = _jobs_manager->getJob(job_name.toStdString());
+      BL::Job::State job_state = job->getState();
+      if (job_state != BL::Job::FINISHED &&
+          job_state != BL::Job::FAILED)
+        enable_results= false;
+    }
+    if (enable_results)
+    {
+      _get_results_job_action->setEnabled(true);
+      _buttons->enable_get_results_button();
+    }
+    else
+    {
+      _get_results_job_action->setEnabled(false);
+      _buttons->disable_get_results_button();
+    }
   }
 }
 
@@ -528,7 +557,7 @@ BL::GenericGui::updateButtonsStatesSingleSelection()
 	_buttons->disable_start_button();
 	_delete_job_action->setEnabled(true);
 	_buttons->enable_delete_button();
-	_get_results_job_action->setEnabled(true);
+	_get_results_job_action->setEnabled(false);
 	_buttons->disable_get_results_button();
 	_restart_job_action->setEnabled(true);
 	_buttons->enable_restart_button();
