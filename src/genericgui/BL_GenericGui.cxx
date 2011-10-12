@@ -112,6 +112,7 @@ BL::GenericGui::createCentralWidget()
   /* Jobs Table */
   _jobs_table = new BL::JobsTable(_tab_parent);
   _jobs_table->setModel(_model);
+  _jobs_table->set_main_gui(this);
 
   /* Job Tab */
   _job_tab = new BL::JobTab(_tab_parent, _jobs_manager);
@@ -139,10 +140,8 @@ BL::GenericGui::createCentralWidget()
   connect(_model, SIGNAL(itemChanged(QStandardItem*)), _job_tab, SLOT(itemChanged(QStandardItem*)));
 
   // TableView -> X
-  connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _job_tab, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), this, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(activated(QModelIndex)), this, SLOT(job_activated(QModelIndex)));
-  connect(_jobs_table, SIGNAL(activated(QModelIndex)), _job_tab, SLOT(job_activated(QModelIndex)));
 }
 
 void
@@ -318,19 +317,35 @@ BL::GenericGui::delete_job_internal()
 }
 
 void
+BL::GenericGui::reset_job_selection()
+{
+  _job_name_selected = "";
+  _job_tab->reset("");
+  updateButtonsStates();
+}
+
+void
 BL::GenericGui::job_selected(const QModelIndex & index)
 {
   DEBTRACE("BL::GenericGui::job_selected");
-  if (index.row() >= 0)
+
+  //Find if a job is selected (ignore index)
+  //If Multiple job are selected, take first job
+  QItemSelectionModel * selection_model = _jobs_table->selectionModel();
+  QModelIndexList selected_rows = selection_model->selectedRows();
+  if (selected_rows.length() >= 1)
   {
-    QStandardItem * item = _model->itemFromIndex(index);
+    QModelIndex idx = selected_rows[0];
+    QStandardItem * item = _model->itemFromIndex(idx);
     QStandardItem * item_name = _model->item(item->row());
     _job_name_selected = item_name->text();
+    _job_tab->job_selected(idx);
     DEBTRACE("BL::GenericGui::job_selected name is " << _job_name_selected.toStdString());
   }
   else
   {
     _job_name_selected = "";
+    _job_tab->reset("");
     DEBTRACE("BL::GenericGui::job_selected - no jobs are selected");
   }
   updateButtonsStates();
@@ -370,8 +385,31 @@ BL::GenericGui::updateButtonsStates()
     _delete_job_action->setEnabled(true);
     _buttons->enable_delete_button();
 
-    _stop_job_action->setEnabled(false);
-    _buttons->disable_stop_button();
+    // Enable stop ?
+    bool enable_stop = true;
+    QModelIndexList selected_rows = _jobs_table->selectionModel()->selectedRows();
+    for (int i = 0; i < selected_rows.length(); ++i)
+    {
+      QString job_name = _model->itemFromIndex(selected_rows[i])->text();
+      DEBTRACE(job_name.toStdString());
+
+      BL::Job * job = _jobs_manager->getJob(job_name.toStdString());
+      BL::Job::State job_state = job->getState();
+      if (job_state != BL::Job::QUEUED  &&
+          job_state != BL::Job::RUNNING &&
+          job_state != BL::Job::PAUSED)
+        enable_stop = false;
+    }
+    if (enable_stop)
+    {
+      _stop_job_action->setEnabled(true);
+      _buttons->enable_stop_button();
+    }
+    else
+    {
+      _stop_job_action->setEnabled(false);
+      _buttons->disable_stop_button();
+    }
 
     _get_results_job_action->setEnabled(false);
     _buttons->disable_get_results_button();

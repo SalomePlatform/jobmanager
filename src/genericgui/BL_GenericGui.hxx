@@ -58,6 +58,8 @@ namespace BL
       void deleteDockWidget();
       void delete_job_external(const QString & name);
 
+      void reset_job_selection();
+
 
     public slots:
       void create_job();

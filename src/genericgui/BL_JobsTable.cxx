@@ -19,12 +19,14 @@
 
 #include "BL_JobsTable.hxx"
 #include "BL_Traces.hxx"
+#include "BL_GenericGui.hxx"
 
 BL::JobsTable::JobsTable(QWidget *parent) : QTableView(parent)
 {
   DEBTRACE("Creating BL::JobsTable");
   BL_ASSERT(parent);
   _parent = parent;
+  _main_gui = NULL;
 
   // Init
   setShowGrid(false);
@@ -61,27 +63,56 @@ BL::JobsTable::selectCurrent()
 }
 
 void
+BL::JobsTable::set_main_gui(BL::GenericGui * main_gui)
+{
+  _main_gui = main_gui;
+}
+
+void 
+BL::JobsTable::selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected )
+{
+  QTableView::selectionChanged(selected, deselected);
+  DEBTRACE("selection changed");
+  QModelIndexList selected_rows = selectionModel()->selectedRows();
+  if (selected_rows.length() == 0)
+  {
+    _main_gui->reset_job_selection();
+  }
+  else if (selected_rows.length() == 1)
+  {
+    DEBTRACE("SELECTED CHANGED ACTIVATION !!!");
+    DEBTRACE("ROW NUMBER: " << selected_rows[0].row());
+    QModelIndex current = selected_rows[0];
+    if (!selectionModel()->isSelected(current))
+    {
+      setCurrentIndex(current);
+    }
+    activated(current);
+  }
+  DEBTRACE("Number of selected rows selection: " << selected_rows.length());
+}
+
+void
 BL::JobsTable::currentChanged(const QModelIndex & current, const QModelIndex & previous)
 {
+  QTableView::currentChanged(current, previous);
   DEBTRACE("current changed");
   DEBTRACE("current row: " << current.row());
   if (current.row() > -1)
     if (!isMultipleSelected())
     {
       DEBTRACE("CURRENT CHANGED ACTIVATION !!!");
-      setCurrentIndex(current);
-      activated(current);
+      //setCurrentIndex(current);
+      //activated(current);
     }
 }
 
 bool
 BL::JobsTable::isMultipleSelected()
 {
-  QModelIndexList list_of_selected = selectedIndexes();
-  int length = list_of_selected.length();
-  length = length / model()->columnCount();
-  DEBTRACE("Number of selected rows: " << length);
-  if (length > 1)
+  QModelIndexList selected_rows = selectionModel()->selectedRows();
+  DEBTRACE("Number of selected rows: " << selected_rows.length());
+  if (selected_rows.length() > 1)
     return true;
   else
     return false;

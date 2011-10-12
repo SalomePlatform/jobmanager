@@ -22,8 +22,9 @@
 
 #include <QtGui>
 
-namespace BL 
+namespace BL
 {
+  class GenericGui;
   class JobsTable: public QTableView
   {
     Q_OBJECT
@@ -35,12 +36,17 @@ namespace BL
       bool selectCurrent();
       bool isMultipleSelected();
       QModelIndexList getSelectedIndexes();
+      void set_main_gui(BL::GenericGui * main_gui);
 
     protected:
       QWidget* _parent;
 
     protected slots:
+      void selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
       void currentChanged(const QModelIndex & current, const QModelIndex & previous);
+
+    private:
+      BL::GenericGui * _main_gui;
   };
 }
 
