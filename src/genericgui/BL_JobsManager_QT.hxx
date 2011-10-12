@@ -25,6 +25,8 @@
 #include "BL_Traces.hxx"
 #include "BL_JobsManager.hxx"
 #include "BL_CreateJobWizard.hxx"
+#include "BL_JobsManager.hxx"
+#include "BL_QModelManager.hxx"
 
 #include <string>
 
@@ -72,7 +74,7 @@ namespace BL{
       void write_normal_text(const QString & text);
       void write_error_text(const QString & text);
 
-      void set_model(QStandardItemModel * model);
+      void set_model_manager(BL::QModelManager * model_manager);
 
     protected:
       void create_job_with_wizard(BL::CreateJobWizard & wizard);
@@ -100,7 +102,7 @@ namespace BL{
       QTimer * _timer;
       QTextEdit * _log;
       BL::GenericGui * _main_gui;
-      QStandardItemModel * _model;
+      BL::QModelManager * _model_manager;
   };
 
 }

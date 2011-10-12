@@ -45,9 +45,50 @@ BL::JobsTable::~JobsTable()
   DEBTRACE("Destroying BL::JobsTable");
 }
 
+bool
+BL::JobsTable::selectCurrent()
+{
+  QModelIndex idx = currentIndex();
+  if (idx.row() > -1)
+    if (!isMultipleSelected())
+    {
+      DEBTRACE("SELECT CURRENT ACTIVATION !!!");
+      setCurrentIndex(idx);
+      activated(idx);
+      return true;
+    }
+  return false;
+}
+
 void
 BL::JobsTable::currentChanged(const QModelIndex & current, const QModelIndex & previous)
 {
-  DEBTRACE("BL::JobsTable currentChanged");
-  activated(current);
+  DEBTRACE("current changed");
+  DEBTRACE("current row: " << current.row());
+  if (current.row() > -1)
+    if (!isMultipleSelected())
+    {
+      DEBTRACE("CURRENT CHANGED ACTIVATION !!!");
+      setCurrentIndex(current);
+      activated(current);
+    }
+}
+
+bool
+BL::JobsTable::isMultipleSelected()
+{
+  QModelIndexList list_of_selected = selectedIndexes();
+  int length = list_of_selected.length();
+  length = length / model()->columnCount();
+  DEBTRACE("Number of selected rows: " << length);
+  if (length > 1)
+    return true;
+  else
+    return false;
+}
+
+QModelIndexList
+BL::JobsTable::getSelectedIndexes()
+{
+  return selectedIndexes();
 }

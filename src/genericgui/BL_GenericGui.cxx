@@ -24,7 +24,6 @@ BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->ge
   DEBTRACE("Creating BL::GenericGui");
   BL_ASSERT(wrapper);
   _wrapper = wrapper;
-  _row_selected = -1;
   _job_name_selected = "";
 
   _dock_parent = _wrapper->getDockParent();
@@ -138,13 +137,12 @@ BL::GenericGui::createCentralWidget()
   /* Signals and Slots */
   // Model -> JobTab
   connect(_model, SIGNAL(itemChanged(QStandardItem*)), _job_tab, SLOT(itemChanged(QStandardItem*)));
+
   // TableView -> X
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), _job_tab, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(clicked(QModelIndex)), this, SLOT(job_selected(QModelIndex)));
   connect(_jobs_table, SIGNAL(activated(QModelIndex)), this, SLOT(job_activated(QModelIndex)));
   connect(_jobs_table, SIGNAL(activated(QModelIndex)), _job_tab, SLOT(job_activated(QModelIndex)));
-  // Delete Job -> X
-  connect(this, SIGNAL(job_deleted(QString)), _job_tab, SLOT(reset(QString)));
 }
 
 void
@@ -174,7 +172,7 @@ BL::GenericGui::showDockWidgets(bool isVisible)
   if (_dw_resource_catalog) {
     _dw_resource_catalog->setVisible(isVisible);
     _dw_resource_catalog->toggleViewAction()->setVisible(isVisible);
-  }    
+  }
 }
 
 void
@@ -262,9 +260,20 @@ void
 BL::GenericGui::delete_job()
 {
   DEBTRACE("Delete Job Slot BL::GenericGui");
-  int ret = QMessageBox::warning(NULL, "Delete a job", "Do you really want to delete this job ?",
-                                 QMessageBox::Ok|QMessageBox::Cancel,
-                                 QMessageBox::Ok);
+  int ret = QMessageBox::Cancel;
+
+  if (!_jobs_table->isMultipleSelected())
+  {
+    ret = QMessageBox::warning(NULL, "Delete a job", "Do you really want to delete job " + _job_name_selected + " ? ",
+                               QMessageBox::Ok|QMessageBox::Cancel,
+                               QMessageBox::Ok);
+  }
+  else
+  {
+   ret = QMessageBox::warning(NULL, "Delete jobs", "Do you really want to delete these jobs ?",
+                              QMessageBox::Ok|QMessageBox::Cancel,
+                              QMessageBox::Ok);
+  }
   if (ret == QMessageBox::Ok)
   {
     delete_job_internal();
@@ -274,12 +283,10 @@ BL::GenericGui::delete_job()
 void
 BL::GenericGui::delete_job_external(const QString & name)
 {
+  DEBTRACE("Delete Job External");
   _jobs_manager->delete_job(name);
-  _model_manager->deleteJob(name);
-  emit job_deleted(name);
-  if (name == _job_name_selected)
+  if (!_jobs_table->selectCurrent())
   {
-    _row_selected = -1;
     _job_name_selected = "";
     updateButtonsStates();
   }
@@ -288,22 +295,44 @@ BL::GenericGui::delete_job_external(const QString & name)
 void
 BL::GenericGui::delete_job_internal()
 {
-  _jobs_manager->delete_job(_job_name_selected);
-  _model_manager->deleteJob(_row_selected);
-  emit job_deleted(_job_name_selected);
-  _row_selected = -1;
-  _job_name_selected = "";
-  updateButtonsStates();
+  if (!_jobs_table->isMultipleSelected())
+  {
+    QModelIndexList selected_list = _jobs_table->getSelectedIndexes();
+    QString job_name_to_delete    = _model->itemFromIndex(selected_list[0])->text();
+    DEBTRACE("Single Deleting job: " << job_name_to_delete.toStdString());
+    _jobs_manager->delete_job(job_name_to_delete);
+    if (!_jobs_table->selectCurrent())
+    {
+      _job_name_selected = "";
+      updateButtonsStates();
+    }
+  }
+  else
+  {
+    QModelIndexList selected_list = _jobs_table->getSelectedIndexes();
+    QString job_name = _model->itemFromIndex(selected_list[0])->text();
+    DEBTRACE("Multiple Deleting job: " << job_name.toStdString());
+    _jobs_manager->delete_job(job_name);
+    delete_job_internal(); // Recursive delete
+  }
 }
 
 void
 BL::GenericGui::job_selected(const QModelIndex & index)
 {
-  DEBTRACE("BL::GenericGui::job_selected slot");
-  QStandardItem * item = _model->itemFromIndex(index);
-  QStandardItem * item_name = _model->item(item->row());
-  _row_selected = item->row();
-  _job_name_selected = item_name->text();
+  DEBTRACE("BL::GenericGui::job_selected");
+  if (index.row() >= 0)
+  {
+    QStandardItem * item = _model->itemFromIndex(index);
+    QStandardItem * item_name = _model->item(item->row());
+    _job_name_selected = item_name->text();
+    DEBTRACE("BL::GenericGui::job_selected name is " << _job_name_selected.toStdString());
+  }
+  else
+  {
+    _job_name_selected = "";
+    DEBTRACE("BL::GenericGui::job_selected - no jobs are selected");
+  }
   updateButtonsStates();
 }
 
@@ -314,19 +343,48 @@ BL::GenericGui::job_activated(const QModelIndex & index)
   job_selected(index);
 }
 
-void 
+void
 BL::GenericGui::job_state_changed(const QString & name)
 {
   if (name == _job_name_selected)
     updateButtonsStates();
 }
+
 void
 BL::GenericGui::updateButtonsStates()
 {
-  DEBTRACE("BL::GenericGui::updateButtonsStates slot");
+  if (!_jobs_table->isMultipleSelected())
+  {
+    updateButtonsStatesSingleSelection();
+  }
+  else
+  {
+    _start_job_action->setEnabled(false);
+    _edit_clone_job_action->setEnabled(false);
+    _restart_job_action->setEnabled(false);
+    _buttons->disable_start_button();
+    _buttons->disable_edit_clone_button();
+    _buttons->disable_restart_button();
+
+    // You can always delete jobs
+    _delete_job_action->setEnabled(true);
+    _buttons->enable_delete_button();
+
+    _stop_job_action->setEnabled(false);
+    _buttons->disable_stop_button();
+
+    _get_results_job_action->setEnabled(false);
+    _buttons->disable_get_results_button();
+  }
+}
+
+void
+BL::GenericGui::updateButtonsStatesSingleSelection()
+{
+  DEBTRACE("BL::GenericGui::updateButtonsStatesSingleSelection slot");
 
   // First case: no job selected
-  if (_job_name_selected == "" and _row_selected == -1)
+  if (_job_name_selected == "")
   {
     _start_job_action->setEnabled(false);
     _delete_job_action->setEnabled(false);
@@ -341,7 +399,7 @@ BL::GenericGui::updateButtonsStates()
     _stop_job_action->setEnabled(false);
     _buttons->disable_stop_button();
   }
-  else if (_job_name_selected != "" and _row_selected != -1)
+  else if (_job_name_selected != "")
   {
     BL::Job * job = _jobs_manager->getJob(_job_name_selected.toStdString());
     BL::Job::State job_state = job->getState();

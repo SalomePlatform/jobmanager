@@ -293,25 +293,28 @@ BL::JobTab::itemChanged(QStandardItem * item)
 void
 BL::JobTab::reset(QString job_name)
 {
-  _job_name_label_value->setText("");
-  _job_type_label_value->setText("");
-  _job_state_label_value->setText("");
-  _job_launcher_label_value->setText("");
-  _job_resource_label_value->setText("");
-  _job_nif_label_value->setText("");
-  _job_nof_label_value->setText("");
-  _job_bd_label_value->setText("");
-  _job_rd_label_value->setText("");
-  _job_mdt_label_value->setText("");
-  _job_em_label_value->setText("");
-  _job_nop_label_value->setText("");
-  _job_jobfile_label_value->setText("");
-  _job_envfile_label_value->setText("");
+  if (job_name == _job_name_label_value->text() || job_name == "")
+  {
+    _job_name_label_value->setText("");
+    _job_type_label_value->setText("");
+    _job_state_label_value->setText("");
+    _job_launcher_label_value->setText("");
+    _job_resource_label_value->setText("");
+    _job_nif_label_value->setText("");
+    _job_nof_label_value->setText("");
+    _job_bd_label_value->setText("");
+    _job_rd_label_value->setText("");
+    _job_mdt_label_value->setText("");
+    _job_em_label_value->setText("");
+    _job_nop_label_value->setText("");
+    _job_jobfile_label_value->setText("");
+    _job_envfile_label_value->setText("");
 
-  _input_files_list->clear();
-  _output_files_list->clear();
+    _input_files_list->clear();
+    _output_files_list->clear();
 
-  _yacs_dump_state_value->setText("");
-  _batch_queue_value->setText("");
-  _ll_jobtype_value->setText("");
+    _yacs_dump_state_value->setText("");
+    _batch_queue_value->setText("");
+    _ll_jobtype_value->setText("");
+  }
 }

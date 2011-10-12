@@ -39,7 +39,7 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
   DEBTRACE("Creating BL::JobsManager_QT");
   _main_gui = main_gui;
   setObserver(this);
-  _model = NULL;
+  _model_manager = NULL;
 
   // Widget Part
 
@@ -96,9 +96,9 @@ BL::JobsManager_QT::~JobsManager_QT()
 }
 
 void
-BL::JobsManager_QT::set_model(QStandardItemModel * model)
+BL::JobsManager_QT::set_model_manager(BL::QModelManager * model_manager)
 {
-  _model = model;
+  _model_manager = model_manager;
 }
 
 void
@@ -313,6 +313,8 @@ void
 BL::JobsManager_QT::delete_job(QString job_name)
 {
   BL::JobsManager::removeJob(job_name.toStdString());
+  _model_manager->delete_job(job_name);
+  _main_gui->_job_tab->reset(job_name);
 }
 
 void 

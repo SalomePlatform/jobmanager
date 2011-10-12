@@ -23,10 +23,10 @@
 #include <QtGui>
 
 #include "BL_Job.hxx"
-#include "BL_JobsManager_QT.hxx"
 
 namespace BL{
 
+  class JobsManager_QT;
   class QModelManager: virtual public QObject
   {
     Q_OBJECT
@@ -37,8 +37,7 @@ namespace BL{
       
       QStandardItemModel * getModel();
 
-      void deleteJob(int row);
-      void deleteJob(const QString & name);
+      void delete_job(const QString & name);
 
     public slots:
       void new_job_added(const QString & name);

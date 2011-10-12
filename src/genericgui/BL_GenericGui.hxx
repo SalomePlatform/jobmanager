@@ -72,12 +72,12 @@ namespace BL
       void job_activated(const QModelIndex & index);
       void job_state_changed(const QString & name);
       void updateButtonsStates();
+      void updateButtonsStatesSingleSelection();
 
-    signals:
-      void job_deleted(QString job_name);
+    public:
+      BL::JobTab * _job_tab;
 
     protected:
-     
       BL::MainWindows_Wrap * _wrapper;
 
       BL::SALOMEServices * _salome_services;
@@ -86,10 +86,9 @@ namespace BL
       QMainWindow * _tab_parent;
       QDockWidget * _dw_summary;
       QDockWidget * _dw_resource_catalog;
-     
+
       BL::Buttons * _buttons;
-      BL::JobsTable * _jobs_table;  
-      BL::JobTab * _job_tab;
+      BL::JobsTable * _jobs_table;
       BL::Summary * _summary;
 
       QAction * _create_job_action;
@@ -106,7 +105,6 @@ namespace BL
       QStandardItemModel * _model;
       JM::ResourceCatalog * _resource_catalog;
 
-      int _row_selected;
       QString _job_name_selected;
   };
 }

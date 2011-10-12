@@ -18,6 +18,7 @@
 //
 
 #include "BL_QModelManager.hxx"
+#include "BL_JobsManager_QT.hxx"
 
 BL::QModelManager::QModelManager(QObject * parent, BL::JobsManager_QT * jobs_manager) : QObject(parent)
 {
@@ -26,7 +27,7 @@ BL::QModelManager::QModelManager(QObject * parent, BL::JobsManager_QT * jobs_man
   _jobs_manager = jobs_manager;
 
   _model = new QStandardItemModel(this);
-  jobs_manager->set_model(_model);
+  jobs_manager->set_model_manager(this);
   QStringList headers;
   headers << "Job Name" << "Type" << "State" << "Resource" << "Launcher Id";
   _model->setHorizontalHeaderLabels(headers);
@@ -118,18 +119,13 @@ BL::QModelManager::job_state_changed(const QString & name)
 }
 
 void
-BL::QModelManager::deleteJob(int row)
-{
-  _model->removeRow(row);
-}
-
-void
-BL::QModelManager::deleteJob(const QString & name)
+BL::QModelManager::delete_job(const QString & name)
 {
   QList<QStandardItem *> list = _model->findItems(name);
   if (list.size() != 1)
   {
-    DEBMSG("WARNING LIST IS NOT ONLY ONE !");
+    DEBMSG("LIST SIZE IS :" << list.size());
+    DEBMSG("FOR NAME :" << name.toStdString());
   }
   if (list.size() > 0)
     _model->removeRow(list[0]->row());

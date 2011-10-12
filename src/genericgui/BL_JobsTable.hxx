@@ -32,6 +32,10 @@ namespace BL
       JobsTable(QWidget *parent);
       virtual ~JobsTable();
 
+      bool selectCurrent();
+      bool isMultipleSelected();
+      QModelIndexList getSelectedIndexes();
+
     protected:
       QWidget* _parent;
 
