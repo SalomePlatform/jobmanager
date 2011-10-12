@@ -167,9 +167,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
   {
     BL::Job * job = _jobs_manager->getJob(item_name->text().toStdString());
 
-    // create a new tab
-    // to be replaced if it is too long
-    createJobSummaryTab();
+    reset("");
 
     _job_name_label_value->setText(QString(job->getName().c_str()));
 
@@ -309,6 +307,4 @@ BL::JobTab::reset(QString job_name)
   _yacs_dump_state_value->setText("");
   _batch_queue_value->setText("");
   _ll_jobtype_value->setText("");
-
-  createJobSummaryTab();
 }
