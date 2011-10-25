@@ -121,8 +121,8 @@ BL::SalomeGui::onWindowActivated( SUIT_ViewWindow* svw)
   
   if (_viewWin) // Be sure to have a _viewWindow
     if (svw->getId() == _viewWin->getId()) // Same Id ?
-      if (getApp()->activeModule() && getApp()->activeModule()->moduleName().compare("JobManager") != 0) // JobManager already activated ?
-        getApp()->activateModule("JobManager");
+      if (!getApp()->activeModule() || getApp()->activeModule()->moduleName() != "JobManager") // JobManager already activated ?
+        if ( !getApp()->activateModule("JobManager") ) return;
 }
 
 // --- Export the module
