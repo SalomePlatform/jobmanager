@@ -305,6 +305,10 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   // End
   addJobToLauncher(wizard.job_name);
   emit new_job_added(QString::fromStdString(wizard.job_name));
+  QStandardItemModel * model = _model_manager->getModel();
+  QList<QStandardItem *> item_list = model->findItems(QString::fromStdString(wizard.job_name));
+  QStandardItem * job_state_item = model->item(item_list.at(0)->row(), 2);
+  _main_gui->_jobs_table->selectRow(item_list.at(0)->row());
   if (wizard.start_job)
     start_job(wizard.job_name);
 }

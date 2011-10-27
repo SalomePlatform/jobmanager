@@ -447,6 +447,7 @@ BL::JobsManager::launcher_event_new_job(const std::string & data)
   std::istringstream job_number_stream(data);
   if (job_number_stream >> job_number)
   {
+	DEBTRACE("Receive NEWJOB:" << job_number);
     BL::JobsManager::thread_info_new_job * ti = new thread_info_new_job();
     ti->object_ptr = this;
     ti->job_number = job_number;

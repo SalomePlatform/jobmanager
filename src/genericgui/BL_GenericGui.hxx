@@ -80,6 +80,7 @@ namespace BL
 
     public:
       BL::JobTab * _job_tab;
+      BL::JobsTable * _jobs_table;
 
     protected:
       BL::MainWindows_Wrap * _wrapper;
@@ -92,7 +93,6 @@ namespace BL
       QDockWidget * _dw_resource_catalog;
 
       BL::Buttons * _buttons;
-      BL::JobsTable * _jobs_table;
       BL::Summary * _summary;
 
       QAction * _create_job_action;

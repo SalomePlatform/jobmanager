@@ -53,6 +53,7 @@ BL::QModelManager::getModel()
 void
 BL::QModelManager::new_job_added(const QString & name)
 {
+  DEBTRACE("Adding new job in the model manager");
   BL::Job * job = _jobs_manager->getJob(name.toStdString());
   QStandardItem * new_job_name = new QStandardItem(name);
   
