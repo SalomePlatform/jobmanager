@@ -19,12 +19,22 @@
 #ifndef __BL_EXCEPTION_HXX__
 #define __BL_EXCEPTION_HXX__
 
+#ifdef WNT
+#  if defined BL_Bases_EXPORTS
+#    define BL_Bases_EXPORT __declspec( dllexport )
+#  else
+#    define BL_Bases_EXPORT __declspec( dllimport )
+#  endif
+#else
+#  define BL_Bases_EXPORT
+#endif
+
 #include <string>
 #include <exception>
 
 namespace BL
 {
-  class Exception : public std::exception
+  class BL_Bases_EXPORT Exception : public std::exception
   {
   protected:
     std::string _what;

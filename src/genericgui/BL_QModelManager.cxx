@@ -20,6 +20,10 @@
 #include "BL_QModelManager.hxx"
 #include "BL_JobsManager_QT.hxx"
 
+#ifdef WNT
+#undef ERROR
+#endif
+
 BL::QModelManager::QModelManager(QObject * parent, BL::JobsManager_QT * jobs_manager) : QObject(parent)
 {
   DEBTRACE("Creating BL::QModelManager");

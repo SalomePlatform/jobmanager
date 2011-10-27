@@ -21,6 +21,16 @@
 #ifndef _BL_MAINWINDOWS_SALOME_HXX_
 #define _BL_MAINWINDOWS_SALOME_HXX_
 
+#ifdef WNT
+#  if defined BL_Wrappers_SALOME_EXPORTS
+#    define BL_Wrappers_SALOME_EXPORT __declspec( dllexport )
+#  else
+#    define BL_Wrappers_SALOME_EXPORT __declspec( dllimport )
+#  endif
+#else
+#  define BL_Wrappers_SALOME_EXPORT
+#endif
+
 #include "BL_MainWindows_Wrap.hxx"
 
 #include <SalomeApp_Application.h>
@@ -33,7 +43,7 @@
 
 namespace BL
 {
-  class MainWindows_SALOME : virtual public MainWindows_Wrap, 
+  class BL_Wrappers_SALOME_EXPORT MainWindows_SALOME : virtual public MainWindows_Wrap, 
                              virtual public SalomeApp_Module
   {
     public:

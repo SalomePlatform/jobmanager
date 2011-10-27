@@ -22,6 +22,8 @@
 
 #include <QtGui>
 
+#include "BL_GenericGuiDefines.hxx"
+
 #include "BL_Traces.hxx"
 
 #include "BL_SALOMEServices.hxx"
@@ -38,7 +40,7 @@
 
 namespace BL 
 {
-  class GenericGui: public QObject
+  class BL_GenericGui_EXPORT GenericGui: public QObject
   {
     Q_OBJECT
 

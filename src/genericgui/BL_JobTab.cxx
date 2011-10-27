@@ -1,4 +1,4 @@
-// Copyright (C) 2009-2011  CEA/DEN, EDF R&D
+//  Copyright (C) 2009-2011  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,10 @@
 
 #include "BL_JobTab.hxx"
 #include "BL_Traces.hxx"
+
+#ifdef WNT
+#undef ERROR
+#endif
 
 BL::JobTab::JobTab(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QTabWidget(parent)
 {

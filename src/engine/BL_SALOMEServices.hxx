@@ -20,6 +20,7 @@
 #ifndef _BL_SALOMESERVICES_HXX_
 #define _BL_SALOMESERVICES_HXX_
 
+#include "BL_Engine.hxx"
 #include "BL_Traces.hxx"
 #include "BL_Job.hxx"
 
@@ -39,7 +40,7 @@ namespace BL{
 
   class JobsManager;
 
-  struct ResourceDescr
+  struct BL_Engine_EXPORT ResourceDescr
   {
     std::string name;
     std::string hostname;
@@ -58,7 +59,7 @@ namespace BL{
     std::string iprotocol;
   };
 
-  class SALOMEServices :
+  class BL_Engine_EXPORT SALOMEServices :
     public POA_JOBMANAGER::LauncherObserver
   {
     public:

@@ -20,6 +20,16 @@
 #ifndef _BL_SALOMEGUI_HXX_
 #define _BL_SALOMEGUI_HXX_
 
+#ifdef WNT
+#  if defined JOBMANAGER_EXPORTS
+#    define JOBMANAGER_EXPORT __declspec( dllexport )
+#  else
+#    define JOBMANAGER_EXPORT __declspec( dllimport )
+#  endif
+#else
+#  define JOBMANAGER_EXPORT
+#endif
+
 #include <SALOMEconfig.h>
 
 #include <SalomeApp_Module.h>

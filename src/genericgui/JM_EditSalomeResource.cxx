@@ -333,8 +333,8 @@ JM::EditSalomeResource::accept()
   resource.nb_node = _nb_node_line->value();
   resource.nb_proc_per_node = _nb_proc_per_node_line->value();
 
-  if (resource.name != "" and
-      resource.hostname != "" and
+  if (resource.name != "" &&
+      resource.hostname != "" &&
       resource.protocol != "")
   {
     _salome_services->addResource(resource);

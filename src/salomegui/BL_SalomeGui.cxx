@@ -128,7 +128,7 @@ BL::SalomeGui::onWindowActivated( SUIT_ViewWindow* svw)
 // --- Export the module
 extern "C"
 {
-  CAM_Module* createModule()
+  JOBMANAGER_EXPORT CAM_Module* createModule()
   {
     return new BL::SalomeGui();
   }

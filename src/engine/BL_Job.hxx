@@ -20,14 +20,19 @@
 #ifndef _BL_JOB_HXX_
 #define _BL_JOB_HXX_
 
+#include "BL_Engine.hxx"
 #include "BL_Traces.hxx"
 
 #include <string>
 #include <list>
 
+#ifdef WNT
+#undef ERROR
+#endif
+
 namespace BL{
 
-  class Job
+  class BL_Engine_EXPORT Job
   {
     public:
       Job();

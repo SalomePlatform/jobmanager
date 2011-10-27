@@ -19,10 +19,16 @@
 
 #include "BL_CreateJobWizard.hxx"
 #include "BL_JobsManager_QT.hxx"
+#ifndef WNT
 #include <unistd.h>
-#include <sys/types.h>
 #include <pwd.h>
+#endif
+#include <sys/types.h>
 #include <stdlib.h>
+
+#ifdef WNT
+#undef ERROR
+#endif
 
 BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALOMEServices * salome_services)
 {
@@ -364,7 +370,7 @@ BL::JobNamePage::validatePage()
 
   // Check if job name already exists
   else {
-    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false or _check_name == false)
+    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false || _check_name == false)
     {
       return_value = true;
     }
@@ -651,7 +657,7 @@ BL::BatchParametersPage::validatePage()
 
   int time_hour = field("duration_hour").toInt();
   int time_min = field("duration_min").toInt();
-  if (time_hour == 0 and time_min == 0)
+  if (time_hour == 0 && time_min == 0)
   {
     QMessageBox::warning(NULL, "Time Error", "Please enter an expected during time");
     return false;
@@ -721,6 +727,9 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
 
   // Default result directory is home directory (if we found it)
   // First try -> HOME
+#ifdef WNT
+  _result_directory->setText(getenv("HOME"));
+#else
   if (getenv("HOME"))
     _result_directory->setText(getenv("HOME"));
   else {
@@ -729,6 +738,7 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
     if (pass_struct)
       _result_directory->setText(pass_struct->pw_dir);
   }
+#endif
   registerField("result_directory", _result_directory);
 
   QGridLayout * output_box = new QGridLayout;
@@ -766,7 +776,7 @@ BL::FilesPage::validatePage()
     }
   }
 
-  if (result_directory == "" and _output_files_list->count() != 0)
+  if (result_directory == "" && _output_files_list->count() != 0)
   {
     QMessageBox::warning(NULL, "Result Directory Error", "Please enter a result directory or remove output files");
     return false;

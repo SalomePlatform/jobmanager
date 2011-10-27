@@ -29,9 +29,9 @@ nodist_libJOBMANAGER_la_SOURCES = $(MOC_FILES)
 
 libJOBMANAGER_la_CXXFLAGS = $(qt4_cppflags) \
 				$(BOOST_CPPFLAGS) \
-				$(OMNIORB_INCLUDES) \
+				$(OMNIORB_INCLUDES) $(OMNIORB_CXXFLAGS) \
 			        -I$(top_builddir)/idl \
-			    -I. \
+			        -I. \
 				-I$(KERNEL_ROOT_DIR)/include/salome \
 				-I$(GUI_ROOT_DIR)/include/salome \
 				-I$(top_srcdir)/src/genericgui \
@@ -56,13 +56,11 @@ salomeinclude_HEADERS = BL_SalomeGui.hxx \
 			JOBMANAGER_version.h
 
 # resources files
-LIBICONS = jobmanager.png
 ICONS = resources/jobmanager.png
 
 nodist_salomeres_SCRIPTS = resources/SalomeApp.xml
 
 dist_salomeres_DATA = ${ICONS}
-#ICONS = $(LIBICONS:%=resources/%)
 
 # --------------------------------------------
 # *.h --> *_moc.cxx

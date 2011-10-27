@@ -44,11 +44,12 @@ libBL_Wrappers_SALOME_la_SOURCES = BL_MainWindows_Wrap.hxx \
 nodist_libBL_Wrappers_SALOME_la_SOURCES =
 
 libBL_Wrappers_SALOME_la_CXXFLAGS = $(qt4_cppflags) -I$(top_srcdir)/src/bases \
-				    $(OMNIORB_INCLUDES) $(BOOST_CPPFLAGS) \
+				    $(OMNIORB_INCLUDES) $(OMNIORB_CXXFLAGS) $(BOOST_CPPFLAGS) \
 				    -I$(KERNEL_ROOT_DIR)/include/salome \
 				    -I$(GUI_ROOT_DIR)/include/salome
 
 libBL_Wrappers_SALOME_la_LDFLAGS = $(qt4_ldflags) 
 
-libBL_Wrappers_SALOME_la_LIBADD = -lQtGui -lQtCore $(top_builddir)/src/bases/libBL_Bases.la
+libBL_Wrappers_SALOME_la_LIBADD = -lQtGui -lQtCore $(top_builddir)/src/bases/libBL_Bases.la $(OMNIORB_LIBS) \
+				  $(KERNEL_LDFLAGS) -lSalomeIDLKernel $(GUI_LDFLAGS) -lLightApp -lSalomeApp -lCAM -lsuit
 

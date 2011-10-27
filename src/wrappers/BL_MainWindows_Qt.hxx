@@ -21,12 +21,22 @@
 #ifndef _BL_MAINWINDOWS_QT_HXX_
 #define _BL_MAINWINDOWS_QT_HXX_
 
+#ifdef WNT
+#  if defined BL_Wrappers_Qt_EXPORTS
+#    define BL_Wrappers_Qt_EXPORT __declspec( dllexport )
+#  else
+#    define BL_Wrappers_Qt_EXPORT __declspec( dllimport )
+#  endif
+#else
+#  define BL_Wrappers_Qt_EXPORT
+#endif
+
 #include "BL_MainWindows_Wrap.hxx"
 #include <map>
 
 namespace BL
 {
-  class MainWindows_Qt : public MainWindows_Wrap, public QObject
+  class BL_Wrappers_Qt_EXPORT MainWindows_Qt : public MainWindows_Wrap, public QObject
   {
     public:
       MainWindows_Qt(QMainWindow * main_window);

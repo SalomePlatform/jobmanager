@@ -27,7 +27,7 @@ jobmanager_gui_CXXFLAGS = $(qt4_cppflags) \
 			      -I$(top_srcdir)/src/bases \
 			      -I$(top_srcdir)/src/engine \
 			      -I$(KERNEL_ROOT_DIR)/include/salome \
-                               $(OMNIORB_INCLUDES) \
+                               $(OMNIORB_INCLUDES) $(OMNIORB_CXXFLAGS) \
 			       -I../../idl \
 			      -I$(top_srcdir)/src/wrappers \
 			      -I$(top_srcdir)/src/genericgui

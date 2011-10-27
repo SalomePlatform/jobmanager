@@ -20,6 +20,7 @@
 #ifndef _BL_JOBSMANAGER_HXX_
 #define _BL_JOBSMANAGER_HXX_
 
+#include "BL_Engine.hxx"
 #include "BL_Job.hxx"
 #include "BL_SALOMEServices.hxx"
 #include "BL_Traces.hxx"
@@ -34,7 +35,7 @@ namespace BL{
 
   class SALOMEServices;
 
-  class JobsManager
+  class BL_Engine_EXPORT JobsManager
   {
     public:
       JobsManager(BL::SALOMEServices * salome_services);

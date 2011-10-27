@@ -20,6 +20,10 @@
 #include "BL_JobsManager.hxx"
 #include <sstream>
 
+#ifdef WNT
+#undef ERROR
+#endif
+
 BL::JobsManager::JobsManager(BL::SALOMEServices * salome_services)
 {
   DEBTRACE("Creating BL::JobsManager");
