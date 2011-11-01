@@ -21,7 +21,8 @@ libdir = $(prefix)/lib/salome
 
 lib_LTLIBRARIES = libBL_GenericGui.la
 
-libBL_GenericGui_la_SOURCES = BL_GenericGui.hxx BL_GenericGui.cxx \
+libBL_GenericGui_la_SOURCES = BL_GenericGuiDefines.hxx \
+			      BL_GenericGui.hxx BL_GenericGui.cxx \
 			      BL_JobsTable.hxx BL_JobsTable.cxx \
 			      BL_JobTab.hxx BL_JobTab.cxx \
 			      BL_Buttons.hxx BL_Buttons.cxx \
