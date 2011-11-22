@@ -51,5 +51,5 @@ libBL_Wrappers_SALOME_la_CXXFLAGS = $(qt4_cppflags) -I$(top_srcdir)/src/bases \
 libBL_Wrappers_SALOME_la_LDFLAGS = $(qt4_ldflags) 
 
 libBL_Wrappers_SALOME_la_LIBADD = -lQtGui -lQtCore $(top_builddir)/src/bases/libBL_Bases.la $(OMNIORB_LIBS) \
-				  $(KERNEL_LDFLAGS) -lSalomeIDLKernel $(GUI_LDFLAGS) -lLightApp -lSalomeApp -lCAM -lsuit
+				  $(KERNEL_LDFLAGS) -lSalomeIDLKernel $(GUI_LDFLAGS) -lLightApp -lSalomeApp -lSalomeSession -lCAM -lsuit
 

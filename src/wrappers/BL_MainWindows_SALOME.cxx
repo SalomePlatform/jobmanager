@@ -18,6 +18,7 @@
 //
 
 #include "BL_MainWindows_SALOME.hxx"
+#include <SalomeApp_Engine_i.hxx>
 
 BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
   SalomeApp_Module(module_name),
@@ -87,7 +88,8 @@ QString
 BL::MainWindows_SALOME::engineIOR() const
 {
   DEBTRACE("Entering in BL::SalomeGui::engineIOR");
-  return _appli->defaultEngineIOR();
+  QString anEngineIOR = SalomeApp_Engine_i::EngineIORForComponent( "JOBMANAGER", true ).c_str();
+  return anEngineIOR;
 }
 
 void 
