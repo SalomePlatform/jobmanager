@@ -46,9 +46,7 @@ The first table below describes the attributes of a job.
                                           the job's *work directory*.
 **Output files**         No               A list of files or directories that have to be copied from the job's resource
                                           to the user computer into the *result directory*.
-**Work directory**       No               It's the directory on the job's resource where the job will be executed. If
-                                          the user does not provide a directory, a default directory will be created
-                                          into the resource with this path: **~/Batch/"current date"**.
+**Work directory**       Yes              It's the directory on the job's resource where the job will be executed.
 **Result directory**     Yes              It's the directory in the user computer where the job's results have to be 
                                           copied at the end of the job.
 ======================== ================ ==============================================================================
@@ -61,7 +59,7 @@ The second table below describes the attributes of computation requirements.
 **Maximum duration**     It's the maximum expected duration of the job. When a batch manager is used, this
                          time is interpreted as a **walltime** and not as a **cputime**.
 **Number of cpu**        It's the number of cpus/cores requested.
-**Memory**               It's the amount of memory per cpu/core expected.
+**Memory**               It's the amount of memory per node expected.
 ======================== ==============================================================================
 
 Job's states
