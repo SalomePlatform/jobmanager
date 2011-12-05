@@ -21,7 +21,7 @@ libdir = $(prefix)/lib/salome
 
 lib_LTLIBRARIES = libBL_Engine.la
 
-libBL_Engine_la_SOURCES = BL_JobsManager.hxx BL_JobsManager.cxx \
+libBL_Engine_la_SOURCES = BL_Engine.hxx BL_JobsManager.hxx BL_JobsManager.cxx \
 			  BL_Job.hxx BL_Job.cxx \
 			  BL_SALOMEServices.hxx BL_SALOMEServices.cxx \
 			  BL_Observer.hxx

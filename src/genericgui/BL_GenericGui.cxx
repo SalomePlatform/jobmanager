@@ -19,6 +19,10 @@
 
 #include "BL_GenericGui.hxx"
 
+#ifdef WNT
+#undef ERROR
+#endif
+
 BL::GenericGui::GenericGui(BL::MainWindows_Wrap * wrapper) : QObject(wrapper->getDockParent())
 {
   DEBTRACE("Creating BL::GenericGui");

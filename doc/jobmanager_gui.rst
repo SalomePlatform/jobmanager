@@ -18,23 +18,27 @@ JOBMANAGER provides some buttons to manage the user job list (see figure :ref:`f
 
 The description of each button (framed in blue in the figure) is given in the table below. 
 
-======================== ============================ ================================================================
-**Button**               **Condition of activation**  **Description**
-======================== ============================ ================================================================
-**Create a job**         Always activated             Launch the job wizard to create a job.
-**Edit/Clone a job**     Job selected                 Edit a job in *created* or *Error* or *Failed* or *Not Created*
-                                                      state. Clone a job in other state.
-**Start a job**          Job selected and job state   Start a job.
+======================== ============================ ================================================================ ===================
+**Button**               **Condition of activation**  **Description**                                                  **Multi Selection**
+======================== ============================ ================================================================ ===================
+**Create**               Always activated             Launch the job wizard to create a job.                           Not matter
+**Start**                Job selected and job state   Start a job.                                                     No
                          equals to *Created*
-**Restart a job**        Job selected and job state   Restart a job.
+**Get Results**          Job selected and job state   Get job results in the result directory.                         Yes
                          equals to *Finish* or 
                          *Failed*
-**Delete a job**         Job selected                 Delete a job.
-**Get job results**      Job selected and job state   Get job results in the result directory.
+**Stop**                 Job selected and job state   Stop the job. If the job is registered into a remote batch       Yes
+                         equals to *Queued* or        manager, it is removed from it.
+                         *Running* or *Paused*
+**Delete**               Job selected                 Delete a job. If the job is registered into a remote batch       Yes
+                                                      manager, it is removed from it.
+**Restart**              Job selected and job state   Restart a job.                                                   No
                          equals to *Finish* or 
                          *Failed*
-**Refresh jobs**         Always activated             Update jobs states.
-======================== ============================ ================================================================
+**Edit/Clone**           Job selected                 Edit a job in *created* or *Error* or *Failed* or *Not Created*  No
+                                                      state. Clone a job in other state.
+**Refresh jobs**         Always activated             Update jobs states.                                              Not matter
+======================== ============================ ================================================================ ===================
 
 **Tip:** You could use the **Auto Refresh** button in GUI part 3 to enable an automatic refresh.
 

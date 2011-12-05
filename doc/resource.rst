@@ -39,12 +39,12 @@ The description of each attribute is given in the table below.
 **username**               Yes              User name to use for creating connections.
 **batch**                  Yes              Type of batch system installed in the resource. Use *ssh* if
                                             the resource is a single computer.
-**iprotocol**              Yes              Internal protocol to use on a cluster (ssh or rsh).
+**iprotocol**              Yes              Internal protocol to use on a cluster (ssh, rsh or srun).
 **mpiImpl**                No               MPI implementation to use.
 
 **OS**                     No               It's the operating system name, e.g.: Linux, Windows.
 **nb_node**                No               It's the amount of node of the computer.
-**nb_proc_per_node**       No               It's the amount or processor or core of your computer.
+**nb_proc_per_node**       No               It's the amount or processor or core in each node.
 **mem_mb**                 No               It's the amount of memory in megabytes per node.
 **cpu_clock**              No               It's the frequency in gigahertz of the computer's processors.
 ========================== ================ =============================================================

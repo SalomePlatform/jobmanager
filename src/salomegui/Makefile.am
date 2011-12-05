@@ -52,8 +52,8 @@ libJOBMANAGER_la_LIBADD  = $(qt4_libs) \
 			       $(top_builddir)/src/wrappers/libBL_Wrappers_SALOME.la \
 			       -lSalomeApp
 
-salomeinclude_HEADERS = BL_SalomeGui.hxx \
-			JOBMANAGER_version.h
+salomeinclude_HEADERS = BL_SalomeGui.hxx
+salomeinclude_DATA = JOBMANAGER_version.h
 
 # resources files
 ICONS = resources/jobmanager.png
