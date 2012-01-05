@@ -50,6 +50,8 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _protocol_line->addItem("ssh");
   _protocol_line->addItem("rsh");
   _protocol_line->addItem("srun");
+  _protocol_line->addItem("pbsdsh");
+  _protocol_line->addItem("blaunch");
   _protocol_line->setCurrentIndex(-1);
 
   QLabel * componentList_label = new QLabel("Component List:");
@@ -114,6 +116,8 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _iprotocol_line->addItem("ssh");
   _iprotocol_line->addItem("rsh");
   _iprotocol_line->addItem("srun");
+  _iprotocol_line->addItem("pbsdsh");
+  _iprotocol_line->addItem("blaunch");
   _iprotocol_line->setCurrentIndex(-1);
 
   QLabel * batch_label = new QLabel("Batch:");
@@ -198,6 +202,10 @@ JM::EditSalomeResource::get_infos()
     _protocol_line->setCurrentIndex(1);
   else if(protocol == "srun")
     _protocol_line->setCurrentIndex(2);
+  else if(protocol == "pbsdsh")
+    _protocol_line->setCurrentIndex(3);
+  else if(protocol == "blaunch")
+    _protocol_line->setCurrentIndex(4);
   else
     _protocol_line->setCurrentIndex(-1);
 
@@ -208,6 +216,10 @@ JM::EditSalomeResource::get_infos()
     _iprotocol_line->setCurrentIndex(1);
   else if (iprotocol == "srun")
     _iprotocol_line->setCurrentIndex(2);
+  else if (iprotocol == "pbsdsh")
+    _iprotocol_line->setCurrentIndex(3);
+  else if (iprotocol == "blaunch")
+    _iprotocol_line->setCurrentIndex(4);
   else
     _iprotocol_line->setCurrentIndex(-1);
 
