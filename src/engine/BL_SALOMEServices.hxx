@@ -57,6 +57,9 @@ namespace BL{
     std::string batch;
     std::string mpiImpl;
     std::string iprotocol;
+
+    bool is_cluster_head;
+    std::string working_directory;
   };
 
   class BL_Engine_EXPORT SALOMEServices :

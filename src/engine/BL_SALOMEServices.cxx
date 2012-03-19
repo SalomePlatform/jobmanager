@@ -162,6 +162,8 @@ BL::SALOMEServices::getResourceDescr(const std::string& name)
     resource_descr.batch = resource_definition->batch.in();
     resource_descr.mpiImpl = resource_definition->mpiImpl.in();
     resource_descr.iprotocol = resource_definition->iprotocol.in();
+    resource_descr.is_cluster_head = resource_definition->is_cluster_head;
+    resource_descr.working_directory = resource_definition->working_directory.in();
 
     delete resource_definition;
   }
@@ -196,6 +198,8 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
   resource_definition->batch = CORBA::string_dup(new_resource.batch.c_str());
   resource_definition->mpiImpl = CORBA::string_dup(new_resource.mpiImpl.c_str());
   resource_definition->iprotocol = CORBA::string_dup(new_resource.iprotocol.c_str());
+  resource_definition->is_cluster_head = new_resource.is_cluster_head;
+  resource_definition->working_directory = CORBA::string_dup(new_resource.working_directory.c_str());
 
   try
   {

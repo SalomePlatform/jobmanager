@@ -70,6 +70,14 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   connect(_remove_button, SIGNAL(clicked()), this, SLOT(remove_components()));
   connect(_componentList, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
+  QLabel * working_directory_label = new QLabel("Working Directory:");
+  _working_directory = new QLineEdit(this);
+  QLabel * is_cluster_head_label = new QLabel("Is Cluster Head:");
+  _is_cluster_head = new QPushButton(this);
+  _is_cluster_head->setCheckable(true);
+  connect(_is_cluster_head, SIGNAL(toggled(bool)), this, SLOT(toggle_is_cluster_head(bool)));
+  toggle_is_cluster_head(false); // Default is false
+
   QGridLayout * m_layout = new QGridLayout;
   m_layout->addWidget(name_label, 0, 0);
   m_layout->addWidget(_name_line, 0, 1);
@@ -83,6 +91,10 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   m_layout->addWidget(_applipath_line, 4, 1);
   m_layout->addWidget(componentList_label, 5, 0);
   m_layout->addWidget(component_widget, 5, 1);
+  m_layout->addWidget(is_cluster_head_label, 6, 0);
+  m_layout->addWidget(_is_cluster_head, 6, 1);
+  m_layout->addWidget(working_directory_label, 7, 0);
+  m_layout->addWidget(_working_directory, 7, 1);
   main_groupBox->setLayout(m_layout);
 
   // Part 2
@@ -162,7 +174,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
 
   // Part 3
   QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-						      | QDialogButtonBox::Cancel);
+                                                      | QDialogButtonBox::Cancel);
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -188,12 +200,14 @@ void
 JM::EditSalomeResource::get_infos()
 {
   BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(_resource_name);
-  
+
   _name_line->setText(QString(resource_descr.name.c_str()));
   _hostname_line->setText(QString(resource_descr.hostname.c_str()));
   _username_line->setText(QString(resource_descr.username.c_str()));
   _applipath_line->setText(QString(resource_descr.applipath.c_str()));
   _os_line->setText(QString(resource_descr.OS.c_str()));
+  _working_directory->setText(QString(resource_descr.working_directory.c_str()));
+  _is_cluster_head->setChecked(resource_descr.is_cluster_head);
 
   std::string protocol = resource_descr.protocol.c_str();
   if (protocol == "ssh")
@@ -238,9 +252,9 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(5);
   else if (batch == "ll")
     _batch_line->setCurrentIndex(6);
-  else  
+  else
     _batch_line->setCurrentIndex(-1);
-  
+
   std::string mpiImpl = resource_descr.mpiImpl.c_str();
   if (mpiImpl == "lam")
     _mpiImpl_line->setCurrentIndex(0);
@@ -280,6 +294,7 @@ JM::EditSalomeResource::get_infos()
   _username_line->setCursorPosition(0);
   _applipath_line->setCursorPosition(0);
   _os_line->setCursorPosition(0);
+  _working_directory->setCursorPosition(0);
 }
 
 
@@ -325,6 +340,11 @@ JM::EditSalomeResource::accept()
   resource.username = _username_line->text().toStdString();
   resource.applipath = _applipath_line->text().toStdString();
   resource.OS = _os_line->text().toStdString();
+  resource.working_directory = _working_directory->text().toStdString();
+  if (_is_cluster_head->isChecked())
+    resource.is_cluster_head = true;
+  else
+    resource.is_cluster_head = false;
 
   // Components
   int count = _componentList->count();
@@ -356,4 +376,13 @@ JM::EditSalomeResource::accept()
   {
     QMessageBox::warning(NULL, "Values missing", "name, hostname and protocol are mandatory! Cancel or add values!");
   }
+}
+
+void
+JM::EditSalomeResource::toggle_is_cluster_head(bool checked)
+{
+  if (checked)
+    _is_cluster_head->setText("true");
+  else
+    _is_cluster_head->setText("false");
 }

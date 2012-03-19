@@ -31,9 +31,9 @@ namespace JM
     Q_OBJECT
 
     public:
-      EditSalomeResource(QWidget *parent, 
-			 BL::SALOMEServices * salome_services, 
-			 const std::string & resource_name = "");
+      EditSalomeResource(QWidget *parent,
+                         BL::SALOMEServices * salome_services,
+                         const std::string & resource_name = "");
       virtual ~EditSalomeResource();
 
       void get_infos();
@@ -43,6 +43,7 @@ namespace JM
       void add_component();
       void remove_components();
       void itemSelectionChanged();
+      void toggle_is_cluster_head(bool checked);
 
     protected:
       QWidget* _parent;
@@ -66,6 +67,9 @@ namespace JM
       QSpinBox * _cpu_clock_line;
       QSpinBox * _nb_node_line;
       QSpinBox * _nb_proc_per_node_line;
+
+      QLineEdit * _working_directory;
+      QPushButton * _is_cluster_head;
 
       QPushButton * _add_button;
       QPushButton * _remove_button;
