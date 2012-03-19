@@ -130,18 +130,26 @@ BL::CreateJobWizard::clone(const std::string & name)
     proc_value.setNum(batch_params.nb_proc);
     setField("proc_value", proc_value);
 
-    std::size_t pos = batch_params.maximum_duration.find(":");
-    std::string hour_str = batch_params.maximum_duration.substr(0, pos);
-    int hour; 
-    std::istringstream iss_hour(hour_str);
-    iss_hour >> hour;
-    setField("duration_hour", hour);
+    if (batch_params.maximum_duration == "")
+    {
+      setField("duration_hour", 0);
+      setField("duration_min", 0);
+    }
+    else
+    {
+      std::size_t pos = batch_params.maximum_duration.find(":");
+      std::string hour_str = batch_params.maximum_duration.substr(0, pos);
+      int hour; 
+      std::istringstream iss_hour(hour_str);
+      iss_hour >> hour;
+      setField("duration_hour", hour);
 
-    std::string min_str = batch_params.maximum_duration.substr(pos + 1, batch_params.maximum_duration.npos);
-    int min; 
-    std::istringstream iss_min(min_str);
-    iss_min >> min;
-    setField("duration_min", min);
+      std::string min_str = batch_params.maximum_duration.substr(pos + 1, batch_params.maximum_duration.npos);
+      int min; 
+      std::istringstream iss_min(min_str);
+      iss_min >> min;
+      setField("duration_min", min);
+    }
 
     std::string mem_type = batch_params.expected_memory.substr(batch_params.expected_memory.size() - 2, 2);
     if (mem_type == "mb")
@@ -215,15 +223,22 @@ BL::CreateJobWizard::end(int result)
 
     QString time_hour;
     QString time_min;
-    if (field("duration_hour").toInt() < 10)
-      time_hour = "0" + field("duration_hour").toString();
+    if(field("duration_hour").toInt() == 0 && field("duration_min").toInt() == 0)
+    {
+      maximum_duration = "";
+    }
     else
-      time_hour = field("duration_hour").toString();
-    if (field("duration_min").toInt() < 10)
-      time_min = "0" + field("duration_min").toString();
-    else
-      time_min = field("duration_min").toString();
-    maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
+    {
+      if (field("duration_hour").toInt() < 10)
+        time_hour = "0" + field("duration_hour").toString();
+      else
+        time_hour = field("duration_hour").toString();
+      if (field("duration_min").toInt() < 10)
+        time_min = "0" + field("duration_min").toString();
+      else
+        time_min = field("duration_min").toString();
+      maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
+    }
 
     QString mem = field("mem_value").toString();
     int mem_type_i = field("mem_type").toInt();
@@ -652,14 +667,6 @@ BL::BatchParametersPage::validatePage()
   if (batch_directory == "")
   {
     QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
-    return false;
-  }
-
-  int time_hour = field("duration_hour").toInt();
-  int time_min = field("duration_min").toInt();
-  if (time_hour == 0 && time_min == 0)
-  {
-    QMessageBox::warning(NULL, "Time Error", "Please enter an expected during time");
     return false;
   }
 
