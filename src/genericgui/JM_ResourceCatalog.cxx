@@ -29,7 +29,7 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   BL_ASSERT(salome_services);
   _parent = parent;
   _salome_services = salome_services;
-  
+
   _refresh_button = new QPushButton("Refresh Resource List");
   _refresh_button->show();
   _resource_files_list = new QListWidget(this);
@@ -63,7 +63,7 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   mainLayout->addWidget(_resource_files_list);
   mainLayout->addWidget(layout_widget);
   setLayout(mainLayout);
-  
+
   // Buttons
   connect(_refresh_button, SIGNAL(clicked()), this, SLOT(refresh_resource_list()));
   connect(_show_button, SIGNAL(clicked()), this, SLOT(show_button()));
@@ -104,9 +104,9 @@ void
 JM::ResourceCatalog::item_choosed(QListWidgetItem * item)
 {
   DEBTRACE("JM::ResourceCatalog::item_choosed");
-  JM::SalomeResource * resource_widget = new JM::SalomeResource(this, 
-								_salome_services,
-								item->text().toStdString());
+  JM::SalomeResource * resource_widget = new JM::SalomeResource(this,
+                                                                _salome_services,
+                                                                item->text().toStdString());
   resource_widget->exec();
   delete resource_widget;
 }
@@ -141,8 +141,8 @@ JM::ResourceCatalog::show_button()
 void
 JM::ResourceCatalog::add_button()
 {
-  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this, 
-									_salome_services);
+  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this,
+                                                                        _salome_services);
   resource_widget->exec();
   delete resource_widget;
   refresh_resource_list();
@@ -162,9 +162,9 @@ JM::ResourceCatalog::edit_button()
 {
   QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
   QString item_name = item_list.at(0)->text();
-  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this, 
-									_salome_services,
-									item_name.toStdString());
+  JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this,
+                                                                        _salome_services,
+                                                                        item_name.toStdString());
   resource_widget->exec();
   delete resource_widget;
   refresh_resource_list();

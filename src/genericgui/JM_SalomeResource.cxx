@@ -21,7 +21,7 @@
 #include "BL_Traces.hxx"
 
 JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
-				   const std::string & resource_name) : QDialog(parent)
+                                   const std::string & resource_name) : QDialog(parent)
 {
   DEBTRACE("Creating JM::SalomeResource");
   BL_ASSERT(parent);
@@ -68,7 +68,6 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   m_layout->addWidget(working_directory_label, 7, 0);
   m_layout->addWidget(_working_directory, 7, 1);
   main_groupBox->setLayout(m_layout);
-  
 
   QGroupBox * config_groupBox = new QGroupBox("Configuration values");
   QLabel * os_label = new QLabel("OS:");
@@ -156,7 +155,7 @@ void
 JM::SalomeResource::get_infos()
 {
   BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(_resource_name);
-  
+
   _name_line->setText(QString(resource_descr.name.c_str()));
   _hostname_line->setText(QString(resource_descr.hostname.c_str()));
   _protocol_line->setText(QString(resource_descr.protocol.c_str()));

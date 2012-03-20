@@ -25,6 +25,7 @@
 #endif
 #include <sys/types.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef WNT
 #undef ERROR
@@ -57,13 +58,13 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   dump_yacs_state = -1;
   ll_jobtype = "";
 
-  setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
+  setOptions(QWizard::NoBackButtonOnStartPage);
 
   // Common pages
   _job_name_page = new BL::JobNamePage(this, _jobs_manager);
 
   setPage(Page_JobName, _job_name_page);
-  setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
+  setPage(Page_BatchParameters, new BL::BatchParametersPage(this, salome_services));
   setPage(Page_Files, new BL::FilesPage(this));
   setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
   setPage(Page_Conclusion, new BL::ConclusionPage(this));
@@ -490,8 +491,8 @@ void
 BL::YACSSchemaPage::choose_file()
 {
   QString yacs_file = QFileDialog::getOpenFileName(this,
-						   tr("Open YACS files"), "",
-						   tr("XML (*.xml);;All Files (*)"));
+                                                   tr("Open YACS files"), "",
+                                                   tr("XML (*.xml);;All Files (*)"));
   _yacs_file_text->setReadOnly(false);
   _yacs_file_text->setText(yacs_file);
   _yacs_file_text->setReadOnly(true);
@@ -501,8 +502,8 @@ void
 BL::YACSSchemaPage::choose_env_file()
 {
   QString env_file = QFileDialog::getOpenFileName(this,
-						      tr("Open environnement file"), "",
-						      tr("sh (*.sh);;All Files (*)"));
+                                                  tr("Open environnement file"), "",
+                                                  tr("sh (*.sh);;All Files (*)"));
   _line_env_file->setReadOnly(false);
   _line_env_file->setText(env_file);
   _line_env_file->setReadOnly(true);
@@ -512,7 +513,7 @@ BL::YACSSchemaPage::choose_env_file()
 int 
 BL::YACSSchemaPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  return BL::CreateJobWizard::Page_Resource;
 }
 
 BL::CommandMainPage::CommandMainPage(QWidget * parent)
@@ -554,8 +555,8 @@ void
 BL::CommandMainPage::choose_command_file()
 {
   QString command_file = QFileDialog::getOpenFileName(this,
-						      tr("Open command file"), "",
-						      tr("sh (*.sh);;All Files (*)"));
+                                                      tr("Open command file"), "",
+                                                      tr("sh (*.sh);;All Files (*)"));
   _line_command->setReadOnly(false);
   _line_command->setText(command_file);
   _line_command->setReadOnly(true);
@@ -565,8 +566,8 @@ void
 BL::CommandMainPage::choose_env_file()
 {
   QString env_file = QFileDialog::getOpenFileName(this,
-						      tr("Open environnement file"), "",
-						      tr("sh (*.sh);;All Files (*)"));
+                                                  tr("Open environnement file"), "",
+                                                  tr("sh (*.sh);;All Files (*)"));
   _line_env_file->setReadOnly(false);
   _line_env_file->setText(env_file);
   _line_env_file->setReadOnly(true);
@@ -588,13 +589,16 @@ BL::CommandMainPage::validatePage()
 int 
 BL::CommandMainPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  return BL::CreateJobWizard::Page_Resource;
 }
 
-BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
+BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services)
 : QWizardPage(parent)
 {
   setTitle("Enter Batch Parameters");
+  resource_choosed = "";
+
+  _salome_services = salome_services;
 
   QLabel *label = new QLabel("In this step you define the parameters of your job");
   label->setWordWrap(true);
@@ -659,6 +663,37 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
 
 BL::BatchParametersPage::~BatchParametersPage()
 {}
+
+void BL::BatchParametersPage::cleanupPage() {}
+
+void
+BL::BatchParametersPage::initializePage()
+{
+  QString f_resource_choosed = field("resource_choosed").toString();
+  if (f_resource_choosed != resource_choosed)
+  {
+    resource_choosed = f_resource_choosed;
+    // If choosed resource has a working_directory set
+    // Generates a default remote working directory
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    QString res_work_dir = resource_descr.working_directory.c_str();
+    if (res_work_dir != "")
+    {
+      time_t rawtime;
+      time(&rawtime);
+      std::string launch_date = ctime(&rawtime);
+      for (int i = 0; i < launch_date.size(); i++)
+        if (launch_date[i] == '/' ||
+            launch_date[i] == '-' ||
+            launch_date[i] == ':' ||
+            launch_date[i] == ' ')
+          launch_date[i] = '_';
+      launch_date.erase(--launch_date.end()); // Last caracter is a \n
+      QString date = launch_date.c_str();
+      setField("batch_directory", res_work_dir + "/" + date);
+    }
+  }
+}
 
 bool
 BL::BatchParametersPage::validatePage()
@@ -796,8 +831,8 @@ void
 BL::FilesPage::choose_input_files()
 {
   QStringList files = QFileDialog::getOpenFileNames(this,
-					      tr("Add input files"), "",
-					      tr("All Files (*)"));
+                                                    tr("Add input files"), "",
+                                                    tr("All Files (*)"));
   for (int i = 0; i < files.size(); ++i) 
   {
     if (_input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
@@ -868,7 +903,7 @@ BL::FilesPage::output_itemSelectionChanged()
 int 
 BL::FilesPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Resource;
+  return BL::CreateJobWizard::Page_Conclusion;
 }
 
 BL::ConclusionPage::ConclusionPage(QWidget * parent)
@@ -1009,7 +1044,7 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
 int 
 BL::ResourcePage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Conclusion;
+  return BL::CreateJobWizard::Page_BatchParameters;
 }
 
 BL::PythonSalomeMainPage::PythonSalomeMainPage(QWidget * parent)
@@ -1085,5 +1120,5 @@ BL::PythonSalomeMainPage::validatePage()
 int 
 BL::PythonSalomeMainPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  return BL::CreateJobWizard::Page_Resource;
 }

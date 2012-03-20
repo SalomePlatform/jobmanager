@@ -105,13 +105,14 @@ namespace BL{
 
       virtual bool validatePage();
       virtual int nextId() const ;
+      virtual void cleanupPage() {}
 
     public slots:
       void yacs_schema_button(bool checked);
       void command_button(bool checked);
       void python_salome_button(bool checked);
 
-    private:	  
+    private:
       BL::JobsManager_QT * _jobs_manager;
       QLabel * _explanation;
 
@@ -130,6 +131,7 @@ namespace BL{
 
       virtual bool validatePage();
       virtual int nextId() const ;
+      virtual void cleanupPage() {}
   };
 
   class BatchParametersPage: virtual public QWizardPage
@@ -137,11 +139,17 @@ namespace BL{
     Q_OBJECT
 
     public:
-      BatchParametersPage(QWidget * parent);
+      BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services);
       virtual ~BatchParametersPage();
 
       virtual bool validatePage();
       virtual int nextId() const;
+      virtual void cleanupPage();
+      virtual void initializePage();
+
+    private:
+      BL::SALOMEServices * _salome_services;
+      QString resource_choosed;
   };
 
   class FilesPage: virtual public QWizardPage
@@ -154,6 +162,7 @@ namespace BL{
 
       virtual int nextId() const;
       virtual bool validatePage();
+      virtual void cleanupPage() {}
 
     public slots:
       void choose_input_files();
@@ -187,6 +196,7 @@ namespace BL{
       virtual int nextId() const;
       virtual bool validatePage();
       virtual void initializePage();
+      virtual void cleanupPage() {}
 
     public slots:
       void itemSelected(QListWidgetItem * item);
@@ -211,6 +221,7 @@ namespace BL{
 
       virtual bool validatePage();
       virtual int nextId() const ;
+      virtual void cleanupPage() {}
 
     public slots:
       void choose_file();
@@ -231,6 +242,7 @@ namespace BL{
 
       virtual bool validatePage();
       virtual int nextId() const ;
+      virtual void cleanupPage() {}
 
     public slots:
       void choose_command_file();
@@ -251,6 +263,7 @@ namespace BL{
 
       virtual bool validatePage();
       virtual int nextId() const ;
+      virtual void cleanupPage() {}
 
     public slots:
       void choose_PythonSalome_file();
