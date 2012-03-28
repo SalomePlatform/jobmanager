@@ -141,6 +141,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _batch_line->addItem("ccc");
   _batch_line->addItem("slurm");
   _batch_line->addItem("ll");
+  _batch_line->addItem("vishnu");
   _batch_line->setCurrentIndex(-1);
 
   QLabel * mpiImpl_label = new QLabel("MPI impl:");
@@ -252,6 +253,8 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(5);
   else if (batch == "ll")
     _batch_line->setCurrentIndex(6);
+  else if (batch == "vishnu")
+    _batch_line->setCurrentIndex(7);
   else
     _batch_line->setCurrentIndex(-1);
 
