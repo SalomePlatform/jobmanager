@@ -57,9 +57,14 @@ The second table below describes the attributes of computation requirements.
 **Attribute**            **Description**
 ======================== ==============================================================================
 **Maximum duration**     It's the maximum expected duration of the job. When a batch manager is used, this
-                         time is interpreted as a **walltime** and not as a **cputime**.
+                         time is interpreted as a **walltime** and not as a **cputime**. If maximum
+                         duration is set to 0, the time will be set to the default value of the
+                         batch queue selected.
 **Number of cpu**        It's the number of cpus/cores requested.
 **Memory**               It's the amount of memory per node expected.
+**Queue**                It's optional. It permits to choose a specific batch queue on the targeted cluster.
+                         If it is not defined, most of the batch systems will affect your job to the queue
+                         that fits with the other attributes requirements.
 ======================== ==============================================================================
 
 Job's states

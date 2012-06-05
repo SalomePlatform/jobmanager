@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2011  CEA/DEN, EDF R&D
+# Copyright (C) 2009-2012  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 # --
 # -----------------------------------------------------------------------------
 #
-AC_INIT([JOBMANAGER project], [6.4.0], [andre.ribes@edf.fr], [JobManager-Module])
+AC_INIT([JOBMANAGER project], [6.5.0], [andre.ribes@edf.fr], [JobManager-Module])
 AM_INIT_AUTOMAKE([tar-pax])
 AC_CONFIG_HEADER(jobmanager_config.h)
 
