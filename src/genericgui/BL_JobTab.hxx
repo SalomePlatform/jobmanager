@@ -1,20 +1,20 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+// Copyright (C) 2009-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef _BL_JOBTAB_HXX_
@@ -24,7 +24,7 @@
 
 #include "BL_JobsManager_QT.hxx"
 
-namespace BL 
+namespace BL
 {
   class JobTab: public QTabWidget
   {
@@ -38,9 +38,9 @@ namespace BL
 
       void createJobSummaryTab();
       void createJobFilesTab();
+      void job_selected(const QModelIndex & index);
 
     public slots:
-      void job_selected(const QModelIndex & index);
       void itemChanged(QStandardItem * item);
       void reset(QString job_name);
 
@@ -50,24 +50,36 @@ namespace BL
       BL::JobsManager_QT * _jobs_manager;
 
       QWidget * _summary_tab;
+      QWidget * _files_tab;
+
       // Main Values
+      QFormLayout * _main_values_form;
       QLabel * _job_name_label_value;
       QLabel * _job_type_label_value;
       QLabel * _job_state_label_value;
-      QLabel * _job_machine_label_value;
-      QLabel * _job_command_label;
-      QLabel * _job_command_label_value;
+      QLabel * _job_launcher_label_value;
+      QLabel * _job_resource_label_value;
+      QLabel * _job_jobfile_label_value;
+      QLabel * _job_envfile_label_value;
 
       // Run Values
+      QFormLayout * _run_values_form;
+      QFormLayout * _other_run_values_form;
       QLabel * _job_nif_label_value;
       QLabel * _job_nof_label_value;
       QLabel * _job_bd_label_value;
       QLabel * _job_rd_label_value;
-      QLabel * _job_edt_label_value;
+      QLabel * _job_mdt_label_value;
       QLabel * _job_em_label_value;
       QLabel * _job_nop_label_value;
 
-      QWidget * _files_tab;
+      // Specific Values
+      QLabel * _yacs_dump_state_label;
+      QLabel * _yacs_dump_state_value;
+      QLabel * _batch_queue_label;
+      QLabel * _batch_queue_value;
+      QLabel * _ll_jobtype_label;
+      QLabel * _ll_jobtype_value;
 
       QListWidget * _input_files_list;
       QListWidget * _output_files_list;

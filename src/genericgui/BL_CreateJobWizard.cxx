@@ -1,23 +1,35 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+// Copyright (C) 2009-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_CreateJobWizard.hxx"
+#include "BL_JobsManager_QT.hxx"
+#ifndef WNT
+#include <unistd.h>
+#include <pwd.h>
+#endif
+#include <sys/types.h>
+#include <stdlib.h>
+#include <time.h>
+
+#ifdef WNT
+#undef ERROR
+#endif
 
 BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALOMEServices * salome_services)
 {
@@ -25,30 +37,42 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   BL_ASSERT(jobs_manager);
   BL_ASSERT(salome_services);
   _jobs_manager = jobs_manager;
+  _salome_services = salome_services;
 
   job_name = "";
   yacs_file = "";
   command = "";
+  python_salome_file = "";
+  env_file = "";
   batch_directory = "";
-  expected_during_time = "";
+  maximum_duration = "";
   expected_memory = "";
   nb_proc = 1;
 
   result_directory = "";
 
-  machine_choosed = "";
+  resource_choosed = "";
+  batch_queue = "";
 
   start_job = false;
+  dump_yacs_state = -1;
+  ll_jobtype = "";
 
-  setOptions(QWizard::IndependentPages | QWizard::NoBackButtonOnStartPage);
+  setOptions(QWizard::NoBackButtonOnStartPage);
 
-  setPage(Page_JobName, new BL::CreateJobWizard::JobNamePage(this, _jobs_manager));
-  setPage(Page_YACSSchema, new BL::YACSSchemaPage(this));
-  setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
+  // Common pages
+  _job_name_page = new BL::JobNamePage(this, _jobs_manager);
+
+  setPage(Page_JobName, _job_name_page);
+  setPage(Page_BatchParameters, new BL::BatchParametersPage(this, salome_services));
   setPage(Page_Files, new BL::FilesPage(this));
-  setPage(Page_Command_Main_Definitions, new BL::CreateJobWizard::CommandMainPage(this));
-  setPage(Page_Machine, new BL::MachinePage(this, salome_services));
-  setPage(Page_Conclusion, new BL::CreateJobWizard::ConclusionPage(this));
+  setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
+  setPage(Page_Conclusion, new BL::ConclusionPage(this));
+
+  // Specific pages
+  setPage(Page_YACSSchema, new BL::YACSSchemaPage(this));
+  setPage(Page_Command_Main_Definitions, new BL::CommandMainPage(this));
+  setPage(Page_PythonSalome_Main_Definitions, new BL::PythonSalomeMainPage(this));
 
   setWindowTitle("Create Job Wizard");
   connect(this, SIGNAL(finished(int)), this, SLOT(end(int)));
@@ -57,6 +81,102 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 BL::CreateJobWizard::~CreateJobWizard()
 {
   DEBTRACE("Destroying BL::CreateJobWizard");
+}
+
+void
+BL::CreateJobWizard::clone(const std::string & name)
+{
+  if (_jobs_manager->job_already_exist(name) == true)
+  {
+    BL::Job * job = _jobs_manager->getJob(name);
+
+    // We can only edit a job in CREATED, ERROR, FAILED and NOT_CREATED
+    if (job->getState() == BL::Job::CREATED ||
+        job->getState() == BL::Job::ERROR   ||
+        job->getState() == BL::Job::FAILED  ||
+        job->getState() == BL::Job::NOT_CREATED)
+    { 
+      setField("job_name", QString(name.c_str()));
+      _job_name_page->_check_name = false;
+    }
+
+    if (job->getType() == BL::Job::YACS_SCHEMA)
+    {
+      setField("yacs_file", QString(job->getJobFile().c_str()));
+      _job_name_page->_yacs_schema_button->click();
+      setField("env_yacs_file", QString(job->getEnvFile().c_str()));
+      if (job->getDumpYACSState() != -1)
+      {
+        QString value;
+        value.setNum(job->getDumpYACSState());
+        setField("dump_yacs_state", value);
+      }
+    }
+    else if (job->getType() == BL::Job::COMMAND)
+    {
+      setField("command", QString(job->getJobFile().c_str()));
+      _job_name_page->_command_button->click();
+      setField("env_command_file", QString(job->getEnvFile().c_str()));
+    }
+    else if (job->getType() == BL::Job::PYTHON_SALOME)
+    {
+      setField("PythonSalome", QString(job->getJobFile().c_str()));
+      _job_name_page->_python_salome_button->click();
+      setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
+    }
+
+    BL::Job::BatchParam batch_params = job->getBatchParameters();
+    setField("batch_directory", QString(batch_params.batch_directory.c_str()));
+    QString proc_value;
+    proc_value.setNum(batch_params.nb_proc);
+    setField("proc_value", proc_value);
+
+    if (batch_params.maximum_duration == "")
+    {
+      setField("duration_hour", 0);
+      setField("duration_min", 0);
+    }
+    else
+    {
+      std::size_t pos = batch_params.maximum_duration.find(":");
+      std::string hour_str = batch_params.maximum_duration.substr(0, pos);
+      int hour; 
+      std::istringstream iss_hour(hour_str);
+      iss_hour >> hour;
+      setField("duration_hour", hour);
+
+      std::string min_str = batch_params.maximum_duration.substr(pos + 1, batch_params.maximum_duration.npos);
+      int min; 
+      std::istringstream iss_min(min_str);
+      iss_min >> min;
+      setField("duration_min", min);
+    }
+
+    std::string mem_type = batch_params.expected_memory.substr(batch_params.expected_memory.size() - 2, 2);
+    if (mem_type == "mb")
+      setField("mem_type", 0);
+    else
+      setField("mem_type", 1);
+    std::string mem_value = batch_params.expected_memory.substr(0, batch_params.expected_memory.find(mem_type));
+    int mem_val; 
+    std::istringstream iss_mem(mem_value);
+    iss_mem >> mem_val;
+    setField("mem_value", mem_val);
+
+    BL::Job::FilesParam files_params = job->getFilesParameters();
+
+    std::list<std::string>::iterator it = files_params.input_files_list.begin();
+    for (; it != files_params.input_files_list.end(); it++)
+      _input_files_list->addItem(QString((*it).c_str()));
+    it = files_params.output_files_list.begin();
+    for (; it != files_params.output_files_list.end(); it++)
+      _output_files_list->addItem(QString((*it).c_str()));
+
+    setField("result_directory", QString(files_params.result_directory.c_str()));
+    setField("resource_choosed", QString(job->getResource().c_str()));
+    setField("batch_queue", QString(job->getBatchQueue().c_str()));
+    setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
+  }
 }
 
 void
@@ -79,26 +199,47 @@ BL::CreateJobWizard::end(int result)
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
     yacs_file = f_yacs_file.toStdString();
-    
+    dump_yacs_state = field("dump_yacs_state").toInt();
+
     // Command Panel
     QString f_command = field("command").toString();
     command = f_command.toStdString();
-    
+
+    // Command Panel
+    QString f_python_salome_file = field("PythonSalome").toString();
+    python_salome_file = f_python_salome_file.toStdString();
+
+    QString f_env_file;
+    if (yacs_file != "")
+      f_env_file = field("env_yacs_file").toString();
+    else if (command != "")
+      f_env_file = field("env_command_file").toString();
+    else if (python_salome_file != "")
+      f_env_file = field("env_PythonSalome_file").toString();
+    env_file = f_env_file.toStdString();
+
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
     batch_directory = f_batch_directory.toStdString();
 
     QString time_hour;
     QString time_min;
-    if (field("during_time_hour").toInt() < 10)
-      time_hour = "0" + field("during_time_hour").toString();
+    if(field("duration_hour").toInt() == 0 && field("duration_min").toInt() == 0)
+    {
+      maximum_duration = "";
+    }
     else
-      time_hour = field("during_time_hour").toString();
-    if (field("during_time_min").toInt() < 10)
-      time_min = "0" + field("during_time_min").toString();
-    else
-      time_min = field("during_time_min").toString();
-    expected_during_time = time_hour.toStdString() + ":" + time_min.toStdString() + ":00";
+    {
+      if (field("duration_hour").toInt() < 10)
+        time_hour = "0" + field("duration_hour").toString();
+      else
+        time_hour = field("duration_hour").toString();
+      if (field("duration_min").toInt() < 10)
+        time_min = "0" + field("duration_min").toString();
+      else
+        time_min = field("duration_min").toString();
+      maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
+    }
 
     QString mem = field("mem_value").toString();
     int mem_type_i = field("mem_type").toInt();
@@ -125,19 +266,37 @@ BL::CreateJobWizard::end(int result)
       output_files_list.push_back(item_text.toStdString());
     }
 
-    // Machine list
-    QString f_machine_choosed = field("machine_choosed").toString();
-    machine_choosed = f_machine_choosed.toStdString(); 
+    // Resource list
+    QString f_resource_choosed = field("resource_choosed").toString();
+    resource_choosed = f_resource_choosed.toStdString(); 
+
+    // Batch Queue
+    QString f_batch_queue = field("batch_queue").toString();
+    batch_queue = f_batch_queue.toStdString();
+
+    // LoadLeveler JobType
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
+    std::string batch = resource_descr.batch.c_str();
+    if (batch == "ll")
+    {
+      QString f_ll_jobtype = field("ll_jobtype").toString();
+      ll_jobtype = f_ll_jobtype.toStdString();
+    }
+    else
+    {
+      ll_jobtype = "";
+    }
 
     start_job = field("start_job").toBool();
   }
 }
 
 // Job Name Page
-BL::CreateJobWizard::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager)
+BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager)
 : QWizardPage(parent)
 {
   _jobs_manager = jobs_manager;
+  _check_name = true;
   setTitle("Create a new job");
 
   QLabel *label = new QLabel("Enter Job name, you cannot add two jobs with the same name");
@@ -147,15 +306,25 @@ BL::CreateJobWizard::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_
   registerField("job_name", _nameLineEdit);
 
   QLabel * label_type = new QLabel("Choose type of batch job:");
-  QGroupBox *groupBox = new QGroupBox();
+  QGroupBox *groupBox = new QGroupBox("Type of job");
   _yacs_schema_button = new QRadioButton(tr("YACS Schema"));
   _yacs_schema_button->setChecked(true);
-  QRadioButton *radio2 = new QRadioButton(tr("Command"));
+  _command_button = new QRadioButton(tr("Command"));
+  _python_salome_button = new QRadioButton(tr("Python script in SALOME"));
   QVBoxLayout *vbox = new QVBoxLayout;
   vbox->addWidget(_yacs_schema_button);
-  vbox->addWidget(radio2);
+  vbox->addWidget(_command_button);
+  vbox->addWidget(_python_salome_button);
   vbox->addStretch(1);
   groupBox->setLayout(vbox);
+
+  QGroupBox * explanationBox = new QGroupBox("Explanation");
+  QVBoxLayout *explanationvbox = new QVBoxLayout;
+  _explanation = new QLabel();
+  _explanation->setWordWrap(true);
+  explanationvbox->addWidget(_explanation);
+  explanationvbox->addStretch(1);
+  explanationBox->setLayout(explanationvbox);
 
   // Layouts
   QVBoxLayout * main_layout = new QVBoxLayout;
@@ -166,16 +335,45 @@ BL::CreateJobWizard::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_
   main_layout->insertLayout(-1, layout);
   layout->addWidget(label_type, 2, 0);
   layout->addWidget(groupBox, 3, 0, 1, -1);
+  layout->addWidget(explanationBox, 4, 0, 1, -1);
   setLayout(main_layout);
+
+  connect(_yacs_schema_button, SIGNAL(clicked(bool)), this, SLOT(yacs_schema_button(bool)));
+  connect(_command_button, SIGNAL(clicked(bool)), this, SLOT(command_button(bool)));
+  connect(_python_salome_button, SIGNAL(clicked(bool)), this, SLOT(python_salome_button(bool)));
+
+  // Default button
+  yacs_schema_button(true);
 }
 
-BL::CreateJobWizard::JobNamePage::~JobNamePage()
+BL::JobNamePage::~JobNamePage()
 {}
 
-bool
-BL::CreateJobWizard::JobNamePage::validatePage()
+void
+BL::JobNamePage::yacs_schema_button(bool checked)
 {
-  DEBTRACE("Calling validatePage of BL::CreateJobWizard::JobNamePage");
+  if (checked)
+    _explanation->setText("This job permits to launch a YACS schema into a SALOME application");
+}
+
+void
+BL::JobNamePage::command_button(bool checked)
+{
+  if (checked)
+    _explanation->setText("This job permits to launch a script into a distributed resource. This script is not launched into a SALOME application");
+}
+
+void
+BL::JobNamePage::python_salome_button(bool checked)
+{
+  if (checked)
+    _explanation->setText("This job permits to launch a python script into a SALOME application");
+}
+
+bool
+BL::JobNamePage::validatePage()
+{
+  DEBTRACE("Calling validatePage of BL::JobNamePage");
   bool return_value;
   QString job_name = field("job_name").toString();
 
@@ -188,7 +386,7 @@ BL::CreateJobWizard::JobNamePage::validatePage()
 
   // Check if job name already exists
   else {
-    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false)
+    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false || _check_name == false)
     {
       return_value = true;
     }
@@ -204,42 +402,68 @@ BL::CreateJobWizard::JobNamePage::validatePage()
   return return_value;
 }
 
-int 
-BL::CreateJobWizard::JobNamePage::nextId() const
+int
+BL::JobNamePage::nextId() const
 {
-  if (_yacs_schema_button->isChecked()) 
+  if (_yacs_schema_button->isChecked())
   {
     return BL::CreateJobWizard::Page_YACSSchema;
   } 
-  else 
+  else if (_command_button->isChecked())
   {
     return BL::CreateJobWizard::Page_Command_Main_Definitions;
+  }
+  else
+  {
+    return BL::CreateJobWizard::Page_PythonSalome_Main_Definitions;
   }
 }
 
 BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
 : QWizardPage(parent)
 {
-  setTitle("Choose YACS Schema");
+  setTitle("Configure YACS Execution");
 
-  QLabel *label = new QLabel("In this step you have to choose what YACS Schema you want to execute");
+  QLabel *label = new QLabel("In this step you have to configure your YACS execution");
   label->setWordWrap(true);
 
-  _yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
-  _yacs_file_button->show();
-  connect(_yacs_file_button, SIGNAL(clicked()), this, SLOT(choose_file()));
-
+  QGroupBox * files_param_box = new QGroupBox("YACS job files");
+  QPushButton * yacs_file_button = new QPushButton(tr("Choose YACS Schema file"));
+  connect(yacs_file_button, SIGNAL(clicked()), this, SLOT(choose_file()));
   _yacs_file_text = new QLineEdit(this);
   _yacs_file_text->setText("");
   registerField("yacs_file", _yacs_file_text);
   _yacs_file_text->setReadOnly(true);
+  QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
+  connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
+  _line_env_file = new QLineEdit(this);
+  registerField("env_yacs_file", _line_env_file);
+  _line_env_file->setReadOnly(true);
+  QGridLayout * files_layout = new QGridLayout;
+  files_layout->addWidget(yacs_file_button, 0, 0);
+  files_layout->addWidget(_yacs_file_text, 0, 1);
+  files_layout->addWidget(command_env_file_button, 1, 0);
+  files_layout->addWidget(_line_env_file, 1, 1);
+  files_param_box->setLayout(files_layout);
+
+  QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
+  QLabel * label_dump =  new QLabel("Dump YACS state each secs (0 disable this feature)");
+  QLabel * label_dump_warning = new QLabel("(WARNING: can only be used with SALOME >= 6.3.0)");
+  QSpinBox * spin_dump = new QSpinBox(this);
+  spin_dump->setMinimum(0);
+  spin_dump->setMaximum(1000000);
+  registerField("dump_yacs_state", spin_dump);
+  QGridLayout * specific_layout = new QGridLayout;
+  specific_layout->addWidget(label_dump, 0, 0);
+  specific_layout->addWidget(spin_dump, 0, 1);
+  specific_layout->addWidget(label_dump_warning, 1, 0);
+  spec_param_box->setLayout(specific_layout);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
-  QGridLayout *layout = new QGridLayout;
-  layout->addWidget(_yacs_file_button, 0, 0);
-  layout->addWidget(_yacs_file_text, 0, 1);
-  main_layout->insertLayout(-1, layout);
+  main_layout->addWidget(files_param_box);
+  main_layout->addWidget(spec_param_box);
+
   setLayout(main_layout);
 };
 
@@ -267,20 +491,32 @@ void
 BL::YACSSchemaPage::choose_file()
 {
   QString yacs_file = QFileDialog::getOpenFileName(this,
-						   tr("Open YACS files"), "",
-						   tr("XML (*.xml);;All Files (*)"));
+                                                   tr("Open YACS files"), "",
+                                                   tr("XML (*.xml);;All Files (*)"));
   _yacs_file_text->setReadOnly(false);
   _yacs_file_text->setText(yacs_file);
   _yacs_file_text->setReadOnly(true);
 }
 
+void
+BL::YACSSchemaPage::choose_env_file()
+{
+  QString env_file = QFileDialog::getOpenFileName(this,
+                                                  tr("Open environnement file"), "",
+                                                  tr("sh (*.sh);;All Files (*)"));
+  _line_env_file->setReadOnly(false);
+  _line_env_file->setText(env_file);
+  _line_env_file->setReadOnly(true);
+}
+
+
 int 
 BL::YACSSchemaPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  return BL::CreateJobWizard::Page_Resource;
 }
 
-BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
+BL::CommandMainPage::CommandMainPage(QWidget * parent)
 : QWizardPage(parent)
 {
   setTitle("Define command job");
@@ -288,13 +524,23 @@ BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
   label->setWordWrap(true);
 
   // command
-  QLabel * label_command = new QLabel("Command: ");
-  QLineEdit * line_command = new QLineEdit(this);
-  registerField("command", line_command);
+  QPushButton * command_file_button = new QPushButton(tr("Choose a command file"));
+  connect(command_file_button, SIGNAL(clicked()), this, SLOT(choose_command_file()));
+  _line_command = new QLineEdit(this);
+  registerField("command", _line_command);
+  _line_command->setReadOnly(true);
+
+  QPushButton * command_env_file_button = new QPushButton(tr("Choose an environnement file"));
+  connect(command_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
+  _line_env_file = new QLineEdit(this);
+  registerField("env_command_file", _line_env_file);
+  _line_env_file->setReadOnly(true);
 
   QGridLayout *layout = new QGridLayout;
-  layout->addWidget(label_command, 0, 0);
-  layout->addWidget(line_command, 0, 1);
+  layout->addWidget(command_file_button, 0, 0);
+  layout->addWidget(_line_command, 0, 1);
+  layout->addWidget(command_env_file_button, 1, 0);
+  layout->addWidget(_line_env_file, 1, 1);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -302,11 +548,33 @@ BL::CreateJobWizard::CommandMainPage::CommandMainPage(QWidget * parent)
   setLayout(main_layout);
 };
 
-BL::CreateJobWizard::CommandMainPage::~CommandMainPage()
+BL::CommandMainPage::~CommandMainPage()
 {}
 
+void
+BL::CommandMainPage::choose_command_file()
+{
+  QString command_file = QFileDialog::getOpenFileName(this,
+                                                      tr("Open command file"), "",
+                                                      tr("sh (*.sh);;All Files (*)"));
+  _line_command->setReadOnly(false);
+  _line_command->setText(command_file);
+  _line_command->setReadOnly(true);
+}
+
+void
+BL::CommandMainPage::choose_env_file()
+{
+  QString env_file = QFileDialog::getOpenFileName(this,
+                                                  tr("Open environnement file"), "",
+                                                  tr("sh (*.sh);;All Files (*)"));
+  _line_env_file->setReadOnly(false);
+  _line_env_file->setText(env_file);
+  _line_env_file->setReadOnly(true);
+}
+
 bool
-BL::CreateJobWizard::CommandMainPage::validatePage()
+BL::CommandMainPage::validatePage()
 {
   QString command = field("command").toString();
   if (command == "")
@@ -319,15 +587,18 @@ BL::CreateJobWizard::CommandMainPage::validatePage()
 }
 
 int 
-BL::CreateJobWizard::CommandMainPage::nextId() const
+BL::CommandMainPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  return BL::CreateJobWizard::Page_Resource;
 }
 
-BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
+BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services)
 : QWizardPage(parent)
 {
   setTitle("Enter Batch Parameters");
+  resource_choosed = "";
+
+  _salome_services = salome_services;
 
   QLabel *label = new QLabel("In this step you define the parameters of your job");
   label->setWordWrap(true);
@@ -335,22 +606,22 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   main_layout->addWidget(label);
 
   // batch_directory
-  QLabel * label_directory = new QLabel("Batch directory: ");
+  QLabel * label_directory = new QLabel("Remote work directory: ");
   QLineEdit * line_directory = new QLineEdit(this);
   registerField("batch_directory", line_directory);
 
   // exected during time
-  QLabel * label_during_time = new QLabel("Expected during time: ");
-  QSpinBox * spin_during_time_hour = new QSpinBox(this);
-  QLabel * label_during_time_hour = new QLabel("Hours");
-  spin_during_time_hour->setMinimum(0);
-  spin_during_time_hour->setMaximum(1000000);
-  registerField("during_time_hour", spin_during_time_hour);
-  QSpinBox * spin_during_time_min = new QSpinBox(this);
-  QLabel * label_during_time_min = new QLabel("Minutes");
-  spin_during_time_min->setMinimum(0);
-  spin_during_time_min->setMaximum(59);
-  registerField("during_time_min", spin_during_time_min);
+  QLabel * label_duration = new QLabel("Maximum during time: ");
+  QSpinBox * spin_duration_hour = new QSpinBox(this);
+  QLabel * label_duration_hour = new QLabel("Hours");
+  spin_duration_hour->setMinimum(0);
+  spin_duration_hour->setMaximum(1000000);
+  registerField("duration_hour", spin_duration_hour);
+  QSpinBox * spin_duration_min = new QSpinBox(this);
+  QLabel * label_duration_min = new QLabel("Minutes");
+  spin_duration_min->setMinimum(0);
+  spin_duration_min->setMaximum(59);
+  registerField("duration_min", spin_duration_min);
 
   // memory
   QLabel * label_memory = new QLabel("Memory per nodes expected: ");
@@ -374,11 +645,11 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(label_directory, 0, 0);
   layout->addWidget(line_directory, 0, 1, 1, -1);
-  layout->addWidget(label_during_time, 1, 0);
-  layout->addWidget(spin_during_time_hour, 1, 1);
-  layout->addWidget(label_during_time_hour, 1, 2);
-  layout->addWidget(spin_during_time_min, 1, 3);
-  layout->addWidget(label_during_time_min, 1, 4);
+  layout->addWidget(label_duration, 1, 0);
+  layout->addWidget(spin_duration_hour, 1, 1);
+  layout->addWidget(label_duration_hour, 1, 2);
+  layout->addWidget(spin_duration_min, 1, 3);
+  layout->addWidget(label_duration_min, 1, 4);
   layout->addWidget(label_memory, 2, 0);
   layout->addWidget(spin_memory, 2, 1);
   layout->addWidget(combo_memory, 2, 2);
@@ -393,6 +664,37 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
 BL::BatchParametersPage::~BatchParametersPage()
 {}
 
+void BL::BatchParametersPage::cleanupPage() {}
+
+void
+BL::BatchParametersPage::initializePage()
+{
+  QString f_resource_choosed = field("resource_choosed").toString();
+  if (f_resource_choosed != resource_choosed)
+  {
+    resource_choosed = f_resource_choosed;
+    // If choosed resource has a working_directory set
+    // Generates a default remote working directory
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    QString res_work_dir = resource_descr.working_directory.c_str();
+    if (res_work_dir != "")
+    {
+      time_t rawtime;
+      time(&rawtime);
+      std::string launch_date = ctime(&rawtime);
+      for (int i = 0; i < launch_date.size(); i++)
+        if (launch_date[i] == '/' ||
+            launch_date[i] == '-' ||
+            launch_date[i] == ':' ||
+            launch_date[i] == ' ')
+          launch_date[i] = '_';
+      launch_date.erase(--launch_date.end()); // Last caracter is a \n
+      QString date = launch_date.c_str();
+      setField("batch_directory", res_work_dir + "/" + date);
+    }
+  }
+}
+
 bool
 BL::BatchParametersPage::validatePage()
 {
@@ -400,14 +702,6 @@ BL::BatchParametersPage::validatePage()
   if (batch_directory == "")
   {
     QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
-    return false;
-  }
-
-  int time_hour = field("during_time_hour").toInt();
-  int time_min = field("during_time_min").toInt();
-  if (time_hour == 0 and time_min == 0)
-  {
-    QMessageBox::warning(NULL, "Time Error", "Please enter an expected during time");
     return false;
   }
 
@@ -469,16 +763,32 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
   connect(_output_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(output_itemSelectionChanged()));
 
   // Results Directory
-  QLabel * label_result_directory = new QLabel("Result directory: ");
-  QLineEdit * result_directory = new QLineEdit(this);
-  registerField("result_directory", result_directory);
+  QPushButton * button_result = new QPushButton("Local Result directory");
+  connect(button_result, SIGNAL(clicked()), this, SLOT(choose_local_directory()));
+  _result_directory = new QLineEdit(this);
+
+  // Default result directory is home directory (if we found it)
+  // First try -> HOME
+#ifdef WNT
+  _result_directory->setText(getenv("HOME"));
+#else
+  if (getenv("HOME"))
+    _result_directory->setText(getenv("HOME"));
+  else {
+    // Second try -> getpwuid
+    struct passwd * pass_struct = getpwuid(getuid());
+    if (pass_struct)
+      _result_directory->setText(pass_struct->pw_dir);
+  }
+#endif
+  registerField("result_directory", _result_directory);
 
   QGridLayout * output_box = new QGridLayout;
   output_box->addWidget(_output_files_button, 0, 0);
   output_box->addWidget(_remove_output_files_button, 0, 1);
   output_box->addWidget(_output_files_list, 1, 0, 1, -1);
-  output_box->addWidget(label_result_directory, 2, 0);
-  output_box->addWidget(result_directory, 2, 1, 1, -1);
+  output_box->addWidget(button_result, 2, 0);
+  output_box->addWidget(_result_directory, 2, 1, 1, -1);
   output_group_box->setLayout(output_box);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
@@ -508,15 +818,9 @@ BL::FilesPage::validatePage()
     }
   }
 
-  if (result_directory == "" and _output_files_list->count() != 0)
+  if (result_directory == "" && _output_files_list->count() != 0)
   {
     QMessageBox::warning(NULL, "Result Directory Error", "Please enter a result directory or remove output files");
-    return false;
-  }
-
-  if (result_directory != "" and _output_files_list->count() == 0)
-  {
-    QMessageBox::warning(NULL, "Result Error", "Please add output files or erase result directory");
     return false;
   }
 
@@ -527,13 +831,25 @@ void
 BL::FilesPage::choose_input_files()
 {
   QStringList files = QFileDialog::getOpenFileNames(this,
-					      tr("Add input files"), "",
-					      tr("All Files (*)"));
+                                                    tr("Add input files"), "",
+                                                    tr("All Files (*)"));
   for (int i = 0; i < files.size(); ++i) 
   {
     if (_input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
       _input_files_list->addItem(files.at(i));
   }
+}
+
+void
+BL::FilesPage::choose_local_directory()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose local result directory"),
+                                                 "",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+
+  if (dir != "")
+    _result_directory->setText(dir);
 }
 
 void 
@@ -587,10 +903,10 @@ BL::FilesPage::output_itemSelectionChanged()
 int 
 BL::FilesPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Machine;
+  return BL::CreateJobWizard::Page_Conclusion;
 }
 
-BL::CreateJobWizard::ConclusionPage::ConclusionPage(QWidget * parent)
+BL::ConclusionPage::ConclusionPage(QWidget * parent)
 : QWizardPage(parent)
 {
   setTitle("Job definition is finished");
@@ -601,86 +917,208 @@ BL::CreateJobWizard::ConclusionPage::ConclusionPage(QWidget * parent)
   setLayout(main_layout);
 };
 
-BL::CreateJobWizard::ConclusionPage::~ConclusionPage()
+BL::ConclusionPage::~ConclusionPage()
 {}
 
 bool
-BL::CreateJobWizard::ConclusionPage::validatePage()
+BL::ConclusionPage::validatePage()
 {
   return true;
 }
 
 int 
-BL::CreateJobWizard::ConclusionPage::nextId() const
+BL::ConclusionPage::nextId() const
 {
   return -1;
 }
 
-BL::MachinePage::MachinePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
+BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
 : QWizardPage(parent)
 {
   _salome_services = salome_services;
-  setTitle("Select a Machine");
+  setTitle("Select a Resource");
 
-  QLabel * main_label = new QLabel("In this step you select the machine of your job");
+  QLabel * main_label = new QLabel("In this step you select the resource of your job");
   main_label->setWordWrap(true);
 
-  // input_Machine
-  QGroupBox * machine_group_box = new QGroupBox("Machine List");
-  _machine_list = new QListWidget();
-  _machine_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  std::list<std::string> machine_list = _salome_services->getMachineList();
-  std::list<std::string>::iterator it;
-  for (it = machine_list.begin(); it != machine_list.end(); it++)
-  {
-    std::string machine = *it;
-    _machine_list->addItem(QString(machine.c_str()));
-  }
-  connect(_machine_list, SIGNAL(itemSelectionChanged()), this, SLOT(machine_itemSelectionChanged()));
-  QVBoxLayout * machine_list_layout = new QVBoxLayout();
-  machine_list_layout->addWidget(_machine_list);
-  machine_group_box->setLayout(machine_list_layout);
+  // input_Resource
+  QGroupBox * resource_group_box = new QGroupBox("Resource List");
+  _resource_list = new JM::ResourceCatalog(this, _salome_services);
+  connect(_resource_list->getQListWidget(), SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemSelected(QListWidgetItem*)));
 
-  QLabel * machine_label = new QLabel("Machine selected: ");
-  _machine_choosed = new QLineEdit();
-  _machine_choosed->setText("");
-  _machine_choosed->setReadOnly(true);
-  registerField("machine_choosed", _machine_choosed);
+  QVBoxLayout * resource_list_layout = new QVBoxLayout();
+  resource_list_layout->addWidget(_resource_list);
+  resource_group_box->setLayout(resource_list_layout);
 
-  QGridLayout * main_layout = new QGridLayout;
-  main_layout->addWidget(machine_group_box, 0, 0, 1, -1);
-  main_layout->addWidget(machine_label, 1, 0);
-  main_layout->addWidget(_machine_choosed, 1, 1);
-  setLayout(main_layout);
+  QLabel * resource_label = new QLabel("Resource selected: ");
+  _resource_choosed = new QLineEdit();
+  _resource_choosed->setText("");
+  _resource_choosed->setReadOnly(true);
+  registerField("resource_choosed", _resource_choosed);
+
+  QLabel * bqLabel = new QLabel("Batch Queue (could be optional):");
+  QLineEdit * _bqLineEdit = new QLineEdit(this);
+  registerField("batch_queue", _bqLineEdit);
+
+  _ll_label = new QLabel("LoadLeveler JobType:", this);
+  _ll_value = new QLineEdit(this);
+  registerField("ll_jobtype", _ll_value);
+  _ll_label->hide();
+  _ll_value->hide();
+
+  _main_layout = new QGridLayout;
+  _main_layout->addWidget(resource_group_box, 0, 0, 1, -1);
+  _main_layout->addWidget(resource_label, 1, 0);
+  _main_layout->addWidget(_resource_choosed, 1, 1);
+  _main_layout->addWidget(bqLabel, 2, 0);
+  _main_layout->addWidget(_bqLineEdit, 2, 1);
+  setLayout(_main_layout);
+
 };
 
-BL::MachinePage::~MachinePage()
+BL::ResourcePage::~ResourcePage()
 {}
 
-bool
-BL::MachinePage::validatePage()
+void
+BL::ResourcePage::initializePage()
 {
-  QString machine_choosed = field("machine_choosed").toString();
-  if (machine_choosed == "")
+  if (field("ll_jobtype").toString() != "")
   {
-    QMessageBox::warning(NULL, "Machine Error", "Please choose a machine");
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+}
+
+bool
+BL::ResourcePage::validatePage()
+{
+  QString resource_choosed = field("resource_choosed").toString();
+  if (resource_choosed == "")
+  {
+    QMessageBox::warning(NULL, "Resource Error", "Please choose a resource");
     return false;
+  }
+
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    QString ll_jobtype = field("ll_jobtype").toString();
+    if (ll_jobtype == "")
+    {
+      QMessageBox::warning(NULL, "LoadLeveler Error", "Please define a LoadLeveler JobType");
+      return false;
+    }
   }
   return true;
 }
 
 void 
-BL::MachinePage::machine_itemSelectionChanged()
+BL::ResourcePage::itemSelected(QListWidgetItem * item)
 {
-  _machine_choosed->setReadOnly(false);
-  QList<QListWidgetItem *> list = _machine_list->selectedItems();
-  QListWidgetItem * item = list.at(0);
-  _machine_choosed->setText(item->text());
-  _machine_choosed->setReadOnly(true);
+  _resource_choosed->setReadOnly(false);
+  _resource_choosed->setText(item->text());
+  _resource_choosed->setReadOnly(true);
+
+  //Specific parameters for LoadLeveler
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(item->text().toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "ll")
+  {
+    _main_layout->addWidget(_ll_label, 3, 0);
+    _main_layout->addWidget(_ll_value, 3, 1);
+    _ll_label->show();
+    _ll_value->show();
+  }
+  else
+  {
+    _main_layout->removeWidget(_ll_value);
+    _main_layout->removeWidget(_ll_label);
+    _ll_label->hide();
+    _ll_value->hide();
+  }
 }
 
 int 
-BL::MachinePage::nextId() const
+BL::ResourcePage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Conclusion;
+  return BL::CreateJobWizard::Page_BatchParameters;
+}
+
+BL::PythonSalomeMainPage::PythonSalomeMainPage(QWidget * parent)
+: QWizardPage(parent)
+{
+  setTitle("Define a Python script in SALOME job");
+  QLabel *label = new QLabel("Enter the Python script that will be executed into the resource");
+  label->setWordWrap(true);
+
+  // PythonSalome
+  QPushButton * PythonSalome_file_button = new QPushButton(tr("Choose a Python file"));
+  connect(PythonSalome_file_button, SIGNAL(clicked()), this, SLOT(choose_PythonSalome_file()));
+  _line_PythonSalome = new QLineEdit(this);
+  registerField("PythonSalome", _line_PythonSalome);
+  _line_PythonSalome->setReadOnly(true);
+
+  QPushButton * PythonSalome_env_file_button = new QPushButton(tr("Choose an environnement file"));
+  connect(PythonSalome_env_file_button, SIGNAL(clicked()), this, SLOT(choose_env_file()));
+  _line_env_file = new QLineEdit(this);
+  registerField("env_PythonSalome_file", _line_env_file);
+  _line_env_file->setReadOnly(true);
+
+  QGridLayout *layout = new QGridLayout;
+  layout->addWidget(PythonSalome_file_button, 0, 0);
+  layout->addWidget(_line_PythonSalome, 0, 1);
+  layout->addWidget(PythonSalome_env_file_button, 1, 0);
+  layout->addWidget(_line_env_file, 1, 1);
+
+  QVBoxLayout * main_layout = new QVBoxLayout;
+  main_layout->addWidget(label);
+  main_layout->insertLayout(-1, layout);
+  setLayout(main_layout);
+};
+
+BL::PythonSalomeMainPage::~PythonSalomeMainPage()
+{}
+
+void
+BL::PythonSalomeMainPage::choose_PythonSalome_file()
+{
+  QString PythonSalome_file = QFileDialog::getOpenFileName(this,
+						      tr("Open Python script file"), "",
+						      tr("py (*.py);;All Files (*)"));
+  _line_PythonSalome->setReadOnly(false);
+  _line_PythonSalome->setText(PythonSalome_file);
+  _line_PythonSalome->setReadOnly(true);
+}
+
+void
+BL::PythonSalomeMainPage::choose_env_file()
+{
+  QString env_file = QFileDialog::getOpenFileName(this,
+						      tr("Open environnement file"), "",
+						      tr("sh (*.sh);;All Files (*)"));
+  _line_env_file->setReadOnly(false);
+  _line_env_file->setText(env_file);
+  _line_env_file->setReadOnly(true);
+}
+
+bool
+BL::PythonSalomeMainPage::validatePage()
+{
+  QString PythonSalome = field("PythonSalome").toString();
+  if (PythonSalome == "")
+  {
+    QMessageBox::warning(NULL, "Python script in SALOME Error", "Please enter a Python script");
+    return false;
+  }
+
+  return true;
+}
+
+int 
+BL::PythonSalomeMainPage::nextId() const
+{
+  return BL::CreateJobWizard::Page_Resource;
 }

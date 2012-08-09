@@ -1,23 +1,24 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+// Copyright (C) 2009-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_JobsManager_QT.hxx"
+#include "BL_GenericGui.hxx"
 
 BL::JobManagerEvent::JobManagerEvent(const std::string & action_i, 
 				     const std::string & event_name_i, 
@@ -32,11 +33,13 @@ BL::JobManagerEvent::JobManagerEvent(const std::string & action_i,
 
 BL::JobManagerEvent::~JobManagerEvent() {}  
 
-BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome_services) : 
+BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, BL::SALOMEServices * salome_services) : 
   QDockWidget(parent), BL::JobsManager(salome_services)
 {
   DEBTRACE("Creating BL::JobsManager_QT");
+  _main_gui = main_gui;
   setObserver(this);
+  _model_manager = NULL;
 
   // Widget Part
 
@@ -44,6 +47,9 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome
 
   _load_jobs = new QPushButton("Load Jobs");
   _save_jobs = new QPushButton("Save Jobs");
+  connect(_load_jobs, SIGNAL(clicked()), this, SLOT(load_jobs_button()));
+  connect(_save_jobs, SIGNAL(clicked()), this, SLOT(save_jobs_button()));
+
   _auto_refresh_jobs = new QPushButton("Auto Refresh: no");
   _timer = new QTimer(this);
   _timer->stop();
@@ -77,13 +83,69 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::SALOMEServices * salome
   mainLayout->addWidget(message_box);
   main_widget->setLayout(mainLayout);
 
-  setWidget(main_widget);
+  QScrollArea * scroll_widget = new QScrollArea(this);
+  scroll_widget->setWidget(main_widget);
+  scroll_widget->setWidgetResizable(true);
+  setWidget(scroll_widget);
   setWindowTitle("Job Manager");
 }
 
 BL::JobsManager_QT::~JobsManager_QT()
 {
   DEBTRACE("Destroying BL::JobsManager_QT");
+}
+
+void
+BL::JobsManager_QT::set_model_manager(BL::QModelManager * model_manager)
+{
+  _model_manager = model_manager;
+}
+
+void
+BL::JobsManager_QT::load_jobs_button()
+{
+  DEBTRACE("load_jobs");
+  QString jobs_file = QFileDialog::getOpenFileName(this,
+                                                   tr("Choose an xml jobs file"), "",
+                                                   tr("xml (*.xml);;All Files (*)"));
+  if (jobs_file == "")
+  {
+    write_normal_text("Load jobs action cancelled\n");
+  }
+  else
+    load_jobs(jobs_file.toStdString());
+}
+
+void
+BL::JobsManager_QT::save_jobs_button()
+{
+  DEBTRACE("save_jobs");
+  QFileDialog dialog(this, "Save jobs file");
+  QStringList filters;
+  filters << "XML files (*.xml)"
+          << "Any files (*)";
+  dialog.setFileMode(QFileDialog::AnyFile);
+  dialog.setFilters(filters);
+  dialog.selectFilter("(*.xml)");
+  dialog.setDefaultSuffix("xml");
+  dialog.setConfirmOverwrite(true);
+  dialog.setAcceptMode(QFileDialog::AcceptSave);
+  QString jobs_file("");
+  QStringList fileNames;
+  fileNames.clear();
+  if (bool ret = dialog.exec())
+  {
+    DEBTRACE(ret << " " << dialog.confirmOverwrite());
+    fileNames = dialog.selectedFiles();
+    if (!fileNames.isEmpty())
+      jobs_file= fileNames.first();
+  }
+  if (jobs_file == "")
+  {
+    write_normal_text("Save jobs action cancelled\n");
+  }
+  else
+    save_jobs(jobs_file.toStdString());
 }
 
 void
@@ -147,54 +209,51 @@ BL::JobsManager_QT::one_hour_refresh()
   _timer->start(1 * 60 * 60 * 1000);
 }
 
+void 
+BL::JobsManager_QT::restart_job(const std::string & name)
+{
+  DEBTRACE("Restart job with name: " << name);
+  BL::CreateJobWizard wizard(this, _salome_services);
+  wizard.clone(name);
+  wizard.end(1);
+  wizard.job_name = name;
+  wizard.start_job = true;
+  _main_gui->delete_job_internal();
+  create_job_with_wizard(wizard);
+}
+
+void 
+BL::JobsManager_QT::edit_clone_job(const std::string & name)
+{
+  BL::CreateJobWizard wizard(this, _salome_services);
+  wizard.clone(name);
+  wizard.exec();
+
+  // Check if the job has the same name
+  if (name == wizard.job_name)
+  {
+    DEBTRACE("Job " << name << " has been edited");
+    _main_gui->delete_job_internal();
+  }
+
+  if (wizard.job_name != "")
+  {
+    create_job_with_wizard(wizard);
+  }
+  else
+  {
+    DEBTRACE("User cancel Create Job Wizard");
+  }
+}
+
 void
-BL::JobsManager_QT::create_job_wizard()
+BL::JobsManager_QT::create_job()
 {
     BL::CreateJobWizard wizard(this, _salome_services);
     wizard.exec();
-
     if (wizard.job_name != "")
     {
-      BL::Job * new_job = addNewJob(wizard.job_name);
-      if (wizard.yacs_file != "")
-      {
-	// YACS schema job
-	new_job->setType(BL::Job::YACS_SCHEMA);
-	new_job->setYACSFile(wizard.yacs_file);
-	BL::Job::BatchParam param;
-	param.batch_directory = wizard.batch_directory;
-	param.expected_during_time = wizard.expected_during_time;
-	param.expected_memory = wizard.expected_memory;
-	param.nb_proc = wizard.nb_proc;
-	new_job->setBatchParameters(param);
-	BL::Job::FilesParam files_params;
-	files_params.result_directory = wizard.result_directory;
-	files_params.input_files_list = wizard.input_files_list;
-	files_params.output_files_list = wizard.output_files_list;
-	new_job->setFilesParameters(files_params);
-	new_job->setMachine(wizard.machine_choosed);
-      }
-      else
-      {
-	// Command Job
-	new_job->setType(BL::Job::COMMAND);
-	new_job->setCommand(wizard.command);
-	BL::Job::BatchParam param;
-	param.batch_directory = wizard.batch_directory;
-	param.expected_during_time = wizard.expected_during_time;
-	param.expected_memory = wizard.expected_memory;
-	param.nb_proc = wizard.nb_proc;
-	new_job->setBatchParameters(param);
-	BL::Job::FilesParam files_params;
-	files_params.result_directory = wizard.result_directory;
-	files_params.input_files_list = wizard.input_files_list;
-	files_params.output_files_list = wizard.output_files_list;
-	new_job->setFilesParameters(files_params);
-	new_job->setMachine(wizard.machine_choosed);
-      }
-      emit new_job_added(QString::fromStdString(wizard.job_name));
-      if (wizard.start_job)
-	start_job(wizard.job_name);
+      create_job_with_wizard(wizard);
     }
     else
     {
@@ -202,10 +261,64 @@ BL::JobsManager_QT::create_job_wizard()
     }
 }
 
+void 
+BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
+{
+  BL::Job * new_job = createJob(wizard.job_name);
+  if (wizard.yacs_file != "")
+  {
+    // YACS schema job
+    new_job->setType(BL::Job::YACS_SCHEMA);
+    new_job->setJobFile(wizard.yacs_file);
+    new_job->setDumpYACSState(wizard.dump_yacs_state);
+  }
+  else if (wizard.command != "")
+  {
+    // Command Job
+    new_job->setType(BL::Job::COMMAND);
+    new_job->setJobFile(wizard.command);
+  }
+  else if (wizard.python_salome_file != "")
+  {
+    // Command Job
+    new_job->setType(BL::Job::PYTHON_SALOME);
+    new_job->setJobFile(wizard.python_salome_file);
+  }
+
+  // For all jobs
+  new_job->setEnvFile(wizard.env_file);
+  BL::Job::BatchParam param;
+  param.batch_directory = wizard.batch_directory;
+  param.maximum_duration = wizard.maximum_duration;
+  param.expected_memory = wizard.expected_memory;
+  param.nb_proc = wizard.nb_proc;
+  new_job->setBatchParameters(param);
+  BL::Job::FilesParam files_params;
+  files_params.result_directory = wizard.result_directory;
+  files_params.input_files_list = wizard.input_files_list;
+  files_params.output_files_list = wizard.output_files_list;
+  new_job->setFilesParameters(files_params);
+  new_job->setResource(wizard.resource_choosed);
+  new_job->setBatchQueue(wizard.batch_queue);
+  new_job->setLoadLevelerJobType(wizard.ll_jobtype);
+
+  // End
+  addJobToLauncher(wizard.job_name);
+  emit new_job_added(QString::fromStdString(wizard.job_name));
+  QStandardItemModel * model = _model_manager->getModel();
+  QList<QStandardItem *> item_list = model->findItems(QString::fromStdString(wizard.job_name));
+  QStandardItem * job_state_item = model->item(item_list.at(0)->row(), 2);
+  _main_gui->_jobs_table->selectRow(item_list.at(0)->row());
+  if (wizard.start_job)
+    start_job(wizard.job_name);
+}
+
 void
 BL::JobsManager_QT::delete_job(QString job_name)
 {
   BL::JobsManager::removeJob(job_name.toStdString());
+  _model_manager->delete_job(job_name);
+  _main_gui->_job_tab->reset(job_name);
 }
 
 void 
@@ -233,7 +346,24 @@ BL::JobsManager_QT::event(QEvent * e)
 	   << event->event_name << " "
 	   << event->job_name << " "
 	   << event->data);
-  if (event->action == "start_job")
+
+  if (event->action == "create_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " created\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error in creating job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else if (event->action == "start_job")
   {
     if (event->event_name == "Ok")
     {
@@ -254,8 +384,10 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " state changed\n");
+      QString name((event->job_name).c_str());
+      QString state((event->data).c_str());
+      state = state.toLower();
+      write_normal_text("Job " + name + " new state is " + state + "\n");
       emit job_state_changed(QString((event->job_name).c_str()));
     }
     else
@@ -299,6 +431,66 @@ BL::JobsManager_QT::event(QEvent * e)
       write_error_text(" ***\n");
     }
   }
+  else if (event->action == "stop_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("Job " + str + " is stopped\n");
+    }
+    else
+    {
+      QString str((event->job_name).c_str());
+      write_error_text("Error when trying to stop job: " + str + "\n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+  }
+  else if (event->action == "save_jobs")
+  {
+    if (event->event_name == "Error")
+    {
+      write_error_text("Error in saving jobs: \n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+    else
+    {
+      QString str((event->data).c_str());
+      write_normal_text("Jobs saved in file " + str + "\n");
+    }
+  }
+  else if (event->action == "load_jobs")
+  {
+    if (event->event_name == "Error")
+    {
+      write_error_text("Error in loading jobs: \n");
+      write_error_text("*** ");
+      write_error_text((event->data).c_str());
+      write_error_text(" ***\n");
+    }
+    else
+    {
+      QString str((event->data).c_str());
+      write_normal_text("Jobs loaded from file " + str + "\n");
+    }
+  }
+  else if (event->action == "add_job")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+      write_normal_text("New job added " + str + "\n");
+      emit new_job_added(str);
+    }
+  }
+  else if (event->action == "to_remove_job")
+  {
+    if (event->event_name == "Ok")
+      _main_gui->delete_job_external((event->job_name).c_str());
+  }
   else
   {
     QString str((event->action).c_str());
@@ -322,9 +514,11 @@ BL::JobsManager_QT::write_normal_text(const QString & text)
 void 
 BL::JobsManager_QT::write_error_text(const QString & text)
 {
+  _log->setReadOnly(false);
   QTextCursor cursor = _log->textCursor();
   QTextCharFormat text_format;
   text_format.setForeground(Qt::red);
   cursor.insertText(text, text_format);
   _log->setTextCursor(cursor);
+  _log->setReadOnly(true);
 }

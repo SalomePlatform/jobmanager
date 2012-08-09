@@ -1,20 +1,20 @@
-//  Copyright (C) 2009 CEA/DEN, EDF R&D
+// Copyright (C) 2009-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "BL_Job.hxx"
@@ -23,34 +23,40 @@ BL::Job::Job()
 {
   DEBTRACE("Creating BL::Job");
   _name = "";
-  _yacs_file = "";
-  _command = "";
+  _job_file = "";
+  _env_file = "";
   _batch_params.batch_directory = "";
-  _batch_params.expected_during_time = "";
+  _batch_params.maximum_duration = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
-  _machine_choosed = "";
+  _resource_choosed = "";
+  _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::Job(const std::string & name)
 {
   DEBTRACE("Creating BL::Job with name : " << name);
   _name = name;
-  _yacs_file = "";
-  _command = "";
+  _job_file = "";
+  _env_file = "";
   _batch_params.batch_directory = "";
-  _batch_params.expected_during_time = "";
+  _batch_params.maximum_duration = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
   _files_params.result_directory = "";
-  _machine_choosed = "";
+  _resource_choosed = "";
+  _batch_queue = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
+  _dump_yacs_state = 0;
+  _ll_jobtype = "";
 }
 
 BL::Job::~Job()
@@ -68,10 +74,27 @@ BL::Job::getName()
   return _name;
 }
 
-void 
+void
 BL::Job::setType(BL::Job::JobType type)
 {
   _type = type;
+}
+
+void
+BL::Job::setType(const std::string & type)
+{
+  if (type == "command")
+  {
+    setType(BL::Job::COMMAND);
+  }
+  else if (type == "yacs_file")
+  {
+    setType(BL::Job::YACS_SCHEMA);
+  }
+  else if (type == "python_salome")
+  {
+    setType(BL::Job::PYTHON_SALOME);
+  }
 }
 
 BL::Job::JobType
@@ -80,35 +103,47 @@ BL::Job::getType()
   return _type;
 }
 
-void 
-BL::Job::setYACSFile(std::string & yacs_file)
+void
+BL::Job::setDumpYACSState(const int & dump_yacs_state)
 {
-  _yacs_file = yacs_file;
+  _dump_yacs_state = dump_yacs_state;
+}
+
+int
+BL::Job::getDumpYACSState()
+{
+  return _dump_yacs_state;
+}
+
+void 
+BL::Job::setJobFile(const std::string & job_file)
+{
+  _job_file = job_file;
 }
 
 std::string & 
-BL::Job::getYACSFile()
+BL::Job::getJobFile()
 {
-  return _yacs_file;
+  return _job_file;
 }
 
 void 
-BL::Job::setCommand(std::string & command)
+BL::Job::setEnvFile(const std::string & env_file)
 {
-  _command = command;
+  _env_file = env_file;
 }
 
 std::string & 
-BL::Job::getCommand()
+BL::Job::getEnvFile()
 {
-  return _command;
+  return _env_file;
 }
 
 void 
 BL::Job::setBatchParameters(BL::Job::BatchParam & param)
 {
   _batch_params.batch_directory = param.batch_directory;
-  _batch_params.expected_during_time = param.expected_during_time;
+  _batch_params.maximum_duration = param.maximum_duration;
   _batch_params.expected_memory = param.expected_memory;
   _batch_params.nb_proc = param.nb_proc;
 }
@@ -134,15 +169,39 @@ BL::Job::getFilesParameters()
 }
 
 void
-BL::Job::setMachine(std::string & machine)
+BL::Job::setResource(const std::string & resource)
 {
-  _machine_choosed = machine;
+  _resource_choosed = resource;
 }
 
 std::string &
-BL::Job::getMachine()
+BL::Job::getResource()
 {
-  return _machine_choosed;
+  return _resource_choosed;
+}
+
+void
+BL::Job::setBatchQueue(const std::string & queue)
+{
+  _batch_queue = queue;
+}
+
+std::string &
+BL::Job::getBatchQueue()
+{
+  return _batch_queue;
+}
+
+void
+BL::Job::setLoadLevelerJobType(const std::string & jobtype)
+{
+  _ll_jobtype = jobtype;
+}
+
+std::string &
+BL::Job::getLoadLevelerJobType()
+{
+  return _ll_jobtype;
 }
 
 void 
@@ -155,6 +214,105 @@ BL::Job::State
 BL::Job::getState()
 {
   return _state;
+}
+
+std::string
+BL::Job::setStringState(const std::string & state)
+{
+  std::string result("");
+
+  // Check if state is an error
+  if (state != "CREATED"     &&
+      state != "IN_PROCESS"  &&
+      state != "QUEUED"      &&
+      state != "RUNNING"     &&
+      state != "PAUSED"      &&
+      state != "FINISHED"    &&
+      state != "FAILED"      &&
+      state != "NOT_CREATED" &&
+      state != "ERROR"
+     )
+  {
+    DEBTRACE("Error state in setStringState");
+    result = "RefreshError";
+  }
+
+  if (result == "")
+  {
+    if (state == "CREATED")
+    {
+      if (_state != BL::Job::CREATED)
+      {
+        setState(BL::Job::CREATED);
+        result = state;
+      }
+    }
+    else if (state == "NOT_CREATED")
+    {
+      if (_state != BL::Job::NOT_CREATED)
+      {
+        setState(BL::Job::NOT_CREATED);
+        result = state;
+      }
+    }
+    else if (state == "QUEUED")
+    {
+      if (_state != BL::Job::QUEUED)
+      {
+        setState(BL::Job::QUEUED);
+        result = state;
+      }
+    }
+    else if (state == "IN_PROCESS")
+    {
+      if (_state != BL::Job::IN_PROCESS)
+      {
+        setState(BL::Job::IN_PROCESS);
+        result = state;
+      }
+    }
+    else if (state == "RUNNING")
+    {
+      if (_state != BL::Job::RUNNING)
+      {
+        setState(BL::Job::RUNNING);
+        result = state;
+      }
+    }
+    else if (state == "PAUSED")
+    {
+      if (_state != BL::Job::PAUSED)
+      {
+        setState(BL::Job::PAUSED);
+        result = state;
+      }
+    }
+    else if (state == "FINISHED")
+    {
+      if (_state != BL::Job::FINISHED)
+      {
+        setState(BL::Job::FINISHED);
+        result = state;
+      }
+    }
+    else if (state == "ERROR")
+    {
+      if (_state != BL::Job::ERROR)
+      {
+        setState(BL::Job::ERROR);
+        result = state;
+      }
+    }
+    else if (state == "FAILED")
+    {
+      if (_state != BL::Job::FAILED)
+      {
+        setState(BL::Job::FAILED);
+        result = state;
+      }
+    }
+  }
+  return result;
 }
 
 void 
