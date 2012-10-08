@@ -31,8 +31,8 @@ run() {
     echo "[  OK  ]"
 }
 
-run "libtoolize --force --copy --automake"
 run "aclocal -I m4"
+run "libtoolize --force --copy --automake"
 run "autoheader -I m4"
 run "autoconf"
 run "automake --add-missing --copy"
