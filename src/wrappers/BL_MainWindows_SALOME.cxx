@@ -18,7 +18,7 @@
 //
 
 #include "BL_MainWindows_SALOME.hxx"
-#include <SalomeApp_Engine_i.hxx>
+#include <SalomeApp_Engine_i.h>
 
 BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
   SalomeApp_Module(module_name),
