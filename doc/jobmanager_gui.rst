@@ -78,9 +78,23 @@ The second page (see :ref:`figure_jobmanager_job_workflow_2`) permits to add two
 
   **Create wizard page 2**
 
-The third page (see :ref:`figure_jobmanager_job_workflow_3`) permits to define the batch parameters related
+The third page (see :ref:`figure_jobmanager_job_workflow_5`) permits to choose the resource where the job 
+will be executed. You can also define the batch queue that you want to use.
+
+.. _figure_jobmanager_job_workflow_5:
+
+.. figure:: images/jobmanager_job_workflow_5.png
+  :align: center
+
+  **Create wizard page 3**
+
+The fourth page (see :ref:`figure_jobmanager_job_workflow_3`) permits to define the batch parameters related
 to the job. It's mandatory to define the *Remote work directory* that is the directory where the job will be executed.
-Input files defined in page 4 will be copied in this directory. You also have to define the maximum duration,
+Note that if a work directory is defined for the selected resource, the work directory for the job will be
+created as a subdirectory of the resource work directory by default. The name of this subdirectory will
+contain the current date and time. Of course, you can override this default value.
+Input files defined in page 4 will be copied in this work directory. You also have to define the maximum duration
+(set 0 hours and 0 minutes to use the default value for the queue),
 the amount of memory needed and the number of processors/cores of the job.
 
 .. _figure_jobmanager_job_workflow_3:
@@ -88,9 +102,9 @@ the amount of memory needed and the number of processors/cores of the job.
 .. figure:: images/jobmanager_job_workflow_3.png
   :align: center
 
-  **Create wizard page 3**
+  **Create wizard page 4**
 
-The fourth page (see :ref:`figure_jobmanager_job_workflow_4`) permits to add the input and output files. 
+The fifth page (see :ref:`figure_jobmanager_job_workflow_4`) permits to add the input and output files. 
 Input files are files located into the user
 computer that have to be transferred into the execution resource. In this page, you could also define the result 
 directory where job's results and logs will be copied.
@@ -98,16 +112,6 @@ directory where job's results and logs will be copied.
 .. _figure_jobmanager_job_workflow_4:
 
 .. figure:: images/jobmanager_job_workflow_4.png
-  :align: center
-
-  **Create wizard page 4**
-
-The fifth page (see :ref:`figure_jobmanager_job_workflow_5`) permits to choose the resource where the job 
-will be executed. You can also define the batch queue that you want to use.
-
-.. _figure_jobmanager_job_workflow_5:
-
-.. figure:: images/jobmanager_job_workflow_5.png
   :align: center
 
   **Create wizard page 5**
