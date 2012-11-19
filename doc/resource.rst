@@ -68,6 +68,11 @@ The description of each attribute is given in the table below.
 **mem_mb**                 No               Memory per node in megabytes (not used by JOBMANAGER)
 **cpu_clock**              No               Clock rate in gigahertz of the computer's processor(s) (not
                                             used by JOBMANAGER)
+**Is Cluster Head**        Yes              Indicate if the resource is a cluster managed by a batch
+                                            manager
+**Working Directory**      No               Base working directory for the resource. The working
+                                            directories for the jobs will by default be created as
+                                            subdirectories of this directory.
 ========================== ================ =============================================================
 
 SALOME installation description
@@ -155,6 +160,7 @@ To launch a **command** job you need to fill the following attributes:
 - **protocol** = *ssh*
 - **username**
 - **batch** = *ssh*
+- **Is Cluster Head** = *false*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys).
@@ -176,6 +182,7 @@ To launch a **command** job you need to fill the following attributes:
 - **batch**
 - **iprotocol**
 - **nb_proc_per_node** (only with PBS batch manager)
+- **Is Cluster Head** = *true*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys) between your computer and the cluster and between
@@ -184,4 +191,3 @@ the cluster's nodes.
 To launch a **SALOME** command job you also need to fill the following attributes:
 
 - **applipath**
-
