@@ -17,13 +17,31 @@ A resource contains three different kinds of information:
 A resource's name could be different from the computer name since 
 different SALOME installation could coexist in the computer.
 
+Types and usage of SALOME resources
+-----------------------------------
+
+In SALOME, resources can be used in two different ways:
+
+- Resources can be used to launch containers, either semi-automatically with
+  YACS or directly by calling the method GiveContainer of the Container
+  Manager (service provided by the KERNEL).
+- Resources can be used to launch jobs, either with the JOBMANAGER module or
+  with the underlying Launcher service (provided by the KERNEL).
+
+Those two kinds of resources are both managed by the Resource Manager (KERNEL
+service). They can both be created and edited with the resource management
+interface of the JOBMANAGER. This is why some informations describing the
+resources (e.g. CPU clock) are in fact not used at all by the JOBMANAGER to
+launch jobs. If you just want to create a resource to launch jobs, you can
+safely ignore those parameters.
+
 Physical description of the computer
 ------------------------------------
 
 A resource contains a physical description of the computer.
-These informations are used by the resource manager (service provided
-by the KERNEL) to choose and use a resource when a container (in YACS)
-or a job (in JOBMANAGER) has to be launched.
+These informations are used by the Resource Manager to choose and use a
+resource when a container (in YACS) or a job (in JOBMANAGER) has to be
+launched.
 
 The description of each attribute is given in the table below. 
 
@@ -32,21 +50,29 @@ The description of each attribute is given in the table below.
 ========================== ================ =============================================================
 **Attribute**              **Mandatory**    **Description**
 ========================== ================ =============================================================
-**hostname**               Yes              It's the network name of the computer. If the computer is a 
-                                            cluster, you have to give the frontal node name.
+**hostname**               Yes              Network name of the computer. If the computer is a cluster,
+                                            you have to give the head node name.
 **protocol**               Yes              Network protocol to use for creating connections 
                                             (ssh or rsh).
-**username**               Yes              User name to use for creating connections.
-**batch**                  Yes              Type of batch system installed in the resource. Use *ssh* if
+**username**               Yes              User login on the computer.
+**batch**                  Yes              Type of batch manager installed in the resource. Use *ssh* if
                                             the resource is a single computer.
-**iprotocol**              Yes              Internal protocol to use on a cluster (ssh, rsh or srun).
+**iprotocol**              Yes              Internal protocol to use on a cluster (i.e. the command used
+                                            to launch processes on other nodes of the cluster).
 **mpiImpl**                No               MPI implementation to use.
-
-**OS**                     No               It's the operating system name, e.g.: Linux, Windows.
-**nb_node**                No               It's the amount of node of the computer.
-**nb_proc_per_node**       No               It's the amount or processor or core in each node.
-**mem_mb**                 No               It's the amount of memory in megabytes per node.
-**cpu_clock**              No               It's the frequency in gigahertz of the computer's processors.
+**OS**                     No               Operating system name, e.g.: Linux, Windows (not used by
+                                            JOBMANAGER)
+**nb_node**                No               Number of nodes in the computer (not used by JOBMANAGER)
+**nb_proc_per_node**       No               Number of processors or cores in each node (only used with
+                                            PBS batch manager)
+**mem_mb**                 No               Memory per node in megabytes (not used by JOBMANAGER)
+**cpu_clock**              No               Clock rate in gigahertz of the computer's processor(s) (not
+                                            used by JOBMANAGER)
+**Is Cluster Head**        Yes              Indicate if the resource is a cluster managed by a batch
+                                            manager
+**Working Directory**      No               Base working directory for the resource. The working
+                                            directories for the jobs will by default be created as
+                                            subdirectories of this directory.
 ========================== ================ =============================================================
 
 SALOME installation description
@@ -60,10 +86,9 @@ The description of each attribute is given in the table below.
 ========================== =============================================================
 **Attribute**              **Description**
 ========================== =============================================================
-**applipath**              It's the directory of the SALOME application to use into the 
-                           resource.
-**componentList**          It's the SALOME component list available in the SALOME 
-                           application.
+**applipath**              Directory of the SALOME application to use on the resource
+**componentList**          List of the SALOME components available in the SALOME 
+                           application (not used by JOBMANAGER)
 ========================== =============================================================
 
 Where is the resource file?
@@ -135,6 +160,7 @@ To launch a **command** job you need to fill the following attributes:
 - **protocol** = *ssh*
 - **username**
 - **batch** = *ssh*
+- **Is Cluster Head** = *false*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys).
@@ -155,7 +181,8 @@ To launch a **command** job you need to fill the following attributes:
 - **username**
 - **batch**
 - **iprotocol**
-- **nb_proc_per_node**
+- **nb_proc_per_node** (only with PBS batch manager)
+- **Is Cluster Head** = *true*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys) between your computer and the cluster and between
@@ -164,4 +191,3 @@ the cluster's nodes.
 To launch a **SALOME** command job you also need to fill the following attributes:
 
 - **applipath**
-
