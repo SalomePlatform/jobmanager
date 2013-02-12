@@ -44,7 +44,7 @@
 namespace BL
 {
   class BL_Wrappers_SALOME_EXPORT MainWindows_SALOME : virtual public MainWindows_Wrap, 
-                             virtual public SalomeApp_Module
+                             public SalomeApp_Module
   {
     public:
       MainWindows_SALOME(const QString & module_name);

@@ -49,9 +49,9 @@ namespace BL{
   };
 
   class GenericGui;
-  class JobsManager_QT: virtual public QDockWidget,
-                        virtual public BL::JobsManager,
-                        virtual public BL::Observer
+  class JobsManager_QT: public QDockWidget,
+                        public BL::JobsManager,
+                        public BL::Observer
   {
     Q_OBJECT
 

@@ -27,7 +27,7 @@
 namespace BL{
 
   class JobsManager_QT;
-  class QModelManager: virtual public QObject
+  class QModelManager: public QObject
   {
     Q_OBJECT
 

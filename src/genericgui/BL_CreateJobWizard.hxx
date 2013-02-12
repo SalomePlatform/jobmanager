@@ -33,7 +33,7 @@ namespace BL{
 
   class JobsManager_QT;
   class JobNamePage;
-  class CreateJobWizard: virtual public QWizard
+  class CreateJobWizard: public QWizard
   {
     Q_OBJECT
 
@@ -95,7 +95,7 @@ namespace BL{
             Page_Conclusion};
   };
 
-  class JobNamePage: virtual public QWizardPage
+  class JobNamePage: public QWizardPage
   {
     Q_OBJECT
 
@@ -123,7 +123,7 @@ namespace BL{
       bool _check_name;
   };
 
-  class ConclusionPage: virtual public QWizardPage
+  class ConclusionPage: public QWizardPage
   {
     public:
       ConclusionPage(QWidget * parent);
@@ -134,7 +134,7 @@ namespace BL{
       virtual void cleanupPage() {}
   };
 
-  class BatchParametersPage: virtual public QWizardPage
+  class BatchParametersPage: public QWizardPage
   {
     Q_OBJECT
 
@@ -152,7 +152,7 @@ namespace BL{
       QString resource_choosed;
   };
 
-  class FilesPage: virtual public QWizardPage
+  class FilesPage: public QWizardPage
   {
     Q_OBJECT
 
@@ -185,7 +185,7 @@ namespace BL{
       QListWidget * _output_files_list;
   };
 
-  class ResourcePage: virtual public QWizardPage
+  class ResourcePage: public QWizardPage
   {
     Q_OBJECT
 
@@ -211,7 +211,7 @@ namespace BL{
       QGridLayout * _main_layout;
   };
 
-  class YACSSchemaPage: virtual public QWizardPage
+  class YACSSchemaPage: public QWizardPage
   {
     Q_OBJECT
 
@@ -232,7 +232,7 @@ namespace BL{
       QLineEdit * _line_env_file;
   };
 
-  class CommandMainPage: virtual public QWizardPage
+  class CommandMainPage: public QWizardPage
   {
     Q_OBJECT
 
@@ -253,7 +253,7 @@ namespace BL{
       QLineEdit * _line_env_file;
   };
 
-  class PythonSalomeMainPage: virtual public QWizardPage
+  class PythonSalomeMainPage: public QWizardPage
   {
     Q_OBJECT
 

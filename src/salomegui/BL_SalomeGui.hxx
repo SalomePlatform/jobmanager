@@ -41,7 +41,7 @@
 
 namespace BL
 {
-  class SalomeGui: virtual public MainWindows_SALOME
+  class SalomeGui: public MainWindows_SALOME
   {
     Q_OBJECT
     

@@ -20,9 +20,7 @@
 #include "BL_SalomeGui.hxx"
 #include "JOBMANAGER_version.h"
 
-BL::SalomeGui::SalomeGui() : MainWindows_SALOME("JobManager"), 
-			     SalomeApp_Module("JobManager"), 
-			     LightApp_Module("JobManager")
+BL::SalomeGui::SalomeGui() : MainWindows_SALOME("JobManager")
 {
   DEBTRACE("Creating BL::SalomeGui");
   _gengui = NULL;

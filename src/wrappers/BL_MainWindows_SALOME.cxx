@@ -21,8 +21,7 @@
 #include <SalomeApp_Engine_i.h>
 
 BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
-  SalomeApp_Module(module_name),
-  LightApp_Module(module_name)
+  SalomeApp_Module(module_name)
 {
   DEBTRACE("Creating BL::MainWindows_SALOME");
   _actionId = 190;
