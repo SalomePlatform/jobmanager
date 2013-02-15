@@ -87,7 +87,7 @@ BL::SALOMEServices::initNS()
 }
 
 std::list<std::string> 
-BL::SALOMEServices::getResourceList()
+BL::SALOMEServices::getResourceList(bool batch_only)
 {
   std::list<std::string> resource_list;
   
@@ -95,6 +95,7 @@ BL::SALOMEServices::getResourceList()
   {
     Engines::ResourceParameters params;
     _lcc->preSet(params);
+    params.can_launch_batch_jobs = batch_only;
     Engines::ResourceList * resourceList = NULL;
     try
     {
@@ -162,7 +163,8 @@ BL::SALOMEServices::getResourceDescr(const std::string& name)
     resource_descr.batch = resource_definition->batch.in();
     resource_descr.mpiImpl = resource_definition->mpiImpl.in();
     resource_descr.iprotocol = resource_definition->iprotocol.in();
-    resource_descr.is_cluster_head = resource_definition->is_cluster_head;
+    resource_descr.can_launch_batch_jobs = resource_definition->can_launch_batch_jobs;
+    resource_descr.can_run_containers = resource_definition->can_run_containers;
     resource_descr.working_directory = resource_definition->working_directory.in();
 
     delete resource_definition;
@@ -177,6 +179,10 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
 
   resource_definition->name = CORBA::string_dup(new_resource.name.c_str());
   resource_definition->hostname = CORBA::string_dup(new_resource.hostname.c_str());
+  if (new_resource.batch == "" || new_resource.batch == "ssh_batch")
+    resource_definition->type = CORBA::string_dup("single_machine");
+  else
+    resource_definition->type = CORBA::string_dup("cluster");
   resource_definition->protocol = CORBA::string_dup(new_resource.protocol.c_str());
   resource_definition->username = CORBA::string_dup(new_resource.username.c_str());
   resource_definition->applipath = CORBA::string_dup(new_resource.applipath.c_str());
@@ -198,7 +204,8 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
   resource_definition->batch = CORBA::string_dup(new_resource.batch.c_str());
   resource_definition->mpiImpl = CORBA::string_dup(new_resource.mpiImpl.c_str());
   resource_definition->iprotocol = CORBA::string_dup(new_resource.iprotocol.c_str());
-  resource_definition->is_cluster_head = new_resource.is_cluster_head;
+  resource_definition->can_launch_batch_jobs = new_resource.can_launch_batch_jobs;
+  resource_definition->can_run_containers = new_resource.can_run_containers;
   resource_definition->working_directory = CORBA::string_dup(new_resource.working_directory.c_str());
 
   try

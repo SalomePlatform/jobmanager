@@ -943,7 +943,7 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
 
   // input_Resource
   QGroupBox * resource_group_box = new QGroupBox("Resource List");
-  _resource_list = new JM::ResourceCatalog(this, _salome_services);
+  _resource_list = new JM::ResourceCatalog(this, _salome_services, true);
   connect(_resource_list->getQListWidget(), SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemSelected(QListWidgetItem*)));
 
   QVBoxLayout * resource_list_layout = new QVBoxLayout();

@@ -58,7 +58,8 @@ namespace BL{
     std::string mpiImpl;
     std::string iprotocol;
 
-    bool is_cluster_head;
+    bool can_launch_batch_jobs;
+    bool can_run_containers;
     std::string working_directory;
   };
 
@@ -74,7 +75,7 @@ namespace BL{
 
       void set_manager(BL::JobsManager * manager) {_manager = manager;}
 
-      std::list<std::string> getResourceList();
+      std::list<std::string> getResourceList(bool batch_only);
       BL::ResourceDescr getResourceDescr(const std::string& name);
       void addResource(BL::ResourceDescr & new_resource);
       void removeResource(const std::string & name);

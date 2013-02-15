@@ -72,11 +72,8 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
 
   QLabel * working_directory_label = new QLabel("Working Directory:");
   _working_directory = new QLineEdit(this);
-  QLabel * is_cluster_head_label = new QLabel("Is Cluster Head:");
-  _is_cluster_head = new QPushButton(this);
-  _is_cluster_head->setCheckable(true);
-  connect(_is_cluster_head, SIGNAL(toggled(bool)), this, SLOT(toggle_is_cluster_head(bool)));
-  toggle_is_cluster_head(false); // Default is false
+  _can_launch_batch_jobs = new QCheckBox("This resource can be used to launch batch jobs", this);
+  _can_run_containers = new QCheckBox("This resource can be used to run interactive containers", this);
 
   QGridLayout * m_layout = new QGridLayout;
   m_layout->addWidget(name_label, 0, 0);
@@ -91,10 +88,10 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   m_layout->addWidget(_applipath_line, 4, 1);
   m_layout->addWidget(componentList_label, 5, 0);
   m_layout->addWidget(component_widget, 5, 1);
-  m_layout->addWidget(is_cluster_head_label, 6, 0);
-  m_layout->addWidget(_is_cluster_head, 6, 1);
-  m_layout->addWidget(working_directory_label, 7, 0);
-  m_layout->addWidget(_working_directory, 7, 1);
+  m_layout->addWidget(working_directory_label, 6, 0);
+  m_layout->addWidget(_working_directory, 6, 1);
+  m_layout->addWidget(_can_launch_batch_jobs, 7, 1);
+  m_layout->addWidget(_can_run_containers, 8, 1);
   main_groupBox->setLayout(m_layout);
 
   // Part 2
@@ -208,7 +205,16 @@ JM::EditSalomeResource::get_infos()
   _applipath_line->setText(QString(resource_descr.applipath.c_str()));
   _os_line->setText(QString(resource_descr.OS.c_str()));
   _working_directory->setText(QString(resource_descr.working_directory.c_str()));
-  _is_cluster_head->setChecked(resource_descr.is_cluster_head);
+
+  if (resource_descr.can_launch_batch_jobs)
+    _can_launch_batch_jobs->setCheckState(Qt::Checked);
+  else
+    _can_launch_batch_jobs->setCheckState(Qt::Unchecked);
+
+  if (resource_descr.can_run_containers)
+    _can_run_containers->setCheckState(Qt::Checked);
+  else
+    _can_run_containers->setCheckState(Qt::Unchecked);
 
   std::string protocol = resource_descr.protocol.c_str();
   if (protocol == "ssh")
@@ -245,7 +251,7 @@ JM::EditSalomeResource::get_infos()
     _batch_line->setCurrentIndex(1);
   else if (batch == "sge")  
     _batch_line->setCurrentIndex(2);
-  else if (batch == "ssh")
+  else if (batch == "ssh_batch")
     _batch_line->setCurrentIndex(3);
   else if (batch == "ccc")
     _batch_line->setCurrentIndex(4);
@@ -344,10 +350,8 @@ JM::EditSalomeResource::accept()
   resource.applipath = _applipath_line->text().toStdString();
   resource.OS = _os_line->text().toStdString();
   resource.working_directory = _working_directory->text().toStdString();
-  if (_is_cluster_head->isChecked())
-    resource.is_cluster_head = true;
-  else
-    resource.is_cluster_head = false;
+  resource.can_launch_batch_jobs = (_can_launch_batch_jobs->checkState() == Qt::Checked);
+  resource.can_run_containers = (_can_run_containers->checkState() == Qt::Checked);
 
   // Components
   int count = _componentList->count();
@@ -379,13 +383,4 @@ JM::EditSalomeResource::accept()
   {
     QMessageBox::warning(NULL, "Values missing", "name, hostname and protocol are mandatory! Cancel or add values!");
   }
-}
-
-void
-JM::EditSalomeResource::toggle_is_cluster_head(bool checked)
-{
-  if (checked)
-    _is_cluster_head->setText("true");
-  else
-    _is_cluster_head->setText("false");
 }

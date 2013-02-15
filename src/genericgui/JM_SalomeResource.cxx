@@ -47,9 +47,8 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   _componentList->setViewMode(QListView::ListMode);
   QLabel * working_directory_label = new QLabel("Working Directory:");
   _working_directory = new QLineEdit(this);
-  QLabel * is_cluster_head_label = new QLabel("Is Cluster Head:");
-  _is_cluster_head = new QPushButton(this);
-  toggle_is_cluster_head(false); // Default is false
+  _can_launch_batch_jobs = new QCheckBox("This resource can be used to launch batch jobs", this);
+  _can_run_containers = new QCheckBox("This resource can be used to run interactive containers", this);
   QGridLayout * m_layout = new QGridLayout;
   m_layout->addWidget(name_label, 0, 0);
   m_layout->addWidget(_name_line, 0, 1);
@@ -63,10 +62,10 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   m_layout->addWidget(_applipath_line, 4, 1);
   m_layout->addWidget(componentList_label, 5, 0);
   m_layout->addWidget(_componentList, 5, 1);
-  m_layout->addWidget(is_cluster_head_label, 6, 0);
-  m_layout->addWidget(_is_cluster_head, 6, 1);
-  m_layout->addWidget(working_directory_label, 7, 0);
-  m_layout->addWidget(_working_directory, 7, 1);
+  m_layout->addWidget(working_directory_label, 6, 0);
+  m_layout->addWidget(_working_directory, 6, 1);
+  m_layout->addWidget(_can_launch_batch_jobs, 7, 1);
+  m_layout->addWidget(_can_run_containers, 8, 1);
   main_groupBox->setLayout(m_layout);
 
   QGroupBox * config_groupBox = new QGroupBox("Configuration values");
@@ -144,6 +143,8 @@ JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_
   _mpiImpl_line->setReadOnly(true);
   _iprotocol_line->setReadOnly(true);
   _working_directory->setReadOnly(true);
+  _can_launch_batch_jobs->setEnabled(false);
+  _can_run_containers->setEnabled(false);
 }
 
 JM::SalomeResource::~SalomeResource()
@@ -166,7 +167,16 @@ JM::SalomeResource::get_infos()
   _mpiImpl_line->setText(QString(resource_descr.mpiImpl.c_str()));
   _iprotocol_line->setText(QString(resource_descr.iprotocol.c_str()));
   _working_directory->setText(QString(resource_descr.working_directory.c_str()));
-  toggle_is_cluster_head(resource_descr.is_cluster_head);
+
+  if (resource_descr.can_launch_batch_jobs)
+    _can_launch_batch_jobs->setCheckState(Qt::Checked);
+  else
+    _can_launch_batch_jobs->setCheckState(Qt::Unchecked);
+
+  if (resource_descr.can_run_containers)
+    _can_run_containers->setCheckState(Qt::Checked);
+  else
+    _can_run_containers->setCheckState(Qt::Unchecked);
 
   QString value;
   _mem_mb_line->setText(value.setNum(resource_descr.mem_mb));
@@ -177,13 +187,4 @@ JM::SalomeResource::get_infos()
    std::list<std::string>::iterator it = resource_descr.componentList.begin();
    for(; it != resource_descr.componentList.end(); it++)
      _componentList->addItem(QString((*it).c_str()));
-}
-
-void
-JM::SalomeResource::toggle_is_cluster_head(bool checked)
-{
-  if (checked)
-    _is_cluster_head->setText("true");
-  else
-    _is_cluster_head->setText("false");
 }

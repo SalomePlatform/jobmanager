@@ -64,7 +64,7 @@ BL::GenericGui::createDockWidgets()
   /* ResourceCatalog */
   _dw_resource_catalog = new QDockWidget(_dock_parent);
   _dw_resource_catalog->setWindowTitle("Resource Catalog");
-  _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services);
+  _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services, false);
   QScrollArea * scroll_widget_resource = new QScrollArea(_dw_resource_catalog);
   scroll_widget_resource->setWidget(_resource_catalog);
   scroll_widget_resource->setWidgetResizable(true);

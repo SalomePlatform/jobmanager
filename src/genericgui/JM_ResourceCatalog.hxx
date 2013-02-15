@@ -34,7 +34,7 @@ namespace JM
     Q_OBJECT
 
     public:
-      ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services);
+      ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services, bool batch_only);
       virtual ~ResourceCatalog();
 
       void get_infos();
@@ -60,6 +60,7 @@ namespace JM
       QPushButton * _add_button;
       QPushButton * _remove_button;
       QListWidget * _resource_files_list;
+      bool _batch_only;
   };
 }
 

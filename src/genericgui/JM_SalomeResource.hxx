@@ -38,8 +38,6 @@ namespace JM
 
       void get_infos();
 
-      void toggle_is_cluster_head(bool checked);
-
     protected:
       QWidget* _parent;
       BL::SALOMEServices * _salome_services;
@@ -52,7 +50,8 @@ namespace JM
       QLineEdit * _username_line;
       QLineEdit * _applipath_line;
       QListWidget * _componentList;
-      QPushButton * _is_cluster_head;
+      QCheckBox * _can_launch_batch_jobs;
+      QCheckBox * _can_run_containers;
       QLineEdit * _working_directory;
       QLineEdit * _os_line;
       QLineEdit * _mem_mb_line;

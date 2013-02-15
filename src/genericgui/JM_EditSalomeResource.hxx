@@ -43,7 +43,6 @@ namespace JM
       void add_component();
       void remove_components();
       void itemSelectionChanged();
-      void toggle_is_cluster_head(bool checked);
 
     protected:
       QWidget* _parent;
@@ -69,7 +68,8 @@ namespace JM
       QSpinBox * _nb_proc_per_node_line;
 
       QLineEdit * _working_directory;
-      QPushButton * _is_cluster_head;
+      QCheckBox * _can_launch_batch_jobs;
+      QCheckBox * _can_run_containers;
 
       QPushButton * _add_button;
       QPushButton * _remove_button;

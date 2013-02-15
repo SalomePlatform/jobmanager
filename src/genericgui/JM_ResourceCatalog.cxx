@@ -22,7 +22,9 @@
 #include "JM_SalomeResource.hxx"
 #include "JM_EditSalomeResource.hxx"
 
-JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services) : QWidget(parent)
+JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services, bool batch_only)
+: QWidget(parent),
+  _batch_only(batch_only)
 {
   DEBTRACE("Creating JM::ResourceCatalog");
   BL_ASSERT(parent);
@@ -34,7 +36,7 @@ JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salom
   _refresh_button->show();
   _resource_files_list = new QListWidget(this);
   _resource_files_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  std::list<std::string> resource_list = _salome_services->getResourceList();
+  std::list<std::string> resource_list = _salome_services->getResourceList(_batch_only);
   std::list<std::string>::iterator it;
   for (it = resource_list.begin(); it != resource_list.end(); it++)
   {
@@ -91,7 +93,7 @@ void
 JM::ResourceCatalog::refresh_resource_list()
 {
   _resource_files_list->clear();
-  std::list<std::string> resource_list = _salome_services->getResourceList();
+  std::list<std::string> resource_list = _salome_services->getResourceList(_batch_only);
   std::list<std::string>::iterator it;
   for (it = resource_list.begin(); it != resource_list.end(); it++)
   {

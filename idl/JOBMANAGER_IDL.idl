@@ -20,7 +20,7 @@
 #ifndef _JOBMANAGER_IDL_
 #define _JOBMANAGER_IDL_
 
-#include "SALOME_ContainerManager.idl"
+#include "SALOME_Launcher.idl"
 
 module JOBMANAGER
 {
