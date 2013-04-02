@@ -49,10 +49,11 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _protocol_line = new QComboBox(this);
   _protocol_line->addItem("ssh");
   _protocol_line->addItem("rsh");
+  _protocol_line->addItem("sh");
   _protocol_line->addItem("srun");
   _protocol_line->addItem("pbsdsh");
   _protocol_line->addItem("blaunch");
-  _protocol_line->setCurrentIndex(-1);
+  _protocol_line->setCurrentIndex(0);
 
   QLabel * componentList_label = new QLabel("Component List:");
   _add_button = new QPushButton("Add");
@@ -127,7 +128,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _iprotocol_line->addItem("srun");
   _iprotocol_line->addItem("pbsdsh");
   _iprotocol_line->addItem("blaunch");
-  _iprotocol_line->setCurrentIndex(-1);
+  _iprotocol_line->setCurrentIndex(0);
 
   QLabel * batch_label = new QLabel("Batch:");
   _batch_line = new QComboBox(this);
@@ -221,12 +222,14 @@ JM::EditSalomeResource::get_infos()
     _protocol_line->setCurrentIndex(0);
   else if(protocol == "rsh")
     _protocol_line->setCurrentIndex(1);
-  else if(protocol == "srun")
+  else if(protocol == "sh")
     _protocol_line->setCurrentIndex(2);
-  else if(protocol == "pbsdsh")
+  else if(protocol == "srun")
     _protocol_line->setCurrentIndex(3);
-  else if(protocol == "blaunch")
+  else if(protocol == "pbsdsh")
     _protocol_line->setCurrentIndex(4);
+  else if(protocol == "blaunch")
+    _protocol_line->setCurrentIndex(5);
   else
     _protocol_line->setCurrentIndex(-1);
 
@@ -376,8 +379,15 @@ JM::EditSalomeResource::accept()
       resource.hostname != "" &&
       resource.protocol != "")
   {
-    _salome_services->addResource(resource);
-    QDialog::accept();
+    try
+    {
+      _salome_services->addResource(resource);
+      QDialog::accept();
+    }
+    catch (const BL::Exception & ex)
+    {
+      QMessageBox::critical(this, "Error", QString("Cannot add resource: ") + ex.what());
+    }
   }
   else
   {

@@ -215,11 +215,13 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
   catch (const SALOME::SALOME_Exception & ex)
   {
     DEBMSG("SALOME Exception in addResource ! " << ex.details.text.in());
+    throw(BL::Exception(ex.details.text.in()));
   }
   catch (const CORBA::SystemException& ex)
   {
     DEBMSG("Receive SALOME System Exception: " << ex);
     DEBMSG("Check SALOME servers...");
+    throw(BL::Exception("SALOME System Exception"));
   }
 }
 
