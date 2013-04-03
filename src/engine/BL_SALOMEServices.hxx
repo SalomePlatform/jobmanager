@@ -89,6 +89,7 @@ namespace BL{
       std::string delete_job(BL::Job * job);
       std::string stop_job(BL::Job * job);
       std::string get_results_job(BL::Job * job);
+      std::string get_assigned_hostnames(BL::Job * job); // Get names or ids of hosts assigned to the job
 
       BL::Job * get_new_job(int job_number);
 

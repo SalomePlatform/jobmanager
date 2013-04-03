@@ -45,9 +45,17 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   python_salome_file = "";
   env_file = "";
   batch_directory = "";
+
+  // For COORM
+  coorm_batch_directory = "";
+
   maximum_duration = "";
   expected_memory = "";
   nb_proc = 1;
+
+  // Parameters for COORM
+  launcher_file = "";
+  launcher_args = "";
 
   result_directory = "";
 
@@ -65,6 +73,10 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   setPage(Page_JobName, _job_name_page);
   setPage(Page_BatchParameters, new BL::BatchParametersPage(this, salome_services));
+
+  // For COORM
+  setPage(Page_COORM_BatchParameters, new BL::COORM_BatchParametersPage(this, salome_services));
+
   setPage(Page_Files, new BL::FilesPage(this));
   setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
   setPage(Page_Conclusion, new BL::ConclusionPage(this));
@@ -125,8 +137,22 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
     }
 
+
+	// For COORM
     BL::Job::BatchParam batch_params = job->getBatchParameters();
-    setField("batch_directory", QString(batch_params.batch_directory.c_str()));
+	BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(job->getResource().c_str());
+	std::string batch = resource_descr.batch.c_str();
+	if (batch == "coorm")
+	{
+		setField("coorm_batch_directory", QString(batch_params.batch_directory.c_str()));
+		setField("launcher_file", QString(batch_params.launcher_file.c_str()));
+		setField("launcher_args", QString(batch_params.launcher_args.c_str()));
+	}
+	else
+	{
+		setField("batch_directory", QString(batch_params.batch_directory.c_str()));
+	}
+
     QString proc_value;
     proc_value.setNum(batch_params.nb_proc);
     setField("proc_value", proc_value);
@@ -221,6 +247,16 @@ BL::CreateJobWizard::end(int result)
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
     batch_directory = f_batch_directory.toStdString();
+
+    // For COORM
+    QString f_coorm_batch_directory = field("coorm_batch_directory").toString();
+    coorm_batch_directory = f_coorm_batch_directory.toStdString();
+
+	// For COORM
+    QString f_launcher_file = field("launcher_file").toString();
+    launcher_file = f_launcher_file.toStdString();
+    QString f_launcher_args = field("launcher_args").toString();
+    launcher_args = f_launcher_args.toStdString();
 
     QString time_hour;
     QString time_min;
@@ -721,6 +757,122 @@ BL::BatchParametersPage::nextId() const
   return BL::CreateJobWizard::Page_Files;
 }
 
+BL::COORM_BatchParametersPage::COORM_BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services)
+: QWizardPage(parent)
+{
+  setTitle("Enter COORM Parameters");
+  resource_choosed = "";
+
+  _salome_services = salome_services;
+
+  QLabel *label = new QLabel("In this step you define the parameters for COORM");
+  label->setWordWrap(true);
+  QVBoxLayout * main_layout = new QVBoxLayout;
+  main_layout->addWidget(label);
+
+  // coorm_batch_directory
+  QLabel * label_directory = new QLabel("Remote work directory: ");
+  QLineEdit * line_directory = new QLineEdit(this);
+  registerField("coorm_batch_directory", line_directory);
+
+  // launcher_file
+  QPushButton * launcher_file_button = new QPushButton(tr("Choose a launcher file"));
+  connect(launcher_file_button, SIGNAL(clicked()), this, SLOT(choose_launcher_file()));
+  _launcher_file_text = new QLineEdit(this);
+  _launcher_file_text->setText("");
+  registerField("launcher_file", _launcher_file_text);
+  _launcher_file_text->setReadOnly(true);
+
+  // launcher_args
+  QLabel * launcher_args_label = new QLabel("Launcher args:");
+  QLineEdit * launcher_args_text = new QLineEdit(this);
+  registerField("launcher_args", launcher_args_text);
+
+  QGridLayout * layout = new QGridLayout;
+  layout->addWidget(label_directory, 0, 0);
+  layout->addWidget(line_directory, 0, 1);
+  layout->addWidget(launcher_file_button, 1, 0);
+  layout->addWidget(_launcher_file_text, 1, 1);
+  layout->addWidget(launcher_args_label, 2, 0);
+  layout->addWidget(launcher_args_text, 2, 1);
+
+  main_layout->insertLayout(-1, layout);
+
+  setLayout(main_layout);
+};
+
+BL::COORM_BatchParametersPage::~COORM_BatchParametersPage()
+{}
+
+bool
+BL::COORM_BatchParametersPage::validatePage()
+{
+  QString coorm_batch_directory = field("coorm_batch_directory").toString();
+  if (coorm_batch_directory == "")
+  {
+    QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
+    return false;
+  }
+
+  QString launcher_file = field("launcher_file").toString();
+  if (launcher_file == "")
+  {
+    QMessageBox::warning(NULL, "Launcher File Error", "Please enter a launcher file");
+    return false;
+  }
+
+  return true;
+}
+
+int
+BL::COORM_BatchParametersPage::nextId() const
+{
+  return BL::CreateJobWizard::Page_Files;
+}
+
+void
+BL::COORM_BatchParametersPage::choose_launcher_file()
+{
+  QString launcher_file = QFileDialog::getOpenFileName(this,
+						   tr("Open launcher files"), "",
+						   tr("Py (*.py);;All Files (*)"));
+  _launcher_file_text->setReadOnly(false);
+  _launcher_file_text->setText(launcher_file);
+  _launcher_file_text->setReadOnly(true);
+}
+
+void BL::COORM_BatchParametersPage::cleanupPage()
+{}
+
+void
+BL::COORM_BatchParametersPage::initializePage()
+{
+  QString f_resource_choosed = field("resource_choosed").toString();
+  if (f_resource_choosed != resource_choosed)
+  {
+    resource_choosed = f_resource_choosed;
+    // If choosed resource has a working_directory set
+    // Generates a default remote working directory
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    QString res_work_dir = resource_descr.working_directory.c_str();
+    if (res_work_dir != "")
+    {
+      time_t rawtime;
+      time(&rawtime);
+      std::string launch_date = ctime(&rawtime);
+      for (int i = 0; i < launch_date.size(); i++)
+        if (launch_date[i] == '/' ||
+            launch_date[i] == '-' ||
+            launch_date[i] == ':' ||
+            launch_date[i] == ' ')
+          launch_date[i] = '_';
+      launch_date.erase(--launch_date.end()); // Last caracter is a \n
+      QString date = launch_date.c_str();
+      setField("coorm_batch_directory", res_work_dir + "/" + date);
+    }
+  }
+}
+
 BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
 : QWizardPage(parent)
 {
@@ -989,6 +1141,18 @@ BL::ResourcePage::initializePage()
     _ll_label->show();
     _ll_value->show();
   }
+
+  // Initialize resource_choosed with first resource in resource list
+  if (field("resource_choosed").toString() == "")
+  {
+    std::list<std::string> resource_list = _salome_services->getResourceList(true);
+    std::list<std::string>::iterator it = resource_list.begin();
+    if (it != resource_list.end())
+    {
+      QString first_resource((*it).c_str());
+      setField("resource_choosed", first_resource);
+    }
+  }
 }
 
 bool
@@ -1044,7 +1208,16 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
 int 
 BL::ResourcePage::nextId() const
 {
-  return BL::CreateJobWizard::Page_BatchParameters;
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(_resource_choosed->text().toStdString());
+  std::string batch = resource_descr.batch.c_str();
+  if (batch == "coorm")
+  {
+	  return BL::CreateJobWizard::Page_COORM_BatchParameters;
+  }
+  else
+  {
+	  return BL::CreateJobWizard::Page_BatchParameters;
+  }
 }
 
 BL::PythonSalomeMainPage::PythonSalomeMainPage(QWidget * parent)

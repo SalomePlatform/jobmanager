@@ -83,6 +83,10 @@ namespace BL
 
       QListWidget * _input_files_list;
       QListWidget * _output_files_list;
+
+	  // Parameters for COORM
+      QLabel * _job_lf_label_value;
+      QLabel * _job_la_label_value;
   };
 }
 

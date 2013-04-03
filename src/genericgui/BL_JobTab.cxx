@@ -103,6 +103,12 @@ BL::JobTab::createJobSummaryTab()
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
 
+  // Parameters for COORM
+  QLabel * job_lf_label = new QLabel("Launcher file:");
+  _job_lf_label_value = new QLabel("");
+  QLabel * job_la_label = new QLabel("Launcher args:");
+  _job_la_label_value = new QLabel("");
+
   // Specific values
   _batch_queue_label = new QLabel("Batch queue:");
   _batch_queue_value = new QLabel("");
@@ -115,10 +121,18 @@ BL::JobTab::createJobSummaryTab()
   _run_values_form->insertRow(1, job_nof_label, _job_nof_label_value);
   _run_values_form->insertRow(2, job_bd_label, _job_bd_label_value);
   _run_values_form->insertRow(3, job_rd_label, _job_rd_label_value);
+
+  // Parameters for COORM
+  _run_values_form->insertRow(4, job_lf_label, _job_lf_label_value);
+
   _other_run_values_form = new QFormLayout;
   _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
   _other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
   _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
+
+  // Parameters for COORM
+  _other_run_values_form->insertRow(3, job_la_label, _job_la_label_value);
+
   QHBoxLayout * box_layout = new QHBoxLayout();
   box_layout->addLayout(_run_values_form);
   box_layout->addLayout(_other_run_values_form);
@@ -220,6 +234,10 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
 
+	// Parameters for COORM
+    _job_lf_label_value->setText(QString(batch_params.launcher_file.c_str()));
+    _job_la_label_value->setText(QString(batch_params.launcher_args.c_str()));
+
     _input_files_list->clear();
     _output_files_list->clear();
     std::list<std::string>::iterator it;
@@ -313,5 +331,9 @@ BL::JobTab::reset(QString job_name)
     _yacs_dump_state_value->setText("");
     _batch_queue_value->setText("");
     _ll_jobtype_value->setText("");
+
+	// Parameters for COORM
+    _job_lf_label_value->setText("");
+    _job_la_label_value->setText("");
   }
 }

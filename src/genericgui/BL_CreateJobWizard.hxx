@@ -69,9 +69,17 @@ namespace BL{
       std::string env_file;
 
       std::string batch_directory;
-      std::string maximum_duration;
+
+	  // For COORM
+	  std::string coorm_batch_directory;
+
+	  std::string maximum_duration;
       std::string expected_memory;
       int nb_proc;
+
+	  // Parameters for COORM
+	  std::string launcher_file;
+	  std::string launcher_args;
 
       std::string result_directory;
       std::list<std::string> input_files_list;
@@ -90,6 +98,7 @@ namespace BL{
             Page_Command_Main_Definitions,
             Page_PythonSalome_Main_Definitions,
             Page_BatchParameters,
+			Page_COORM_BatchParameters,
             Page_Files,
             Page_Resource,
             Page_Conclusion};
@@ -149,6 +158,29 @@ namespace BL{
 
     private:
       BL::SALOMEServices * _salome_services;
+      QString resource_choosed;
+  };
+
+  // For COORM
+  class COORM_BatchParametersPage: public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      COORM_BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services);
+      virtual ~COORM_BatchParametersPage();
+
+      virtual bool validatePage();
+      virtual int nextId() const;
+      virtual void cleanupPage();
+      virtual void initializePage();
+
+    public slots:
+      void choose_launcher_file();
+
+    private:
+      BL::SALOMEServices * _salome_services;
+      QLineEdit * _launcher_file_text;
       QString resource_choosed;
   };
 

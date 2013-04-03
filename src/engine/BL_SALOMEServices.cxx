@@ -331,6 +331,10 @@ BL::SALOMEServices::create_job(BL::Job * job)
     memory = memory * 1024;
   job_parameters->resource_required.mem_mb = memory;
 
+  // Parameters for COORM
+  job_parameters->launcher_file = CORBA::string_dup(cpp_batch_params.launcher_file.c_str());
+  job_parameters->launcher_args = CORBA::string_dup(cpp_batch_params.launcher_args.c_str());
+
   // Create Job
   try
   {
@@ -471,6 +475,31 @@ BL::SALOMEServices::get_results_job(BL::Job * job)
   return ret;
 }
 
+// Get names or ids of hosts assigned to the job
+std::string
+BL::SALOMEServices::get_assigned_hostnames(BL::Job * job)
+{
+  std::string ret = "";
+
+  try
+  {
+    CORBA::String_var result = _salome_launcher->getAssignedHostnames(job->getSalomeLauncherId());
+    ret = result.in();
+  }
+  catch (const SALOME::SALOME_Exception & ex)
+  {
+    DEBMSG("SALOME Exception in get_assigned_hostnames !");
+    ret = ex.details.text.in();
+  }
+  catch (const CORBA::SystemException& ex)
+  {
+    DEBMSG("Receive SALOME System Exception: " << ex);
+    DEBMSG("Check SALOME servers...");
+    ret = "SALOME System Exception - see logs";
+  }
+  return ret;
+}
+
 std::string
 BL::SALOMEServices::save_jobs(const std::string & file_name)
 {
@@ -597,6 +626,11 @@ BL::SALOMEServices::get_new_job(int job_number)
     std::ostringstream mem_stream;
     mem_stream << job_parameters->resource_required.mem_mb << "mb";
     batch_param.expected_memory = mem_stream.str();
+
+	// Parameters for COORM
+    batch_param.launcher_file = job_parameters->launcher_file.in();
+    batch_param.launcher_args = job_parameters->launcher_args.in();
+
     job_return->setBatchParameters(batch_param);
 
     job_return->setResource(job_parameters->resource_required.name.in());

@@ -297,7 +297,20 @@ BL::JobsManager::refresh_jobs_thread(void * object_ptr)
           else if (result_job != "")
           {
             if (object->_observer)
+			{
               object->_observer->sendEvent("refresh_job", "Ok", job->getName(), result_job);
+
+			  // get assigned hostnames when the job will start
+			  if (result_job == "RUNNING")
+			  {
+				std::string assigned_hostnames = object->_salome_services->get_assigned_hostnames(job);
+				if (assigned_hostnames != "")
+				{
+					// sent event "get_assigned_hostnames"
+					object->_observer->sendEvent("get_assigned_hostnames", "Ok", job->getName(), assigned_hostnames);
+				}
+			  }
+			}
           }
         }
       }

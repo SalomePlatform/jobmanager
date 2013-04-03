@@ -19,6 +19,12 @@
 
 #include "BL_JobsManager_QT.hxx"
 #include "BL_GenericGui.hxx"
+#include <vector>
+
+using namespace std;
+
+// To tokenize a string
+static void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");
 
 BL::JobManagerEvent::JobManagerEvent(const std::string & action_i, 
 				     const std::string & event_name_i, 
@@ -288,10 +294,25 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   // For all jobs
   new_job->setEnvFile(wizard.env_file);
   BL::Job::BatchParam param;
-  param.batch_directory = wizard.batch_directory;
+
+  // For COORM
+  if (wizard.coorm_batch_directory != "")
+  {
+	param.batch_directory = wizard.coorm_batch_directory;
+  }
+  else if (wizard.batch_directory != "")
+  {
+	param.batch_directory = wizard.batch_directory;
+  }
+
   param.maximum_duration = wizard.maximum_duration;
   param.expected_memory = wizard.expected_memory;
   param.nb_proc = wizard.nb_proc;
+
+  // Parameters for COORM
+  param.launcher_file = wizard.launcher_file;
+  param.launcher_args = wizard.launcher_args;
+
   new_job->setBatchParameters(param);
   BL::Job::FilesParam files_params;
   files_params.result_directory = wizard.result_directory;
@@ -447,6 +468,33 @@ BL::JobsManager_QT::event(QEvent * e)
       write_error_text(" ***\n");
     }
   }
+  else if (event->action == "get_assigned_hostnames")
+  {
+    if (event->event_name == "Ok")
+    {
+      QString str((event->job_name).c_str());
+
+	  vector<string> hostnames;
+
+	  Tokenize(event->data, hostnames, "+");
+
+	  vector<string>::iterator it;
+
+      write_normal_text("Job " + str + " assigned hostnames are :\n");
+
+	  for (it = hostnames.begin(); it < hostnames.end(); it++)
+	  {
+		  vector<string> hostname;
+		  Tokenize(*it, hostname, ".");
+		  QString assigned_hostname(hostname[0].c_str());
+		  write_normal_text("+ " + assigned_hostname + "\n");
+	  }
+    }
+    else
+    {
+		// Do nothing in case the batch manager does not support this
+    }
+  }
   else if (event->action == "save_jobs")
   {
     if (event->event_name == "Error")
@@ -521,4 +569,23 @@ BL::JobsManager_QT::write_error_text(const QString & text)
   cursor.insertText(text, text_format);
   _log->setTextCursor(cursor);
   _log->setReadOnly(true);
+}
+
+// To tokenize a string
+void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
+{
+	// Skip delimiters at beginning.
+	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	// Find first "non-delimiter".
+	string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		// Found a token, add it to the vector.
+		tokens.push_back(str.substr(lastPos, pos - lastPos));
+		// Skip delimiters.  Note the "not_of"
+		lastPos = str.find_first_not_of(delimiters, pos);
+		// Find next "non-delimiter"
+		pos = str.find_first_of(delimiters, lastPos);
+	}
 }

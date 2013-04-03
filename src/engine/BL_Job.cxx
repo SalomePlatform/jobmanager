@@ -37,6 +37,10 @@ BL::Job::Job()
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
   _ll_jobtype = "";
+
+  // Parameters for COORM
+  _batch_params.launcher_file = "";
+  _batch_params.launcher_args = "";
 }
 
 BL::Job::Job(const std::string & name)
@@ -57,6 +61,10 @@ BL::Job::Job(const std::string & name)
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
   _ll_jobtype = "";
+
+  // Parameters for COORM
+  _batch_params.launcher_file = "";
+  _batch_params.launcher_args = "";
 }
 
 BL::Job::~Job()
@@ -146,6 +154,10 @@ BL::Job::setBatchParameters(BL::Job::BatchParam & param)
   _batch_params.maximum_duration = param.maximum_duration;
   _batch_params.expected_memory = param.expected_memory;
   _batch_params.nb_proc = param.nb_proc;
+
+  // Parameters for COORM
+  _batch_params.launcher_file = param.launcher_file;
+  _batch_params.launcher_args = param.launcher_args;
 }
 
 BL::Job::BatchParam & 
