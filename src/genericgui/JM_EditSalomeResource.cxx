@@ -50,9 +50,6 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _protocol_line->addItem("ssh");
   _protocol_line->addItem("rsh");
   _protocol_line->addItem("sh");
-  _protocol_line->addItem("srun");
-  _protocol_line->addItem("pbsdsh");
-  _protocol_line->addItem("blaunch");
   _protocol_line->setCurrentIndex(0);
 
   QLabel * componentList_label = new QLabel("Component List:");
@@ -226,12 +223,6 @@ JM::EditSalomeResource::get_infos()
     _protocol_line->setCurrentIndex(1);
   else if(protocol == "sh")
     _protocol_line->setCurrentIndex(2);
-  else if(protocol == "srun")
-    _protocol_line->setCurrentIndex(3);
-  else if(protocol == "pbsdsh")
-    _protocol_line->setCurrentIndex(4);
-  else if(protocol == "blaunch")
-    _protocol_line->setCurrentIndex(5);
   else
     _protocol_line->setCurrentIndex(-1);
 
