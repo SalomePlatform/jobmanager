@@ -20,6 +20,8 @@
 #include "JM_EditSalomeResource.hxx"
 #include "BL_Traces.hxx"
 
+using namespace std;
+
 JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices * salome_services,
                                            const std::string & resource_name) : QDialog(parent)
 {
@@ -127,19 +129,19 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _iprotocol_line->addItem("blaunch");
   _iprotocol_line->setCurrentIndex(0);
 
-  QLabel * batch_label = new QLabel("Batch:");
+  QLabel * batch_label = new QLabel("Batch Manager:");
   _batch_line = new QComboBox(this);
-  _batch_line->addItem("pbs");
-  _batch_line->addItem("lsf");
-  _batch_line->addItem("sge");
-  _batch_line->addItem("ssh");
-  _batch_line->addItem("ccc");
-  _batch_line->addItem("slurm");
-  _batch_line->addItem("ll");
-  _batch_line->addItem("vishnu");
-  _batch_line->addItem("oar");
-  _batch_line->addItem("coorm");
-  _batch_line->setCurrentIndex(-1);
+  _batch_line->addItem("None", "ssh_batch");
+  _batch_line->addItem("CCC", "ccc");
+  _batch_line->addItem("LSF", "lsf");
+  _batch_line->addItem("SGE", "sge");
+  _batch_line->addItem("SLURM", "slurm");
+  _batch_line->addItem("VISHNU", "vishnu");
+  _batch_line->addItem("CooRM (limited support)", "coorm");
+  _batch_line->addItem("LoadLeveler (limited support)", "ll");
+  _batch_line->addItem("OAR (limited support)", "oar");
+  _batch_line->addItem("PBS (limited support)", "pbs");
+  _batch_line->setCurrentIndex(0);
 
   QLabel * mpiImpl_label = new QLabel("MPI impl:");
   _mpiImpl_line = new QComboBox(this);
@@ -240,29 +242,13 @@ JM::EditSalomeResource::get_infos()
   else
     _iprotocol_line->setCurrentIndex(-1);
 
-  std::string batch = resource_descr.batch.c_str();
-  if (batch == "pbs")
-    _batch_line->setCurrentIndex(0);
-  else if (batch == "lsf")  
-    _batch_line->setCurrentIndex(1);
-  else if (batch == "sge")  
-    _batch_line->setCurrentIndex(2);
-  else if (batch == "ssh_batch")
-    _batch_line->setCurrentIndex(3);
-  else if (batch == "ccc")
-    _batch_line->setCurrentIndex(4);
-  else if (batch == "slurm")
-    _batch_line->setCurrentIndex(5);
-  else if (batch == "ll")
-    _batch_line->setCurrentIndex(6);
-  else if (batch == "vishnu")
-    _batch_line->setCurrentIndex(7);
-  else if (batch == "oar")
-    _batch_line->setCurrentIndex(8);
-  else if (batch == "coorm")
-    _batch_line->setCurrentIndex(9);
-  else
-    _batch_line->setCurrentIndex(-1);
+  for (int i=0 ; i<_batch_line->count() ; i++)
+  {
+    if (_batch_line->itemData(i).toString().toStdString() == resource_descr.batch)
+    {
+      _batch_line->setCurrentIndex(i);
+    }
+  }
 
   std::string mpiImpl = resource_descr.mpiImpl.c_str();
   if (mpiImpl == "lam")
@@ -361,9 +347,7 @@ JM::EditSalomeResource::accept()
   // ComboBox
   resource.protocol = _protocol_line->currentText().toStdString();
   resource.iprotocol = _iprotocol_line->currentText().toStdString();
-  resource.batch = _batch_line->currentText().toStdString();
-  if (resource.batch == "ssh")
-    resource.batch = "ssh_batch";
+  resource.batch = _batch_line->itemData(_batch_line->currentIndex()).toString().toStdString();
   resource.mpiImpl = _mpiImpl_line->currentText().toStdString();
 
   // QSpinBox

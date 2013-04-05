@@ -55,8 +55,13 @@ The description of each attribute is given in the table below.
 **protocol**               Yes              Network protocol to use for creating connections 
                                             (ssh or rsh).
 **username**               Yes              User login on the computer.
-**batch**                  Yes              Type of batch manager installed in the resource. Use *ssh* if
-                                            the resource is a single computer.
+**Batch Manager**          No               Type of batch manager installed in the resource. Use *None*
+                                            if the resource is a single computer. Some batch managers are
+                                            indicated with "limited support". This means that their
+                                            support in JOBMANAGER is either new and experimental or
+                                            old and obsolete. In both cases, they have not been fully
+                                            validated in this version and thus can be buggy or even not
+                                            work at all.
 **iprotocol**              Yes              Internal protocol to use on a cluster (i.e. the command used
                                             to launch processes on other nodes of the cluster).
 **mpiImpl**                No               MPI implementation to use.
@@ -148,10 +153,10 @@ Two usage scenarios of SALOME's resource with the JOBMANAGER
 This section describes to common scenarios for understanding how to describe
 a resource for the JOBMANAGER.
 
-Using an interactive resource
------------------------------
+Using a single machine
+----------------------
 
-In this scenario, you need to launch a job into your computer or an interactive computer
+In this scenario, you need to launch a job on your computer or another single computer
 available in your network.
 
 To launch a **command** job you need to fill the following attributes:
@@ -159,7 +164,7 @@ To launch a **command** job you need to fill the following attributes:
 - **hostname**
 - **protocol** = *ssh*
 - **username**
-- **batch** = *ssh*
+- **Batch Manager** = *None*
 - **Is Cluster Head** = *false*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
@@ -179,14 +184,14 @@ To launch a **command** job you need to fill the following attributes:
 - **hostname**
 - **protocol**
 - **username**
-- **batch**
+- **Batch Manager**
 - **iprotocol**
 - **nb_proc_per_node** (only with PBS batch manager)
 - **Is Cluster Head** = *true*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
-interactive password (RSA or DSA keys) between your computer and the cluster and between
-the cluster's nodes.
+interactive password (RSA or DSA keys) between your computer and the cluster and
+eventually between the cluster's nodes.
 
 To launch a **SALOME** command job you also need to fill the following attributes:
 

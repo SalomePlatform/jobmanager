@@ -179,7 +179,7 @@ BL::SALOMEServices::addResource(BL::ResourceDescr & new_resource)
 
   resource_definition->name = CORBA::string_dup(new_resource.name.c_str());
   resource_definition->hostname = CORBA::string_dup(new_resource.hostname.c_str());
-  if (new_resource.batch == "" || new_resource.batch == "ssh_batch")
+  if (new_resource.batch == "ssh_batch")
     resource_definition->type = CORBA::string_dup("single_machine");
   else
     resource_definition->type = CORBA::string_dup("cluster");
