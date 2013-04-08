@@ -220,20 +220,20 @@ BL::CreateJobWizard::end(int result)
   {
     // Job Name Panel
     QString f_job_name = field("job_name").toString();
-    job_name = f_job_name.toStdString();
+    job_name = f_job_name.trimmed().toStdString();
 
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
-    yacs_file = f_yacs_file.toStdString();
+    yacs_file = f_yacs_file.trimmed().toStdString();
     dump_yacs_state = field("dump_yacs_state").toInt();
 
     // Command Panel
     QString f_command = field("command").toString();
-    command = f_command.toStdString();
+    command = f_command.trimmed().toStdString();
 
     // Command Panel
     QString f_python_salome_file = field("PythonSalome").toString();
-    python_salome_file = f_python_salome_file.toStdString();
+    python_salome_file = f_python_salome_file.trimmed().toStdString();
 
     QString f_env_file;
     if (yacs_file != "")
@@ -242,11 +242,11 @@ BL::CreateJobWizard::end(int result)
       f_env_file = field("env_command_file").toString();
     else if (python_salome_file != "")
       f_env_file = field("env_PythonSalome_file").toString();
-    env_file = f_env_file.toStdString();
+    env_file = f_env_file.trimmed().toStdString();
 
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
-    batch_directory = f_batch_directory.toStdString();
+    batch_directory = f_batch_directory.trimmed().toStdString();
 
     // For COORM
     QString f_coorm_batch_directory = field("coorm_batch_directory").toString();
@@ -267,13 +267,13 @@ BL::CreateJobWizard::end(int result)
     else
     {
       if (field("duration_hour").toInt() < 10)
-        time_hour = "0" + field("duration_hour").toString();
+        time_hour = "0" + field("duration_hour").toString().trimmed();
       else
-        time_hour = field("duration_hour").toString();
+        time_hour = field("duration_hour").toString().trimmed();
       if (field("duration_min").toInt() < 10)
-        time_min = "0" + field("duration_min").toString();
+        time_min = "0" + field("duration_min").toString().trimmed();
       else
-        time_min = field("duration_min").toString();
+        time_min = field("duration_min").toString().trimmed();
       maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
     }
 
@@ -282,33 +282,33 @@ BL::CreateJobWizard::end(int result)
     QString mem_type("gb");
     if (mem_type_i == 0)
       mem_type = "mb";
-    expected_memory = mem.toStdString() + mem_type.toStdString();
+    expected_memory = mem.trimmed().toStdString() + mem_type.toStdString();
 
     nb_proc = field("proc_value").toInt();
 
     // Files Panel
     QString f_result_directory = field("result_directory").toString();
-    result_directory = f_result_directory.toStdString();
+    result_directory = f_result_directory.trimmed().toStdString();
     for (int i = 0; i < _input_files_list->count(); ++i)
     {
       QListWidgetItem * item = _input_files_list->item(i);
       QString item_text = item->text();
-      input_files_list.push_back(item_text.toStdString());
+      input_files_list.push_back(item_text.trimmed().toStdString());
     }
     for (int i = 0; i < _output_files_list->count(); ++i)
     {
       QListWidgetItem * item = _output_files_list->item(i);
       QString item_text = item->text();
-      output_files_list.push_back(item_text.toStdString());
+      output_files_list.push_back(item_text.trimmed().toStdString());
     }
 
     // Resource list
     QString f_resource_choosed = field("resource_choosed").toString();
-    resource_choosed = f_resource_choosed.toStdString(); 
+    resource_choosed = f_resource_choosed.trimmed().toStdString();
 
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
-    batch_queue = f_batch_queue.toStdString();
+    batch_queue = f_batch_queue.trimmed().toStdString();
 
     // LoadLeveler JobType
     BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
@@ -316,7 +316,7 @@ BL::CreateJobWizard::end(int result)
     if (batch == "ll")
     {
       QString f_ll_jobtype = field("ll_jobtype").toString();
-      ll_jobtype = f_ll_jobtype.toStdString();
+      ll_jobtype = f_ll_jobtype.trimmed().toStdString();
     }
     else
     {

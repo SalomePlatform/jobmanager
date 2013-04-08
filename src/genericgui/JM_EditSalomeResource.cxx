@@ -330,19 +330,19 @@ JM::EditSalomeResource::accept()
   BL::ResourceDescr resource;
 
   // Text
-  resource.name = _name_line->text().toStdString();
-  resource.hostname = _hostname_line->text().toStdString();
-  resource.username = _username_line->text().toStdString();
-  resource.applipath = _applipath_line->text().toStdString();
-  resource.OS = _os_line->text().toStdString();
-  resource.working_directory = _working_directory->text().toStdString();
+  resource.name = _name_line->text().trimmed().toStdString();
+  resource.hostname = _hostname_line->text().trimmed().toStdString();
+  resource.username = _username_line->text().trimmed().toStdString();
+  resource.applipath = _applipath_line->text().trimmed().toStdString();
+  resource.OS = _os_line->text().trimmed().toStdString();
+  resource.working_directory = _working_directory->text().trimmed().toStdString();
   resource.can_launch_batch_jobs = (_can_launch_batch_jobs->checkState() == Qt::Checked);
   resource.can_run_containers = (_can_run_containers->checkState() == Qt::Checked);
 
   // Components
   int count = _componentList->count();
   for (int i = 0; i < count; i++)
-    resource.componentList.push_back(_componentList->item(i)->text().toStdString());
+    resource.componentList.push_back(_componentList->item(i)->text().trimmed().toStdString());
 
   // ComboBox
   resource.protocol = _protocol_line->currentText().toStdString();
