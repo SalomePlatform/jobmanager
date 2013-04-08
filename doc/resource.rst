@@ -73,8 +73,11 @@ The description of each attribute is given in the table below.
 **mem_mb**                 No               Memory per node in megabytes (not used by JOBMANAGER)
 **cpu_clock**              No               Clock rate in gigahertz of the computer's processor(s) (not
                                             used by JOBMANAGER)
-**Is Cluster Head**        Yes              Indicate if the resource is a cluster managed by a batch
-                                            manager
+**Can launch batch jobs**  Yes              Indicate if the resource can be used to launch batch jobs
+                                            (mandatory to use the resource with JOBMANAGER)
+**Can run containers**     No               Indicate if the resource can be used to run containers
+                                            interactively (from a YACS schema running on the local
+                                            machine for instance)
 **Working Directory**      No               Base working directory for the resource. The working
                                             directories for the jobs will by default be created as
                                             subdirectories of this directory.
@@ -107,7 +110,8 @@ in three different locations:
 3. If not, in the directory of the installation of SALOME KERNEL: 
    $KERNEL_ROOT_DIR/share/salome/resources/kernel/CatalogResources.xml.
 
-By default, the resource manager creates a resource with the name and the hostname of the user computer.
+By default, the resource manager creates a resource named "localhost" with the hostname
+of the local computer.
 
 JOBMANAGER resource management GUI
 ++++++++++++++++++++++++++++++++++
@@ -165,7 +169,7 @@ To launch a **command** job you need to fill the following attributes:
 - **protocol** = *ssh*
 - **username**
 - **Batch Manager** = *None*
-- **Is Cluster Head** = *false*
+- **Can launch batch jobs** = *yes*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys).
@@ -187,7 +191,7 @@ To launch a **command** job you need to fill the following attributes:
 - **Batch Manager**
 - **iprotocol**
 - **nb_proc_per_node** (only with PBS batch manager)
-- **Is Cluster Head** = *true*
+- **Can launch batch jobs** = *yes*
 
 **Warning:** You have to configure ssh for allowing ssh commands without asking 
 interactive password (RSA or DSA keys) between your computer and the cluster and
