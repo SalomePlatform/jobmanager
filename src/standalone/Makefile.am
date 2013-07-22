@@ -40,6 +40,9 @@ jobmanager_gui_LDADD = -lQtGui -lQtCore \
 			   $(top_builddir)/src/wrappers/libBL_Wrappers_Qt.la \
 			   @OMNIORB_LIBS@ \
 			   $(top_builddir)/idl/libJOBMANAGER_IDL.la \
-			   -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeLifeCycleCORBA -lSalomeIDLKernel -lSalomeNS
+			   -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeLifeCycleCORBA -lSalomeIDLKernel -lSalomeNS -lOpUtil \
+			   -lSALOMELocalTrace -lSALOMEBasics -lSalomeContainer -lSalomeHDFPersist -lSalomeResourcesManager \
+			   -lResourcesManager -lSalomeIDLKernel -lSalomeGenericObj -lSalomeNotification -lRegistry
+			   
 
 EXTRA_DIST = start_jobmanager.sh.in
