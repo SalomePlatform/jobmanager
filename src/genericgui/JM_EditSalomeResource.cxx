@@ -131,7 +131,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
 
   QLabel * batch_label = new QLabel("Batch Manager:");
   _batch_line = new QComboBox(this);
-  _batch_line->addItem("None", "ssh_batch");
+  _batch_line->addItem("None", "none");
   _batch_line->addItem("CCC", "ccc");
   _batch_line->addItem("LSF", "lsf");
   _batch_line->addItem("SGE", "sge");
