@@ -102,6 +102,8 @@ BL::JobTab::createJobSummaryTab()
   _job_em_label_value = new QLabel("");
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
+  QLabel * job_excl_label = new QLabel("Exclusive:");
+  _job_excl_label_value = new QLabel("");
 
   // Parameters for COORM
   QLabel * job_lf_label = new QLabel("Launcher file:");
@@ -129,9 +131,10 @@ BL::JobTab::createJobSummaryTab()
   _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
   _other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
   _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
+  _other_run_values_form->insertRow(3, job_excl_label, _job_excl_label_value);
 
   // Parameters for COORM
-  _other_run_values_form->insertRow(3, job_la_label, _job_la_label_value);
+  _other_run_values_form->insertRow(4, job_la_label, _job_la_label_value);
 
   QHBoxLayout * box_layout = new QHBoxLayout();
   box_layout->addLayout(_run_values_form);
@@ -233,6 +236,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_mdt_label_value->setText(QString(batch_params.maximum_duration.c_str()));
     _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
+    QString exclText = (batch_params.exclusive)? "yes" : "no";
+    _job_excl_label_value->setText(exclText);
 
 	// Parameters for COORM
     _job_lf_label_value->setText(QString(batch_params.launcher_file.c_str()));
@@ -322,6 +327,7 @@ BL::JobTab::reset(QString job_name)
     _job_mdt_label_value->setText("");
     _job_em_label_value->setText("");
     _job_nop_label_value->setText("");
+    _job_excl_label_value->setText("");
     _job_jobfile_label_value->setText("");
     _job_envfile_label_value->setText("");
 

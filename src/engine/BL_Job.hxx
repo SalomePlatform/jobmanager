@@ -62,13 +62,14 @@ namespace BL{
         std::string maximum_duration;
         std::string expected_memory;
         int nb_proc;
+        bool exclusive;
 
 		// Parameters for COORM
 		std::string launcher_file;
 		std::string launcher_args;
       };
-      void setBatchParameters(BL::Job::BatchParam & param);
-      BL::Job::BatchParam & getBatchParameters();
+      void setBatchParameters(const BL::Job::BatchParam & param);
+      const BL::Job::BatchParam & getBatchParameters();
 
       struct FilesParam
       {

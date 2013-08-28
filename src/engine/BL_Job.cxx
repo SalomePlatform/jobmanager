@@ -29,6 +29,7 @@ BL::Job::Job()
   _batch_params.maximum_duration = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
+  _batch_params.exclusive = false;
   _files_params.result_directory = "";
   _resource_choosed = "";
   _batch_queue = "";
@@ -53,6 +54,7 @@ BL::Job::Job(const std::string & name)
   _batch_params.maximum_duration = "";
   _batch_params.expected_memory = "";
   _batch_params.nb_proc = 0;
+  _batch_params.exclusive = false;
   _files_params.result_directory = "";
   _resource_choosed = "";
   _batch_queue = "";
@@ -148,19 +150,12 @@ BL::Job::getEnvFile()
 }
 
 void 
-BL::Job::setBatchParameters(BL::Job::BatchParam & param)
+BL::Job::setBatchParameters(const BL::Job::BatchParam & param)
 {
-  _batch_params.batch_directory = param.batch_directory;
-  _batch_params.maximum_duration = param.maximum_duration;
-  _batch_params.expected_memory = param.expected_memory;
-  _batch_params.nb_proc = param.nb_proc;
-
-  // Parameters for COORM
-  _batch_params.launcher_file = param.launcher_file;
-  _batch_params.launcher_args = param.launcher_args;
+  _batch_params = param;
 }
 
-BL::Job::BatchParam & 
+const BL::Job::BatchParam &
 BL::Job::getBatchParameters()
 {
   return _batch_params;

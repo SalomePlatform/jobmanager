@@ -72,6 +72,7 @@ namespace BL
       QLabel * _job_mdt_label_value;
       QLabel * _job_em_label_value;
       QLabel * _job_nop_label_value;
+      QLabel * _job_excl_label_value;
 
       // Specific Values
       QLabel * _yacs_dump_state_label;

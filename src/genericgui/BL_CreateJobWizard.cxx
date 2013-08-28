@@ -157,6 +157,8 @@ BL::CreateJobWizard::clone(const std::string & name)
     proc_value.setNum(batch_params.nb_proc);
     setField("proc_value", proc_value);
 
+    setField("exclusive", batch_params.exclusive);
+
     if (batch_params.maximum_duration == "")
     {
       setField("duration_hour", 0);
@@ -285,6 +287,7 @@ BL::CreateJobWizard::end(int result)
     expected_memory = mem.trimmed().toStdString() + mem_type.toStdString();
 
     nb_proc = field("proc_value").toInt();
+    exclusive = field("exclusive").toBool();
 
     // Files Panel
     QString f_result_directory = field("result_directory").toString();
@@ -389,21 +392,30 @@ void
 BL::JobNamePage::yacs_schema_button(bool checked)
 {
   if (checked)
+  {
     _explanation->setText("This job permits to launch a YACS schema into a SALOME application");
+    setField("exclusive", true);
+  }
 }
 
 void
 BL::JobNamePage::command_button(bool checked)
 {
   if (checked)
+  {
     _explanation->setText("This job permits to launch a script into a distributed resource. This script is not launched into a SALOME application");
+    setField("exclusive", false);
+  }
 }
 
 void
 BL::JobNamePage::python_salome_button(bool checked)
 {
   if (checked)
+  {
     _explanation->setText("This job permits to launch a python script into a SALOME application");
+    setField("exclusive", true);
+  }
 }
 
 bool
@@ -647,7 +659,7 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEService
   registerField("batch_directory", line_directory);
 
   // exected during time
-  QLabel * label_duration = new QLabel("Maximum during time: ");
+  QLabel * label_duration = new QLabel("Time limit: ");
   QSpinBox * spin_duration_hour = new QSpinBox(this);
   QLabel * label_duration_hour = new QLabel("Hours");
   spin_duration_hour->setMinimum(0);
@@ -660,7 +672,7 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEService
   registerField("duration_min", spin_duration_min);
 
   // memory
-  QLabel * label_memory = new QLabel("Memory per nodes expected: ");
+  QLabel * label_memory = new QLabel("Memory per node: ");
   QSpinBox * spin_memory = new QSpinBox(this);
   spin_memory->setMinimum(0);
   spin_memory->setMaximum(1000000);
@@ -672,11 +684,17 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEService
   registerField("mem_type", combo_memory);
 
   // proc
-  QLabel * label_proc = new QLabel("Number of proc expected: ");
+  QLabel * label_proc = new QLabel("Number of cores: ");
   QSpinBox * spin_proc = new QSpinBox(this);
   spin_proc->setMinimum(1);
   spin_proc->setMaximum(1000000);
   registerField("proc_value", spin_proc);
+
+  // exclusive
+  QLabel * label_exclusive = new QLabel("Exclusive (do not share nodes with other jobs): ");
+  QCheckBox * check_exclusive = new QCheckBox(this);
+  check_exclusive->setChecked(true);
+  registerField("exclusive", check_exclusive);
 
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(label_directory, 0, 0);
@@ -691,6 +709,8 @@ BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEService
   layout->addWidget(combo_memory, 2, 2);
   layout->addWidget(label_proc, 3, 0);
   layout->addWidget(spin_proc, 3, 1);
+  layout->addWidget(label_exclusive, 4, 0);
+  layout->addWidget(check_exclusive, 4, 1);
 
   main_layout->insertLayout(-1, layout);
 

@@ -320,6 +320,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->resource_required.name = CORBA::string_dup(job->getResource().c_str());
   job_parameters->resource_required.nb_proc = cpp_batch_params.nb_proc;
   job_parameters->queue = CORBA::string_dup(job->getBatchQueue().c_str());
+  job_parameters->exclusive = cpp_batch_params.exclusive;
 
   // Memory
   CORBA::Long memory;
@@ -623,6 +624,7 @@ BL::SALOMEServices::get_new_job(int job_number)
     batch_param.batch_directory = job_parameters->work_directory.in();
     batch_param.maximum_duration = job_parameters->maximum_duration.in();
     batch_param.nb_proc = job_parameters->resource_required.nb_proc;
+    batch_param.exclusive = job_parameters->exclusive;
     std::ostringstream mem_stream;
     mem_stream << job_parameters->resource_required.mem_mb << "mb";
     batch_param.expected_memory = mem_stream.str();

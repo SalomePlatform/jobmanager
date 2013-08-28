@@ -76,6 +76,7 @@ namespace BL{
 	  std::string maximum_duration;
       std::string expected_memory;
       int nb_proc;
+      bool exclusive;
 
 	  // Parameters for COORM
 	  std::string launcher_file;
