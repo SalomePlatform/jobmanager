@@ -41,7 +41,15 @@ MOC_FILES =                          BL_GenericGui_moc.cxx BL_JobsTable_moc.cxx 
 				     BL_Summary_moc.cxx JM_ResourceCatalog_moc.cxx \
 				     JM_SalomeResource_moc.cxx JM_EditSalomeResource_moc.cxx
 
-nodist_libBL_GenericGui_la_SOURCES = $(MOC_FILES)
+UIC_FILES = ui_ResourceRequirementsWizardPage.hxx \
+            ui_FilesWizardPage.hxx
+
+nodist_libBL_GenericGui_la_SOURCES = $(MOC_FILES) $(UIC_FILES)
+
+BUILT_SOURCES = $(MOC_FILES) $(UIC_FILES)
+
+# extra distributed files
+EXTRA_DIST = $(UIC_FILES:ui_%.hxx=%.ui)
 
 libBL_GenericGui_la_CXXFLAGS = $(qt4_cppflags) \
 			       -I$(top_srcdir)/src/bases \
@@ -65,8 +73,12 @@ SUFFIXES = .hxx _moc.cxx .qrc _qrc.cxx
 .qrc_qrc.cxx :
 	$(QT_RCC) -name $(*F)  $< -o $@
 
+# qt forms files generation (uic)
+ui_%.hxx: %.ui
+	$(QT_UIC) -o $@ $<
+
 clean-local-qt :
-	rm -f *_moc.cxx *_qrc.cxx ui_*.h
+	rm -f *_moc.cxx *_qrc.cxx ui_*.hxx
 
 clean-local: clean-local-qt
 

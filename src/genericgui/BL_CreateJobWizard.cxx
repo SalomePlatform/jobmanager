@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <ui_ResourceRequirementsWizardPage.hxx>
+#include <ui_FilesWizardPage.hxx>
+
 #ifdef WNT
 #undef ERROR
 #endif
@@ -72,12 +75,12 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   _job_name_page = new BL::JobNamePage(this, _jobs_manager);
 
   setPage(Page_JobName, _job_name_page);
-  setPage(Page_BatchParameters, new BL::BatchParametersPage(this, salome_services));
+  setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
 
   // For COORM
   setPage(Page_COORM_BatchParameters, new BL::COORM_BatchParametersPage(this, salome_services));
 
-  setPage(Page_Files, new BL::FilesPage(this));
+  setPage(Page_Files, new BL::FilesPage(this, salome_services));
   setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
   setPage(Page_Conclusion, new BL::ConclusionPage(this));
 
@@ -640,127 +643,30 @@ BL::CommandMainPage::nextId() const
   return BL::CreateJobWizard::Page_Resource;
 }
 
-BL::BatchParametersPage::BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services)
-: QWizardPage(parent)
+BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
+: QWizardPage(parent),
+  ui(new Ui::ResourceRequirementsWizardPage)
 {
-  setTitle("Enter Batch Parameters");
-  resource_choosed = "";
+  ui->setupUi(this);
 
-  _salome_services = salome_services;
-
-  QLabel *label = new QLabel("In this step you define the parameters of your job");
-  label->setWordWrap(true);
-  QVBoxLayout * main_layout = new QVBoxLayout;
-  main_layout->addWidget(label);
-
-  // batch_directory
-  QLabel * label_directory = new QLabel("Remote work directory: ");
-  QLineEdit * line_directory = new QLineEdit(this);
-  registerField("batch_directory", line_directory);
-
-  // exected during time
-  QLabel * label_duration = new QLabel("Time limit: ");
-  QSpinBox * spin_duration_hour = new QSpinBox(this);
-  QLabel * label_duration_hour = new QLabel("Hours");
-  spin_duration_hour->setMinimum(0);
-  spin_duration_hour->setMaximum(1000000);
-  registerField("duration_hour", spin_duration_hour);
-  QSpinBox * spin_duration_min = new QSpinBox(this);
-  QLabel * label_duration_min = new QLabel("Minutes");
-  spin_duration_min->setMinimum(0);
-  spin_duration_min->setMaximum(59);
-  registerField("duration_min", spin_duration_min);
-
-  // memory
-  QLabel * label_memory = new QLabel("Memory per node: ");
-  QSpinBox * spin_memory = new QSpinBox(this);
-  spin_memory->setMinimum(0);
-  spin_memory->setMaximum(1000000);
-  registerField("mem_value", spin_memory);
-  QComboBox * combo_memory = new QComboBox(this);
-  combo_memory->addItem("MB");
-  combo_memory->addItem("GB");
-  combo_memory->setCurrentIndex(1);
-  registerField("mem_type", combo_memory);
-
-  // proc
-  QLabel * label_proc = new QLabel("Number of cores: ");
-  QSpinBox * spin_proc = new QSpinBox(this);
-  spin_proc->setMinimum(1);
-  spin_proc->setMaximum(1000000);
-  registerField("proc_value", spin_proc);
-
-  // exclusive
-  QLabel * label_exclusive = new QLabel("Exclusive (do not share nodes with other jobs): ");
-  QCheckBox * check_exclusive = new QCheckBox(this);
-  check_exclusive->setChecked(true);
-  registerField("exclusive", check_exclusive);
-
-  QGridLayout *layout = new QGridLayout;
-  layout->addWidget(label_directory, 0, 0);
-  layout->addWidget(line_directory, 0, 1, 1, -1);
-  layout->addWidget(label_duration, 1, 0);
-  layout->addWidget(spin_duration_hour, 1, 1);
-  layout->addWidget(label_duration_hour, 1, 2);
-  layout->addWidget(spin_duration_min, 1, 3);
-  layout->addWidget(label_duration_min, 1, 4);
-  layout->addWidget(label_memory, 2, 0);
-  layout->addWidget(spin_memory, 2, 1);
-  layout->addWidget(combo_memory, 2, 2);
-  layout->addWidget(label_proc, 3, 0);
-  layout->addWidget(spin_proc, 3, 1);
-  layout->addWidget(label_exclusive, 4, 0);
-  layout->addWidget(check_exclusive, 4, 1);
-
-  main_layout->insertLayout(-1, layout);
-
-  setLayout(main_layout);
+  registerField("duration_hour", ui->spin_duration_hour);
+  registerField("duration_min", ui->spin_duration_min);
+  registerField("mem_value", ui->spin_memory);
+  registerField("mem_type", ui->combo_memory);
+  registerField("proc_value", ui->spin_proc);
+  registerField("exclusive", ui->check_exclusive);
 };
 
 BL::BatchParametersPage::~BatchParametersPage()
-{}
+{
+  delete ui;
+}
 
 void BL::BatchParametersPage::cleanupPage() {}
-
-void
-BL::BatchParametersPage::initializePage()
-{
-  QString f_resource_choosed = field("resource_choosed").toString();
-  if (f_resource_choosed != resource_choosed)
-  {
-    resource_choosed = f_resource_choosed;
-    // If choosed resource has a working_directory set
-    // Generates a default remote working directory
-    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
-    QString res_work_dir = resource_descr.working_directory.c_str();
-    if (res_work_dir != "")
-    {
-      time_t rawtime;
-      time(&rawtime);
-      std::string launch_date = ctime(&rawtime);
-      for (int i = 0; i < launch_date.size(); i++)
-        if (launch_date[i] == '/' ||
-            launch_date[i] == '-' ||
-            launch_date[i] == ':' ||
-            launch_date[i] == ' ')
-          launch_date[i] = '_';
-      launch_date.erase(--launch_date.end()); // Last caracter is a \n
-      QString date = launch_date.c_str();
-      setField("batch_directory", res_work_dir + "/" + date);
-    }
-  }
-}
 
 bool
 BL::BatchParametersPage::validatePage()
 {
-  QString batch_directory = field("batch_directory").toString();
-  if (batch_directory == "")
-  {
-    QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
-    return false;
-  }
-
   int mem = field("mem_value").toInt();
   if (mem == 0)
   {
@@ -893,96 +799,93 @@ BL::COORM_BatchParametersPage::initializePage()
   }
 }
 
-BL::FilesPage::FilesPage(BL::CreateJobWizard * parent)
-: QWizardPage(parent)
+BL::FilesPage::FilesPage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
+: QWizardPage(parent),
+  ui(new Ui::FilesWizardPage)
 {
-  setTitle("Enter Input and Output Files");
+  ui->setupUi(this);
 
-  QLabel * main_label = new QLabel("In this step you define input and output files of your job");
-  main_label->setWordWrap(true);
+  resource_choosed = "";
+  _salome_services = salome_services;
 
-  // input_files
-  QGroupBox * input_group_box = new QGroupBox("Input Files");
-  _input_files_button = new QPushButton("Add input files");
-  _input_files_button->show();
-  connect(_input_files_button, SIGNAL(clicked()), this, SLOT(choose_input_files()));
-  _remove_input_files_button = new QPushButton("Remove input files");
-  _remove_input_files_button->show();
-  _remove_input_files_button->setEnabled(false);
-  connect(_remove_input_files_button, SIGNAL(clicked()), this, SLOT(remove_input_files()));
-  _input_files_list = new QListWidget();
-  _input_files_list->setSelectionMode(QAbstractItemView::MultiSelection);
-  connect(_input_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(input_itemSelectionChanged()));
+  connect(ui->add_input_files_button, SIGNAL(clicked()), this, SLOT(choose_input_files()));
+  connect(ui->remove_input_files_button, SIGNAL(clicked()), this, SLOT(remove_input_files()));
+  connect(ui->input_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(input_itemSelectionChanged()));
+  connect(ui->add_output_files_button, SIGNAL(clicked()), this, SLOT(add_output_file()));
+  connect(ui->remove_output_files_button, SIGNAL(clicked()), this, SLOT(remove_output_files()));
+  connect(ui->output_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(output_itemSelectionChanged()));
+  connect(ui->button_choose_result_dir, SIGNAL(clicked()), this, SLOT(choose_local_directory()));
 
-  QGridLayout * input_box = new QGridLayout;
-  input_box->addWidget(_input_files_button, 0, 0);
-  input_box->addWidget(_remove_input_files_button, 0, 1);
-  input_box->addWidget(_input_files_list, 1, 0, 1, -1);
-  input_group_box->setLayout(input_box);
-
-  // output_files
-  QGroupBox * output_group_box = new QGroupBox("Output Files");
-  _output_files_button = new QPushButton("Add output file");
-  _output_files_button->show();
-  connect(_output_files_button, SIGNAL(clicked()), this, SLOT(add_output_file()));
-  _remove_output_files_button = new QPushButton("Remove output files");
-  _remove_output_files_button->show();
-  _remove_output_files_button->setEnabled(false);
-  connect(_remove_output_files_button, SIGNAL(clicked()), this, SLOT(remove_output_files()));
-  _output_files_list = new QListWidget();
-  _output_files_list->setSelectionMode(QAbstractItemView::MultiSelection);
-  _output_files_list->setEditTriggers(QAbstractItemView::DoubleClicked);
-  connect(_output_files_list, SIGNAL(itemSelectionChanged()), this, SLOT(output_itemSelectionChanged()));
-
-  // Results Directory
-  QPushButton * button_result = new QPushButton("Local Result directory");
-  connect(button_result, SIGNAL(clicked()), this, SLOT(choose_local_directory()));
-  _result_directory = new QLineEdit(this);
+  registerField("batch_directory", ui->line_remote_working_dir);
+  registerField("result_directory", ui->line_result_dir);
 
   // Default result directory is home directory (if we found it)
   // First try -> HOME
 #ifdef WNT
-  _result_directory->setText(getenv("HOME"));
+  ui->line_result_dir->setText(getenv("HOME"));
 #else
   if (getenv("HOME"))
-    _result_directory->setText(getenv("HOME"));
+    ui->line_result_dir->setText(getenv("HOME"));
   else {
     // Second try -> getpwuid
     struct passwd * pass_struct = getpwuid(getuid());
     if (pass_struct)
-      _result_directory->setText(pass_struct->pw_dir);
+      ui->line_result_dir->setText(pass_struct->pw_dir);
   }
 #endif
-  registerField("result_directory", _result_directory);
 
-  QGridLayout * output_box = new QGridLayout;
-  output_box->addWidget(_output_files_button, 0, 0);
-  output_box->addWidget(_remove_output_files_button, 0, 1);
-  output_box->addWidget(_output_files_list, 1, 0, 1, -1);
-  output_box->addWidget(button_result, 2, 0);
-  output_box->addWidget(_result_directory, 2, 1, 1, -1);
-  output_group_box->setLayout(output_box);
-
-  QVBoxLayout * main_layout = new QVBoxLayout;
-  main_layout->addWidget(main_label);
-  main_layout->addWidget(input_group_box);
-  main_layout->addWidget(output_group_box);
-  setLayout(main_layout);
-
-  parent->setFilesList(_input_files_list, _output_files_list);
+  parent->setFilesList(ui->input_files_list, ui->output_files_list);
 };
 
 BL::FilesPage::~FilesPage()
-{}
+{
+  delete ui;
+}
+
+void
+BL::FilesPage::initializePage()
+{
+  QString f_resource_choosed = field("resource_choosed").toString();
+  if (f_resource_choosed != resource_choosed)
+  {
+    resource_choosed = f_resource_choosed;
+    // If choosed resource has a working_directory set
+    // Generates a default remote working directory
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    QString res_work_dir = resource_descr.working_directory.c_str();
+    if (res_work_dir != "")
+    {
+      time_t rawtime;
+      time(&rawtime);
+      std::string launch_date = ctime(&rawtime);
+      for (int i = 0; i < launch_date.size(); i++)
+        if (launch_date[i] == '/' ||
+            launch_date[i] == '-' ||
+            launch_date[i] == ':' ||
+            launch_date[i] == ' ')
+          launch_date[i] = '_';
+      launch_date.erase(--launch_date.end()); // Last caracter is a \n
+      QString date = launch_date.c_str();
+      setField("batch_directory", res_work_dir + "/" + date);
+    }
+  }
+}
 
 bool
 BL::FilesPage::validatePage()
 {
+  QString batch_directory = field("batch_directory").toString();
+  if (batch_directory == "")
+  {
+    QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
+    return false;
+  }
+
   QString result_directory = field("result_directory").toString();
   
-  for (int i = 0; i < _output_files_list->count(); ++i)
+  for (int i = 0; i < ui->output_files_list->count(); ++i)
   {
-    QListWidgetItem * item = _output_files_list->item(i);
+    QListWidgetItem * item = ui->output_files_list->item(i);
     if (item->text() == "TO EDIT!")
     {
       QMessageBox::warning(NULL, "Ouput Files Error", "Some output files are not defined !");
@@ -990,7 +893,7 @@ BL::FilesPage::validatePage()
     }
   }
 
-  if (result_directory == "" && _output_files_list->count() != 0)
+  if (result_directory == "" && ui->output_files_list->count() != 0)
   {
     QMessageBox::warning(NULL, "Result Directory Error", "Please enter a result directory or remove output files");
     return false;
@@ -1007,8 +910,8 @@ BL::FilesPage::choose_input_files()
                                                     tr("All Files (*)"));
   for (int i = 0; i < files.size(); ++i) 
   {
-    if (_input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
-      _input_files_list->addItem(files.at(i));
+    if (ui->input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
+      ui->input_files_list->addItem(files.at(i));
   }
 }
 
@@ -1021,27 +924,27 @@ BL::FilesPage::choose_local_directory()
                                                  | QFileDialog::DontResolveSymlinks);
 
   if (dir != "")
-    _result_directory->setText(dir);
+    ui->line_result_dir->setText(dir);
 }
 
 void 
 BL::FilesPage::remove_input_files()
 {
-  QList<QListWidgetItem *> list = _input_files_list->selectedItems();
+  QList<QListWidgetItem *> list = ui->input_files_list->selectedItems();
   for (int i = 0; i < list.size(); ++i)
   {
-    int row = _input_files_list->row( list.at(i) );
-    delete _input_files_list->takeItem(row);
+    int row = ui->input_files_list->row( list.at(i) );
+    delete ui->input_files_list->takeItem(row);
   }
 }
 
 void 
 BL::FilesPage::input_itemSelectionChanged()
 {
-  if (_input_files_list->selectedItems().size() > 0)
-    _remove_input_files_button->setEnabled(true);
+  if (ui->input_files_list->selectedItems().size() > 0)
+    ui->remove_input_files_button->setEnabled(true);
   else
-    _remove_input_files_button->setEnabled(false);
+    ui->remove_input_files_button->setEnabled(false);
 }
 
 void
@@ -1049,27 +952,27 @@ BL::FilesPage::add_output_file()
 {
   QListWidgetItem * new_item = new QListWidgetItem("TO EDIT!");
   new_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-  _output_files_list->addItem(new_item);
+  ui->output_files_list->addItem(new_item);
 }
 
 void 
 BL::FilesPage::remove_output_files()
 {
-  QList<QListWidgetItem *> list = _output_files_list->selectedItems();
+  QList<QListWidgetItem *> list = ui->output_files_list->selectedItems();
   for (int i = 0; i < list.size(); ++i)
   {
-    int row = _output_files_list->row( list.at(i) );
-    delete _output_files_list->takeItem(row);
+    int row = ui->output_files_list->row( list.at(i) );
+    delete ui->output_files_list->takeItem(row);
   }
 }
 
 void 
 BL::FilesPage::output_itemSelectionChanged()
 {
-  if (_output_files_list->selectedItems().size() > 0)
-    _remove_output_files_button->setEnabled(true);
+  if (ui->output_files_list->selectedItems().size() > 0)
+    ui->remove_output_files_button->setEnabled(true);
   else
-    _remove_output_files_button->setEnabled(false);
+    ui->remove_output_files_button->setEnabled(false);
 }
 
 int 

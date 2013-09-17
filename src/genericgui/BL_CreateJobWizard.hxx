@@ -29,6 +29,11 @@
 #include <string>
 #include <list>
 
+namespace Ui {
+  class ResourceRequirementsWizardPage;
+  class FilesWizardPage;
+}
+
 namespace BL{
 
   class JobsManager_QT;
@@ -149,17 +154,15 @@ namespace BL{
     Q_OBJECT
 
     public:
-      BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services);
+      BatchParametersPage(QWidget * parent);
       virtual ~BatchParametersPage();
 
       virtual bool validatePage();
       virtual int nextId() const;
       virtual void cleanupPage();
-      virtual void initializePage();
 
     private:
-      BL::SALOMEServices * _salome_services;
-      QString resource_choosed;
+      Ui::ResourceRequirementsWizardPage * ui;
   };
 
   // For COORM
@@ -190,9 +193,10 @@ namespace BL{
     Q_OBJECT
 
     public:
-      FilesPage(BL::CreateJobWizard * parent);
+      FilesPage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services);
       virtual ~FilesPage();
 
+      virtual void initializePage();
       virtual int nextId() const;
       virtual bool validatePage();
       virtual void cleanupPage() {}
@@ -208,14 +212,9 @@ namespace BL{
       void output_itemSelectionChanged();
 
     private:
-      QPushButton * _input_files_button;
-      QPushButton * _remove_input_files_button;
-      QListWidget * _input_files_list;
-      QLineEdit * _result_directory;
-
-      QPushButton * _output_files_button;
-      QPushButton * _remove_output_files_button;
-      QListWidget * _output_files_list;
+      Ui::FilesWizardPage * ui;
+      BL::SALOMEServices * _salome_services;
+      QString resource_choosed;
   };
 
   class ResourcePage: public QWizardPage
