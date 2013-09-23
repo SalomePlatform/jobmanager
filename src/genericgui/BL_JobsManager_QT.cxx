@@ -306,7 +306,8 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   }
 
   param.maximum_duration = wizard.maximum_duration;
-  param.expected_memory = wizard.expected_memory;
+  param.mem_limit = wizard.mem_limit;
+  param.mem_req_type = wizard.mem_req_type;
   param.nb_proc = wizard.nb_proc;
   param.exclusive = wizard.exclusive;
 

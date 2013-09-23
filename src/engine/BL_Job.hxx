@@ -56,11 +56,14 @@ namespace BL{
       void setDumpYACSState(const int & dump_yacs_state);
       int getDumpYACSState();
 
+      enum MemReqType {MEM_PER_NODE, MEM_PER_CPU};
+
       struct BatchParam
       {
         std::string batch_directory;
         std::string maximum_duration;
-        std::string expected_memory;
+        unsigned long mem_limit;
+        MemReqType mem_req_type;
         int nb_proc;
         bool exclusive;
 

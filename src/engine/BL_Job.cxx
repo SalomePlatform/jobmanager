@@ -23,11 +23,13 @@ BL::Job::Job()
 {
   DEBTRACE("Creating BL::Job");
   _name = "";
+  _type = COMMAND;
   _job_file = "";
   _env_file = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
-  _batch_params.expected_memory = "";
+  _batch_params.mem_limit = 0;
+  _batch_params.mem_req_type = MEM_PER_NODE;
   _batch_params.nb_proc = 0;
   _batch_params.exclusive = false;
   _files_params.result_directory = "";
@@ -48,11 +50,13 @@ BL::Job::Job(const std::string & name)
 {
   DEBTRACE("Creating BL::Job with name : " << name);
   _name = name;
+  _type = COMMAND;
   _job_file = "";
   _env_file = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
-  _batch_params.expected_memory = "";
+  _batch_params.mem_limit = 0;
+  _batch_params.mem_req_type = MEM_PER_NODE;
   _batch_params.nb_proc = 0;
   _batch_params.exclusive = false;
   _files_params.result_directory = "";

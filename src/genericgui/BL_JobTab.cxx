@@ -24,6 +24,8 @@
 #undef ERROR
 #endif
 
+using namespace std;
+
 BL::JobTab::JobTab(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QTabWidget(parent)
 {
   DEBTRACE("Creating BL::JobTab");
@@ -234,12 +236,31 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_rd_label_value->setText(QString(files_params.result_directory.c_str()));
 
     _job_mdt_label_value->setText(QString(batch_params.maximum_duration.c_str()));
-    _job_em_label_value->setText(QString(batch_params.expected_memory.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
     QString exclText = (batch_params.exclusive)? "yes" : "no";
     _job_excl_label_value->setText(exclText);
 
-	// Parameters for COORM
+    // Memory requirement
+    unsigned long long mem_mb = batch_params.mem_limit;
+    ostringstream mem_ss;
+    if (mem_mb % 1024 == 0)
+      mem_ss << mem_mb / 1024 << "GB";
+    else
+      mem_ss << mem_mb << "MB";
+    switch (batch_params.mem_req_type)
+    {
+    case BL::Job::MEM_PER_NODE:
+      mem_ss << " per node";
+      break;
+    case BL::Job::MEM_PER_CPU:
+      mem_ss << " per core";
+      break;
+    default:
+      throw Exception("Unknown memory requirement, unable to show selected job");
+    }
+    _job_em_label_value->setText(QString(mem_ss.str().c_str()));
+
+    // Parameters for COORM
     _job_lf_label_value->setText(QString(batch_params.launcher_file.c_str()));
     _job_la_label_value->setText(QString(batch_params.launcher_args.c_str()));
 

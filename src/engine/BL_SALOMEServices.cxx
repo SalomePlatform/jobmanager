@@ -323,14 +323,19 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->exclusive = cpp_batch_params.exclusive;
 
   // Memory
-  CORBA::Long memory;
-  std::string ram = cpp_batch_params.expected_memory.substr(0,cpp_batch_params.expected_memory.size()-2);
-  std::istringstream iss(ram);
-  iss >> memory;
-  std::string unity = cpp_batch_params.expected_memory.substr(cpp_batch_params.expected_memory.size()-2, 2);
-  if((unity.find("gb") != std::string::npos))
-    memory = memory * 1024;
-  job_parameters->resource_required.mem_mb = memory;
+  switch (cpp_batch_params.mem_req_type)
+  {
+  case BL::Job::MEM_PER_NODE:
+    job_parameters->resource_required.mem_mb = cpp_batch_params.mem_limit;
+    job_parameters->mem_per_cpu = 0;
+    break;
+  case BL::Job::MEM_PER_CPU:
+    job_parameters->resource_required.mem_mb = 0;
+    job_parameters->mem_per_cpu = cpp_batch_params.mem_limit;
+    break;
+  default:
+    throw Exception("Unknown memory requirement, unable to create job");
+  }
 
   // Parameters for COORM
   job_parameters->launcher_file = CORBA::string_dup(cpp_batch_params.launcher_file.c_str());
@@ -625,11 +630,19 @@ BL::SALOMEServices::get_new_job(int job_number)
     batch_param.maximum_duration = job_parameters->maximum_duration.in();
     batch_param.nb_proc = job_parameters->resource_required.nb_proc;
     batch_param.exclusive = job_parameters->exclusive;
-    std::ostringstream mem_stream;
-    mem_stream << job_parameters->resource_required.mem_mb << "mb";
-    batch_param.expected_memory = mem_stream.str();
 
-	// Parameters for COORM
+    if (job_parameters->mem_per_cpu != 0)
+    {
+      batch_param.mem_limit = job_parameters->mem_per_cpu;
+      batch_param.mem_req_type = BL::Job::MEM_PER_CPU;
+    }
+    else
+    {
+      batch_param.mem_limit = job_parameters->resource_required.mem_mb;
+      batch_param.mem_req_type = BL::Job::MEM_PER_NODE;
+    }
+
+    // Parameters for COORM
     batch_param.launcher_file = job_parameters->launcher_file.in();
     batch_param.launcher_args = job_parameters->launcher_args.in();
 

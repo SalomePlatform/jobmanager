@@ -34,6 +34,9 @@
 #undef ERROR
 #endif
 
+using namespace std;
+using namespace BL;
+
 BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALOMEServices * salome_services)
 {
   DEBTRACE("Creating BL::CreateJobWizard");
@@ -53,7 +56,8 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   coorm_batch_directory = "";
 
   maximum_duration = "";
-  expected_memory = "";
+  mem_limit = 0;
+  mem_req_type = BL::Job::MEM_PER_NODE;
   nb_proc = 1;
 
   // Parameters for COORM
@@ -73,9 +77,10 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   // Common pages
   _job_name_page = new BL::JobNamePage(this, _jobs_manager);
+  _batch_parameters_page = new BL::BatchParametersPage(this, salome_services);
 
   setPage(Page_JobName, _job_name_page);
-  setPage(Page_BatchParameters, new BL::BatchParametersPage(this));
+  setPage(Page_BatchParameters, _batch_parameters_page);
 
   // For COORM
   setPage(Page_COORM_BatchParameters, new BL::COORM_BatchParametersPage(this, salome_services));
@@ -183,16 +188,18 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("duration_min", min);
     }
 
-    std::string mem_type = batch_params.expected_memory.substr(batch_params.expected_memory.size() - 2, 2);
-    if (mem_type == "mb")
-      setField("mem_type", 0);
+    unsigned long long mem_mb = batch_params.mem_limit;
+    if (mem_mb % 1024 == 0)
+    {
+      setField("mem_value", mem_mb / 1024);
+      _batch_parameters_page->setMemUnit(BatchParametersPage::GB);
+    }
     else
-      setField("mem_type", 1);
-    std::string mem_value = batch_params.expected_memory.substr(0, batch_params.expected_memory.find(mem_type));
-    int mem_val; 
-    std::istringstream iss_mem(mem_value);
-    iss_mem >> mem_val;
-    setField("mem_value", mem_val);
+    {
+      setField("mem_value", mem_mb);
+      _batch_parameters_page->setMemUnit(BatchParametersPage::MB);
+    }
+    _batch_parameters_page->setMemReqType(batch_params.mem_req_type);
 
     BL::Job::FilesParam files_params = job->getFilesParameters();
 
@@ -282,12 +289,20 @@ BL::CreateJobWizard::end(int result)
       maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
     }
 
-    QString mem = field("mem_value").toString();
-    int mem_type_i = field("mem_type").toInt();
-    QString mem_type("gb");
-    if (mem_type_i == 0)
-      mem_type = "mb";
-    expected_memory = mem.trimmed().toStdString() + mem_type.toStdString();
+    unsigned long mem = field("mem_value").toULongLong();
+    BatchParametersPage::MemUnit mem_unit = _batch_parameters_page->getMemUnit();
+    switch (mem_unit)
+    {
+    case BatchParametersPage::MB:
+      mem_limit = mem;
+      break;
+    case BatchParametersPage::GB:
+      mem_limit = mem * 1024;
+      break;
+    default:
+      throw Exception("Invalid memory unit");
+    }
+    mem_req_type = _batch_parameters_page->getMemReqType();
 
     nb_proc = field("proc_value").toInt();
     exclusive = field("exclusive").toBool();
@@ -643,44 +658,119 @@ BL::CommandMainPage::nextId() const
   return BL::CreateJobWizard::Page_Resource;
 }
 
-BL::BatchParametersPage::BatchParametersPage(QWidget * parent)
+BatchParametersPage::BatchParametersPage(QWidget * parent, SALOMEServices * salome_services)
 : QWizardPage(parent),
-  ui(new Ui::ResourceRequirementsWizardPage)
+  ui(new Ui::ResourceRequirementsWizardPage),
+  _salome_services(salome_services),
+  resource_choosed()
 {
   ui->setupUi(this);
 
   registerField("duration_hour", ui->spin_duration_hour);
   registerField("duration_min", ui->spin_duration_min);
   registerField("mem_value", ui->spin_memory);
-  registerField("mem_type", ui->combo_memory);
   registerField("proc_value", ui->spin_proc);
   registerField("exclusive", ui->check_exclusive);
+
+  ui->combo_memory_unit->insertItem(ui->combo_memory_unit->count(), "MB", MB);
+  ui->combo_memory_unit->insertItem(ui->combo_memory_unit->count(), "GB", GB);
+  setMemUnit(GB);
+
+  ui->combo_memory_req_type->insertItem(ui->combo_memory_req_type->count(),
+                                        "per node", Job::MEM_PER_NODE);
+  ui->combo_memory_req_type->insertItem(ui->combo_memory_req_type->count(),
+                                        "per core", Job::MEM_PER_CPU);
+
+  ui->label_warning_icon->setPixmap(QIcon::fromTheme("dialog-error").pixmap(16, 16));
+
+  connect(ui->combo_memory_req_type, SIGNAL(currentIndexChanged(int)), this, SIGNAL(completeChanged()));
+  connect(ui->check_exclusive, SIGNAL(stateChanged(int)), this, SIGNAL(completeChanged()));
 };
 
-BL::BatchParametersPage::~BatchParametersPage()
+BatchParametersPage::~BatchParametersPage()
 {
   delete ui;
 }
 
-void BL::BatchParametersPage::cleanupPage() {}
+void
+BatchParametersPage::initializePage()
+{
+  string f_resource_choosed = field("resource_choosed").toString().toStdString();
+  if (f_resource_choosed != resource_choosed)
+  {
+    resource_choosed = f_resource_choosed;
+    // If choosed resource has a SLURM batch manager, activate option "memory per cpu"
+    ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
+    if (resource_descr.batch == "slurm")
+    {
+      ui->combo_memory_req_type->setEnabled(true);
+    }
+    else
+    {
+      ui->combo_memory_req_type->setEnabled(false);
+      setMemReqType(Job::MEM_PER_NODE);
+    }
+  }
+}
+
+BatchParametersPage::MemUnit
+BatchParametersPage::getMemUnit() const
+{
+  int idx = ui->combo_memory_unit->currentIndex();
+  return (MemUnit)(ui->combo_memory_unit->itemData(idx).toInt());
+}
+
+void
+BatchParametersPage::setMemUnit(MemUnit mem_unit)
+{
+  ui->combo_memory_unit->setCurrentIndex(ui->combo_memory_unit->findData(mem_unit));
+}
+
+Job::MemReqType
+BatchParametersPage::getMemReqType() const
+{
+  int idx = ui->combo_memory_req_type->currentIndex();
+  return (Job::MemReqType)(ui->combo_memory_req_type->itemData(idx).toInt());
+}
+
+void
+BatchParametersPage::setMemReqType(Job::MemReqType mem_req_type)
+{
+  ui->combo_memory_req_type->setCurrentIndex(ui->combo_memory_req_type->findData(mem_req_type));
+}
 
 bool
-BL::BatchParametersPage::validatePage()
+BatchParametersPage::isComplete() const
 {
-  int mem = field("mem_value").toInt();
-  if (mem == 0)
+  QString warn_msg;
+  if (field("exclusive").toBool() && getMemReqType() == Job::MEM_PER_CPU)
   {
-    QMessageBox::warning(NULL, "Memory Error", "Please enter an expected memory");
+    warn_msg = "Parameters \"Exclusive\" and \"Memory required per core\" "
+               "are mutually exclusive. Please uncheck \"Exclusive\" if you "
+               "want to specify the memory requirement \"per core\".";
+  }
+  ui->label_warning_text->setText(warn_msg);
+  if (warn_msg.isEmpty())
+  {
+    ui->label_warning_icon->hide();
+    return true;
+  }
+  else
+  {
+    ui->label_warning_icon->show();
     return false;
   }
+}
 
-  return true;
+void
+BatchParametersPage::cleanupPage()
+{
 }
 
 int 
-BL::BatchParametersPage::nextId() const
+BatchParametersPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Files;
+  return CreateJobWizard::Page_Files;
 }
 
 BL::COORM_BatchParametersPage::COORM_BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services)

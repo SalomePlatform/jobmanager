@@ -38,6 +38,7 @@ namespace BL{
 
   class JobsManager_QT;
   class JobNamePage;
+  class BatchParametersPage;
   class CreateJobWizard: public QWizard
   {
     Q_OBJECT
@@ -54,13 +55,12 @@ namespace BL{
       void end(int result);
 
     private:
-      //Page Name
-      QLineEdit * _nameLineEdit;
       BL::JobsManager_QT * _jobs_manager;
       QListWidget * _input_files_list;
       QListWidget * _output_files_list;
 
       BL::JobNamePage * _job_name_page;
+      BL::BatchParametersPage * _batch_parameters_page;
       BL::SALOMEServices * _salome_services;
 
     public:
@@ -75,17 +75,18 @@ namespace BL{
 
       std::string batch_directory;
 
-	  // For COORM
-	  std::string coorm_batch_directory;
+      // For COORM
+      std::string coorm_batch_directory;
 
-	  std::string maximum_duration;
-      std::string expected_memory;
+      std::string maximum_duration;
+      unsigned long mem_limit;
+      BL::Job::MemReqType mem_req_type;
       int nb_proc;
       bool exclusive;
 
-	  // Parameters for COORM
-	  std::string launcher_file;
-	  std::string launcher_args;
+      // Parameters for COORM
+      std::string launcher_file;
+      std::string launcher_args;
 
       std::string result_directory;
       std::list<std::string> input_files_list;
@@ -104,7 +105,7 @@ namespace BL{
             Page_Command_Main_Definitions,
             Page_PythonSalome_Main_Definitions,
             Page_BatchParameters,
-			Page_COORM_BatchParameters,
+            Page_COORM_BatchParameters,
             Page_Files,
             Page_Resource,
             Page_Conclusion};
@@ -154,15 +155,26 @@ namespace BL{
     Q_OBJECT
 
     public:
-      BatchParametersPage(QWidget * parent);
+      enum MemUnit {MB, GB};
+
+      BatchParametersPage(QWidget * parent, BL::SALOMEServices * salome_services);
       virtual ~BatchParametersPage();
 
-      virtual bool validatePage();
+      virtual void initializePage();
+      virtual bool isComplete() const;
       virtual int nextId() const;
       virtual void cleanupPage();
 
+      MemUnit getMemUnit() const;
+      void setMemUnit(MemUnit mem_unit);
+
+      BL::Job::MemReqType getMemReqType() const;
+      void setMemReqType(BL::Job::MemReqType mem_req_type);
+
     private:
       Ui::ResourceRequirementsWizardPage * ui;
+      BL::SALOMEServices * _salome_services;
+      std::string resource_choosed;
   };
 
   // For COORM
