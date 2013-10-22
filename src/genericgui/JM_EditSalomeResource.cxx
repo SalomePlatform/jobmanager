@@ -73,6 +73,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   QLabel * working_directory_label = new QLabel("Working Directory:");
   _working_directory = new QLineEdit(this);
   _can_launch_batch_jobs = new QCheckBox("This resource can be used to launch batch jobs", this);
+  _can_launch_batch_jobs->setCheckState(Qt::Checked);
   _can_run_containers = new QCheckBox("This resource can be used to run interactive containers", this);
 
   QGridLayout * m_layout = new QGridLayout;
