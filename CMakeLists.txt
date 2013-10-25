@@ -60,7 +60,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
 # User options
 # (some options have already been defined in KERNEL) 
 # ============
-#OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ${SALOME_BUILD_TESTS}) For use in the future
+#OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ON) #for use in the future
 OPTION(SALOME_BUILD_DOC "Generate SALOME JOBMANAGER documentation" ON)
 
 ##
@@ -87,7 +87,9 @@ ENDIF()
 SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI")
 IF(EXISTS ${GUI_ROOT_DIR})
   LIST(APPEND CMAKE_MODULE_PATH "${GUI_ROOT_DIR}/adm_local/cmake_files")
-  FIND_PACKAGE(SalomeGUI)
+  FIND_PACKAGE(SalomeGUI REQUIRED)
+  ADD_DEFINITIONS(${GUI_DEFINITIONS})
+  INCLUDE_DIRECTORIES(${GUI_INCLUDE_DIRS})
 ELSE(EXISTS ${GUI_ROOT_DIR})
   MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR")
 ENDIF(EXISTS ${GUI_ROOT_DIR})
