@@ -61,7 +61,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
 # (some options have already been defined in KERNEL) 
 # ============
 #OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ${SALOME_BUILD_TESTS}) For use in the future
-OPTION(SALOME_BUILD_DOC "Generate SALOME JOBMANAGER documentation" ${SALOME_BUILD_DOC})
+OPTION(SALOME_BUILD_DOC "Generate SALOME JOBMANAGER documentation" ON)
 
 ##
 ## From KERNEL:
