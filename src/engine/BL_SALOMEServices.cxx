@@ -337,6 +337,11 @@ BL::SALOMEServices::create_job(BL::Job * job)
     throw Exception("Unknown memory requirement, unable to create job");
   }
 
+  // Unused parameters
+  job_parameters->resource_required.nb_node = -1;
+  job_parameters->resource_required.nb_proc_per_node = -1;
+  job_parameters->resource_required.cpu_clock = -1;
+
   // Parameters for COORM
   job_parameters->launcher_file = CORBA::string_dup(cpp_batch_params.launcher_file.c_str());
   job_parameters->launcher_args = CORBA::string_dup(cpp_batch_params.launcher_args.c_str());
