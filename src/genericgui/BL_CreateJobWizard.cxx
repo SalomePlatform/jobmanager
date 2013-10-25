@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <ui_ResourceRequirementsWizardPage.hxx>
-#include <ui_FilesWizardPage.hxx>
+#include <ui_ResourceRequirementsWizardPage.h>
+#include <ui_FilesWizardPage.h>
 
 #ifdef WNT
 #undef ERROR

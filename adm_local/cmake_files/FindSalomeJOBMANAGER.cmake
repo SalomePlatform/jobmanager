@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,16 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+#
 
-ACLOCAL_AMFLAGS = -I m4
+IF(NOT SalomeJOBMANAGER_FIND_QUIETLY)
+  MESSAGE(STATUS "Looking for Salome JOBMANAGER ...")
+ENDIF()
 
-SUBDIRS = idl src doc
+SET(CMAKE_PREFIX_PATH "${JOBMANAGER_ROOT_DIR}")
 
-EXTRA_DIST = build_configure clean_configure
+SALOME_FIND_PACKAGE(SalomeJOBMANAGER SalomeJOBMANAGER CONFIG)
+
+IF(NOT SalomeJOBMANAGER_FIND_QUIETLY)
+  MESSAGE(STATUS "Found Salome JOBMANAGER: ${JOBMANAGER_ROOT_DIR}")
+ENDIF()

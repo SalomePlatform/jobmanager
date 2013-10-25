@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2012-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,4 +17,26 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SUBDIRS = bases engine genericgui wrappers standalone salomegui
+# --- headers ---
+
+# header files / no moc processed
+SET(BL_Bases_HEADERS
+  BL_Traces.hxx 
+  BL_Exception.hxx
+)
+
+# --- sources ---
+
+# sources / static
+SET(BL_Bases_SOURCES
+  BL_Exception.cxx 
+  BL_Exception.hxx
+)
+
+# --- rules ---
+
+ADD_LIBRARY(BL_Bases ${BL_Bases_SOURCES})
+TARGET_LINK_LIBRARIES(BL_Bases ${_link_LIBRARIES} )
+INSTALL(TARGETS BL_Bases EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+INSTALL(FILES ${BL_Bases_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

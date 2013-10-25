@@ -1,5 +1,4 @@
-#! /bin/sh
-# Copyright (C) 2009-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2012-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,17 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# ---
-# File   : clean_configure
-# Author : Vadim SANDLER, Open CASCADE S.A.S (vadim.sandler@opencascade.com)
-# ---
-#
-rm -rf autom4te.cache aclocal.m4 configure build_configure.log
-( cd m4 && rm -rf l*.m4 config.guess config.sub install-sh ltmain.sh missing depcomp )
-rm -rf jobmanager_config.h.in INSTALL
-find . -name "*~" -print -exec rm {} \;
-find . -name "*.pyc" -print -exec rm {} \;
+##
+# Common packages
+##
+SET(SUBDIRS_COMMON
+  bases 
+  engine 
+  genericgui 
+  wrappers 
+  standalone 
+  salomegui
+)
 
-# ... 
+SET(SUBDIRS
+  ${SUBDIRS_COMMON}
+)
 
-find . -name Makefile.in | xargs rm -f
+FOREACH(dir ${SUBDIRS})
+ ADD_SUBDIRECTORY(${dir})
+ENDFOREACH(dir ${SUBDIRS})
+            

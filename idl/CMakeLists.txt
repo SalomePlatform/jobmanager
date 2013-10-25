@@ -1,5 +1,4 @@
-#! /bin/sh
-# Copyright (C) 2009-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2012-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,22 +17,25 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ORIG_DIR=`pwd`
-run() {
-    local logfile=$ORIG_DIR/build_configure.log
-    printf "%-50s" "$1 ... "
-    eval $1 > $logfile 2>&1
-    if test $? != 0 ; then
-        echo "[FAILED]"
-        echo "see file build_configure.log ..."
-        exit 1
-    fi
-    echo "[  OK  ]"
-}
+INCLUDE(UseOmniORB)  # Provided by KERNEL
 
-run "aclocal -I m4"
-run "libtoolize --force --copy --automake"
-run "autoheader -I m4"
-run "autoconf"
-run "automake --add-missing --copy"
+INCLUDE_DIRECTORIES(
+  ${OMNIORB_INCLUDE_DIR}
+  ${KERNEL_INCLUDE_DIRS}
+  ${PROJECT_BINARY_DIR}/idl
+)
 
+SET(SalomeIDLJOBMANAGER_IDLSOURCES
+  JOBMANAGER_IDL.idl
+)
+
+SET(_idl_include_dirs
+  ${KERNEL_ROOT_DIR}/idl/salome
+)
+
+SET(_idl_link_flags
+  ${KERNEL_SalomeIDLKernel}
+)
+
+OMNIORB_ADD_MODULE(JOBMANAGER_IDL "${SalomeIDLJOBMANAGER_IDLSOURCES}" "${_idl_include_dirs}" "${_idl_link_flags}")
+INSTALL(TARGETS JOBMANAGER_IDL EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
