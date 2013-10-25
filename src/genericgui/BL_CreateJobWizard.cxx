@@ -680,11 +680,6 @@ BatchParametersPage::BatchParametersPage(QWidget * parent, SALOMEServices * salo
                                         "per node", Job::MEM_PER_NODE);
   ui->combo_memory_req_type->insertItem(ui->combo_memory_req_type->count(),
                                         "per core", Job::MEM_PER_CPU);
-
-  ui->label_warning_icon->setPixmap(QIcon::fromTheme("dialog-error").pixmap(16, 16));
-
-  connect(ui->combo_memory_req_type, SIGNAL(currentIndexChanged(int)), this, SIGNAL(completeChanged()));
-  connect(ui->check_exclusive, SIGNAL(stateChanged(int)), this, SIGNAL(completeChanged()));
 };
 
 BatchParametersPage::~BatchParametersPage()
@@ -737,29 +732,6 @@ void
 BatchParametersPage::setMemReqType(Job::MemReqType mem_req_type)
 {
   ui->combo_memory_req_type->setCurrentIndex(ui->combo_memory_req_type->findData(mem_req_type));
-}
-
-bool
-BatchParametersPage::isComplete() const
-{
-  QString warn_msg;
-  if (field("exclusive").toBool() && getMemReqType() == Job::MEM_PER_CPU)
-  {
-    warn_msg = "Parameters \"Exclusive\" and \"Memory required per core\" "
-               "are mutually exclusive. Please uncheck \"Exclusive\" if you "
-               "want to specify the memory requirement \"per core\".";
-  }
-  ui->label_warning_text->setText(warn_msg);
-  if (warn_msg.isEmpty())
-  {
-    ui->label_warning_icon->hide();
-    return true;
-  }
-  else
-  {
-    ui->label_warning_icon->show();
-    return false;
-  }
 }
 
 void
@@ -889,7 +861,7 @@ BL::COORM_BatchParametersPage::initializePage()
   }
 }
 
-BL::FilesPage::FilesPage(BL::CreateJobWizard * parent, BL::SALOMEServices * salome_services)
+FilesPage::FilesPage(CreateJobWizard * parent, SALOMEServices * salome_services)
 : QWizardPage(parent),
   ui(new Ui::FilesWizardPage)
 {
@@ -925,15 +897,20 @@ BL::FilesPage::FilesPage(BL::CreateJobWizard * parent, BL::SALOMEServices * salo
 #endif
 
   parent->setFilesList(ui->input_files_list, ui->output_files_list);
+
+  // Check for warning messages
+  ui->label_warning_icon->setPixmap(QIcon::fromTheme("dialog-error").pixmap(16, 16));
+  connect(ui->line_remote_working_dir, SIGNAL(textChanged(const QString &)), this, SIGNAL(completeChanged()));
+  connect(ui->line_result_dir, SIGNAL(textChanged(const QString &)), this, SIGNAL(completeChanged()));
 };
 
-BL::FilesPage::~FilesPage()
+FilesPage::~FilesPage()
 {
   delete ui;
 }
 
 void
-BL::FilesPage::initializePage()
+FilesPage::initializePage()
 {
   QString f_resource_choosed = field("resource_choosed").toString();
   if (f_resource_choosed != resource_choosed)
@@ -962,38 +939,32 @@ BL::FilesPage::initializePage()
 }
 
 bool
-BL::FilesPage::validatePage()
+FilesPage::isComplete() const
 {
-  QString batch_directory = field("batch_directory").toString();
-  if (batch_directory == "")
+  QString warn_msg;
+  if (field("batch_directory").toString().isEmpty())
+    warn_msg = "Remote working directory is mandatory.";
+  if (field("result_directory").toString().isEmpty() && ui->output_files_list->count() != 0)
   {
-    QMessageBox::warning(NULL, "Batch Directory Error", "Please enter a batch directory");
+    if (!warn_msg.isEmpty()) warn_msg += "\n";
+    warn_msg += "Result directory is mandatory if there are output files.";
+  }
+
+  ui->label_warning_text->setText(warn_msg);
+  if (warn_msg.isEmpty())
+  {
+    ui->label_warning_icon->hide();
+    return true;
+  }
+  else
+  {
+    ui->label_warning_icon->show();
     return false;
   }
-
-  QString result_directory = field("result_directory").toString();
-  
-  for (int i = 0; i < ui->output_files_list->count(); ++i)
-  {
-    QListWidgetItem * item = ui->output_files_list->item(i);
-    if (item->text() == "TO EDIT!")
-    {
-      QMessageBox::warning(NULL, "Ouput Files Error", "Some output files are not defined !");
-      return false;
-    }
-  }
-
-  if (result_directory == "" && ui->output_files_list->count() != 0)
-  {
-    QMessageBox::warning(NULL, "Result Directory Error", "Please enter a result directory or remove output files");
-    return false;
-  }
-
-  return true;
 }
 
 void
-BL::FilesPage::choose_input_files()
+FilesPage::choose_input_files()
 {
   QStringList files = QFileDialog::getOpenFileNames(this,
                                                     tr("Add input files"), "",
@@ -1006,7 +977,7 @@ BL::FilesPage::choose_input_files()
 }
 
 void
-BL::FilesPage::choose_local_directory()
+FilesPage::choose_local_directory()
 {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Choose local result directory"),
                                                  "",
@@ -1018,7 +989,7 @@ BL::FilesPage::choose_local_directory()
 }
 
 void 
-BL::FilesPage::remove_input_files()
+FilesPage::remove_input_files()
 {
   QList<QListWidgetItem *> list = ui->input_files_list->selectedItems();
   for (int i = 0; i < list.size(); ++i)
@@ -1029,7 +1000,7 @@ BL::FilesPage::remove_input_files()
 }
 
 void 
-BL::FilesPage::input_itemSelectionChanged()
+FilesPage::input_itemSelectionChanged()
 {
   if (ui->input_files_list->selectedItems().size() > 0)
     ui->remove_input_files_button->setEnabled(true);
@@ -1038,15 +1009,16 @@ BL::FilesPage::input_itemSelectionChanged()
 }
 
 void
-BL::FilesPage::add_output_file()
+FilesPage::add_output_file()
 {
   QListWidgetItem * new_item = new QListWidgetItem("TO EDIT!");
   new_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
   ui->output_files_list->addItem(new_item);
+  emit completeChanged();
 }
 
 void 
-BL::FilesPage::remove_output_files()
+FilesPage::remove_output_files()
 {
   QList<QListWidgetItem *> list = ui->output_files_list->selectedItems();
   for (int i = 0; i < list.size(); ++i)
@@ -1054,10 +1026,11 @@ BL::FilesPage::remove_output_files()
     int row = ui->output_files_list->row( list.at(i) );
     delete ui->output_files_list->takeItem(row);
   }
+  emit completeChanged();
 }
 
 void 
-BL::FilesPage::output_itemSelectionChanged()
+FilesPage::output_itemSelectionChanged()
 {
   if (ui->output_files_list->selectedItems().size() > 0)
     ui->remove_output_files_button->setEnabled(true);
@@ -1066,7 +1039,7 @@ BL::FilesPage::output_itemSelectionChanged()
 }
 
 int 
-BL::FilesPage::nextId() const
+FilesPage::nextId() const
 {
   return BL::CreateJobWizard::Page_Conclusion;
 }

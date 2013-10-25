@@ -161,7 +161,6 @@ namespace BL{
       virtual ~BatchParametersPage();
 
       virtual void initializePage();
-      virtual bool isComplete() const;
       virtual int nextId() const;
       virtual void cleanupPage();
 
@@ -210,7 +209,7 @@ namespace BL{
 
       virtual void initializePage();
       virtual int nextId() const;
-      virtual bool validatePage();
+      virtual bool isComplete() const;
       virtual void cleanupPage() {}
 
     public slots:
