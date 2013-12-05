@@ -88,14 +88,12 @@ will be executed. You can also define the batch queue that you want to use.
 
   **Create wizard page 3**
 
-The fourth page (see :ref:`figure_jobmanager_job_workflow_3`) permits to define the batch parameters related
-to the job. It's mandatory to define the *Remote work directory* that is the directory where the job will be executed.
-Note that if a work directory is defined for the selected resource, the work directory for the job will be
-created as a subdirectory of the resource work directory by default. The name of this subdirectory will
-contain the current date and time. Of course, you can override this default value.
-Input files defined in page 4 will be copied in this work directory. You also have to define the maximum duration
+The fourth page (see :ref:`figure_jobmanager_job_workflow_3`) allows to define the resource requirements
+and limits for the job. You can define the maximum duration
 (set 0 hours and 0 minutes to use the default value for the queue),
-the amount of memory needed and the number of processors/cores of the job.
+the amount of memory needed (per node or per core if the batch manager supports it), the number of
+processors/cores for the job, and whether it should use nodes exclusively (not sharing them with other
+jobs).
 
 .. _figure_jobmanager_job_workflow_3:
 
@@ -106,8 +104,14 @@ the amount of memory needed and the number of processors/cores of the job.
 
 The fifth page (see :ref:`figure_jobmanager_job_workflow_4`) permits to add the input and output files. 
 Input files are files located into the user
-computer that have to be transferred into the execution resource. In this page, you could also define the result 
-directory where job's results and logs will be copied.
+computer that have to be transferred into the execution resource. Output files will be copied to the user
+computer at the end of the job.
+It's mandatory to define the *Remote working directory* that is the directory where the job will be executed.
+Note that if a working directory is defined for the selected resource, the working directory for the job will be
+created as a subdirectory of the resource working directory by default. The name of this subdirectory will
+contain the current date and time. Of course, you can override this default value.
+Input files will be copied in this working directory.
+In this page, you can also define the result directory where the job's results and logs will be copied.
 
 .. _figure_jobmanager_job_workflow_4:
 
