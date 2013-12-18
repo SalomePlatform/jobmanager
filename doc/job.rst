@@ -61,10 +61,13 @@ The second table below describes the attributes of computation requirements.
                          duration is set to 0, the time will be set to the default value of the
                          batch queue selected.
 **Number of cpu**        It's the number of cpus/cores requested.
-**Memory**               It's the amount of memory per node expected.
+**Memory**               It's the amount of required memory. It is generally specified **per node**.
+                         With some batch mangers, it is possible to specify the required memory
+                         **per core** (only available with SLURM for now).
 **Queue**                It's optional. It permits to choose a specific batch queue on the targeted cluster.
                          If it is not defined, most of the batch systems will affect your job to the queue
                          that fits with the other attributes requirements.
+**Exclusive**            It indicates if the job can share nodes with other jobs or not.
 ======================== ==============================================================================
 
 Job's states

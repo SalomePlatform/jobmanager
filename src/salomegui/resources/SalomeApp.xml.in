@@ -24,7 +24,7 @@
     <parameter name="name" value="JobManager"/>
     <parameter name="icon" value="jobmanager.png"/>
     <parameter name="documentation" value="jobmanager_help"/>
-    <parameter name="version" value="@VERSION@"/>
+    <parameter name="version" value="@SALOMEJOBMANAGER_VERSION@"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
