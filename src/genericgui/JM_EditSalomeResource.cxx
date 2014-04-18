@@ -137,11 +137,11 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _batch_line->addItem("LSF", "lsf");
   _batch_line->addItem("SGE", "sge");
   _batch_line->addItem("SLURM", "slurm");
-  _batch_line->addItem("VISHNU", "vishnu");
   _batch_line->addItem("CooRM (limited support)", "coorm");
   _batch_line->addItem("LoadLeveler (limited support)", "ll");
   _batch_line->addItem("OAR (limited support)", "oar");
   _batch_line->addItem("PBS (limited support)", "pbs");
+  _batch_line->addItem("VISHNU (limited support)", "vishnu");
   _batch_line->setCurrentIndex(0);
 
   QLabel * mpiImpl_label = new QLabel("MPI impl:");
