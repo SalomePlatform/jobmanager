@@ -54,7 +54,7 @@ void
 BL::QModelManager::new_job_added(const QString & name)
 {
   DEBTRACE("Adding new job in the model manager");
-  BL::Job * job = _jobs_manager->getJob(name.toStdString());
+  BL::Job * job = _jobs_manager->getJob(name.toUtf8().constData());
   QStandardItem * new_job_name = new QStandardItem(name);
   
   QStandardItem * new_job_type;
@@ -101,7 +101,7 @@ BL::QModelManager::job_state_changed(const QString & name)
 {
   DEBTRACE("BL::QModelManager::job_state_changed received");
 
-  BL::Job * job = _jobs_manager->getJob(name.toStdString());
+  BL::Job * job = _jobs_manager->getJob(name.toUtf8().constData());
   QList<QStandardItem *> item_list = _model->findItems(name);
   QStandardItem * job_state_item = _model->item(item_list.at(0)->row(), 2);
 
@@ -130,7 +130,7 @@ BL::QModelManager::delete_job(const QString & name)
   if (list.size() != 1)
   {
     DEBMSG("LIST SIZE IS :" << list.size());
-    DEBMSG("FOR NAME :" << name.toStdString());
+    DEBMSG("FOR NAME :" << name.toUtf8().constData());
   }
   if (list.size() > 0)
     _model->removeRow(list[0]->row());

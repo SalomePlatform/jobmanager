@@ -108,7 +108,7 @@ JM::ResourceCatalog::item_choosed(QListWidgetItem * item)
   DEBTRACE("JM::ResourceCatalog::item_choosed");
   JM::SalomeResource * resource_widget = new JM::SalomeResource(this,
                                                                 _salome_services,
-                                                                item->text().toStdString());
+                                                                item->text().toUtf8().constData());
   resource_widget->exec();
   delete resource_widget;
 }
@@ -155,7 +155,7 @@ JM::ResourceCatalog::remove_button()
 {
   QList<QListWidgetItem *> item_list = _resource_files_list->selectedItems();
   QString item_name = item_list.at(0)->text();
-  _salome_services->removeResource(item_name.toStdString());
+  _salome_services->removeResource(item_name.toUtf8().constData());
   refresh_resource_list();
 }
 
@@ -166,7 +166,7 @@ JM::ResourceCatalog::edit_button()
   QString item_name = item_list.at(0)->text();
   JM::EditSalomeResource * resource_widget = new JM::EditSalomeResource(this,
                                                                         _salome_services,
-                                                                        item_name.toStdString());
+                                                                        item_name.toUtf8().constData());
   resource_widget->exec();
   delete resource_widget;
   refresh_resource_list();

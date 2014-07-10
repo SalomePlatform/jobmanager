@@ -220,14 +220,14 @@ void
 BL::GenericGui::edit_clone_job()
 {
   DEBTRACE("Edit/Clone Job Slot BL::GenericGui");
-  _jobs_manager->edit_clone_job(_job_name_selected.toStdString());
+  _jobs_manager->edit_clone_job(_job_name_selected.toUtf8().constData());
 }
 
 void
 BL::GenericGui::start_job()
 {
   DEBTRACE("Start Job Slot BL::GenericGui");
-  _jobs_manager->start_job(_job_name_selected.toStdString());
+  _jobs_manager->start_job(_job_name_selected.toUtf8().constData());
   updateButtonsStates();
 }
 
@@ -235,7 +235,7 @@ void
 BL::GenericGui::restart_job()
 {
   DEBTRACE("Restart Job Slot BL::GenericGui");
-  _jobs_manager->restart_job(_job_name_selected.toStdString());
+  _jobs_manager->restart_job(_job_name_selected.toUtf8().constData());
   updateButtonsStates();
 }
 
@@ -252,7 +252,7 @@ BL::GenericGui::get_results_job()
   DEBTRACE("Get Results Job Slot BL::GenericGui");
   if (!_jobs_table->isMultipleSelected())
   {
-    _jobs_manager->get_results_job(_job_name_selected.toStdString());
+    _jobs_manager->get_results_job(_job_name_selected.toUtf8().constData());
   }
   else
   {
@@ -260,7 +260,7 @@ BL::GenericGui::get_results_job()
     for (int i = 0; i < selected_rows.length(); ++i)
     {
       QString job_name = _model->itemFromIndex(selected_rows[i])->text();
-    _jobs_manager->get_results_job(job_name.toStdString());
+    _jobs_manager->get_results_job(job_name.toUtf8().constData());
     }
   }
 }
@@ -271,7 +271,7 @@ BL::GenericGui::stop_job()
   DEBTRACE("Stop Job Slot BL::GenericGui");
   if (!_jobs_table->isMultipleSelected())
   {
-    _jobs_manager->stop_job(_job_name_selected.toStdString());
+    _jobs_manager->stop_job(_job_name_selected.toUtf8().constData());
   }
   else
   {
@@ -279,7 +279,7 @@ BL::GenericGui::stop_job()
     for (int i = 0; i < selected_rows.length(); ++i)
     {
       QString job_name = _model->itemFromIndex(selected_rows[i])->text();
-      _jobs_manager->stop_job(job_name.toStdString());
+      _jobs_manager->stop_job(job_name.toUtf8().constData());
     }
   }
 }
@@ -328,7 +328,7 @@ BL::GenericGui::delete_job_internal()
   {
     QModelIndexList selected_list = _jobs_table->getSelectedIndexes();
     QString job_name_to_delete    = _model->itemFromIndex(selected_list[0])->text();
-    DEBTRACE("Single Deleting job: " << job_name_to_delete.toStdString());
+    DEBTRACE("Single Deleting job: " << job_name_to_delete.toUtf8().constData());
     _jobs_manager->delete_job(job_name_to_delete);
     if (!_jobs_table->selectCurrent())
     {
@@ -340,7 +340,7 @@ BL::GenericGui::delete_job_internal()
   {
     QModelIndexList selected_list = _jobs_table->getSelectedIndexes();
     QString job_name = _model->itemFromIndex(selected_list[0])->text();
-    DEBTRACE("Multiple Deleting job: " << job_name.toStdString());
+    DEBTRACE("Multiple Deleting job: " << job_name.toUtf8().constData());
     _jobs_manager->delete_job(job_name);
     delete_job_internal(); // Recursive delete
   }
@@ -370,7 +370,7 @@ BL::GenericGui::job_selected(const QModelIndex & index)
     QStandardItem * item_name = _model->item(item->row());
     _job_name_selected = item_name->text();
     _job_tab->job_selected(idx);
-    DEBTRACE("BL::GenericGui::job_selected name is " << _job_name_selected.toStdString());
+    DEBTRACE("BL::GenericGui::job_selected name is " << _job_name_selected.toUtf8().constData());
   }
   else
   {
@@ -421,7 +421,7 @@ BL::GenericGui::updateButtonsStates()
     for (int i = 0; i < selected_rows.length(); ++i)
     {
       QString job_name = _model->itemFromIndex(selected_rows[i])->text();
-      BL::Job * job = _jobs_manager->getJob(job_name.toStdString());
+      BL::Job * job = _jobs_manager->getJob(job_name.toUtf8().constData());
       BL::Job::State job_state = job->getState();
       if (job_state != BL::Job::QUEUED  &&
           job_state != BL::Job::RUNNING &&
@@ -444,7 +444,7 @@ BL::GenericGui::updateButtonsStates()
     for (int i = 0; i < selected_rows.length(); ++i)
     {
       QString job_name = _model->itemFromIndex(selected_rows[i])->text();
-      BL::Job * job = _jobs_manager->getJob(job_name.toStdString());
+      BL::Job * job = _jobs_manager->getJob(job_name.toUtf8().constData());
       BL::Job::State job_state = job->getState();
       if (job_state != BL::Job::FINISHED &&
           job_state != BL::Job::FAILED)
@@ -486,7 +486,7 @@ BL::GenericGui::updateButtonsStatesSingleSelection()
   }
   else if (_job_name_selected != "")
   {
-    BL::Job * job = _jobs_manager->getJob(_job_name_selected.toStdString());
+    BL::Job * job = _jobs_manager->getJob(_job_name_selected.toUtf8().constData());
     BL::Job::State job_state = job->getState();
 
     _edit_clone_job_action->setEnabled(true);

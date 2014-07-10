@@ -188,11 +188,11 @@ BL::JobTab::job_selected(const QModelIndex & index)
   QStandardItem * item_name = _model->item(item->row());
   if (item)
   {
-    BL::Job * job = _jobs_manager->getJob(item_name->text().toStdString());
+    BL::Job * job = _jobs_manager->getJob(item_name->text().toUtf8().constData());
 
     reset("");
 
-    _job_name_label_value->setText(QString(job->getName().c_str()));
+    _job_name_label_value->setText(QString::fromUtf8(job->getName().c_str()));
 
     if (job->getState() == BL::Job::CREATED)
       _job_state_label_value->setText("Created");
@@ -214,8 +214,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _job_state_label_value->setText("Finished");
 
     _job_launcher_label_value->setText(QVariant(job->getSalomeLauncherId()).toString());
-    _job_jobfile_label_value->setText(QString(job->getJobFile().c_str()));
-    _job_envfile_label_value->setText(QString(job->getEnvFile().c_str()));
+    _job_jobfile_label_value->setText(QString::fromUtf8(job->getJobFile().c_str()));
+    _job_envfile_label_value->setText(QString::fromUtf8(job->getEnvFile().c_str()));
     if (job->getType() == BL::Job::YACS_SCHEMA)
       _job_type_label_value->setText("YACS_Schema");
     else if (job->getType() == BL::Job::COMMAND)
@@ -223,7 +223,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
     else if (job->getType() == BL::Job::PYTHON_SALOME)
       _job_type_label_value->setText("Python_Salome");
 
-    _job_resource_label_value->setText(QString(job->getResource().c_str()));
+    _job_resource_label_value->setText(QString::fromUtf8(job->getResource().c_str()));
 
     BL::Job::BatchParam batch_params = job->getBatchParameters();
 
@@ -232,8 +232,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_nif_label_value->setText(QVariant(nif).toString());
     int nof = files_params.output_files_list.size();
     _job_nof_label_value->setText(QVariant(nof).toString());
-    _job_bd_label_value->setText(QString(batch_params.batch_directory.c_str()));
-    _job_rd_label_value->setText(QString(files_params.result_directory.c_str()));
+    _job_bd_label_value->setText(QString::fromUtf8(batch_params.batch_directory.c_str()));
+    _job_rd_label_value->setText(QString::fromUtf8(files_params.result_directory.c_str()));
 
     _job_mdt_label_value->setText(QString(batch_params.maximum_duration.c_str()));
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
@@ -261,8 +261,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_em_label_value->setText(QString(mem_ss.str().c_str()));
 
     // Parameters for COORM
-    _job_lf_label_value->setText(QString(batch_params.launcher_file.c_str()));
-    _job_la_label_value->setText(QString(batch_params.launcher_args.c_str()));
+    _job_lf_label_value->setText(QString::fromUtf8(batch_params.launcher_file.c_str()));
+    _job_la_label_value->setText(QString::fromUtf8(batch_params.launcher_args.c_str()));
 
     _input_files_list->clear();
     _output_files_list->clear();
@@ -270,12 +270,12 @@ BL::JobTab::job_selected(const QModelIndex & index)
     for (it = files_params.input_files_list.begin(); it != files_params.input_files_list.end(); it++)
     {
       std::string file = *it;
-      _input_files_list->addItem(QString(file.c_str()));
+      _input_files_list->addItem(QString::fromUtf8(file.c_str()));
     }
     for (it = files_params.output_files_list.begin(); it != files_params.output_files_list.end(); it++)
     {
       std::string file = *it;
-      _output_files_list->addItem(QString(file.c_str()));
+      _output_files_list->addItem(QString::fromUtf8(file.c_str()));
     }
 
     // Specific parameters management
@@ -306,9 +306,9 @@ BL::JobTab::itemChanged(QStandardItem * item)
   DEBTRACE("BL::JobTab::itemChanged slot");
 
   QStandardItem * item_name = _model->item(item->row());
-  BL::Job * job = _jobs_manager->getJob(item_name->text().toStdString());
+  BL::Job * job = _jobs_manager->getJob(item_name->text().toUtf8().constData());
 
-  if (_job_name_label_value->text() == QString(job->getName().c_str()))
+  if (_job_name_label_value->text() == QString::fromUtf8(job->getName().c_str()))
   {
     if (job->getState() == BL::Job::CREATED)
       _job_state_label_value->setText("Created");

@@ -232,20 +232,20 @@ BL::CreateJobWizard::end(int result)
   {
     // Job Name Panel
     QString f_job_name = field("job_name").toString();
-    job_name = f_job_name.trimmed().toStdString();
+    job_name = f_job_name.trimmed().toUtf8().constData();
 
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
-    yacs_file = f_yacs_file.trimmed().toStdString();
+    yacs_file = f_yacs_file.trimmed().toUtf8().constData();
     dump_yacs_state = field("dump_yacs_state").toInt();
 
     // Command Panel
     QString f_command = field("command").toString();
-    command = f_command.trimmed().toStdString();
+    command = f_command.trimmed().toUtf8().constData();
 
     // Command Panel
     QString f_python_salome_file = field("PythonSalome").toString();
-    python_salome_file = f_python_salome_file.trimmed().toStdString();
+    python_salome_file = f_python_salome_file.trimmed().toUtf8().constData();
 
     QString f_env_file;
     if (yacs_file != "")
@@ -254,21 +254,21 @@ BL::CreateJobWizard::end(int result)
       f_env_file = field("env_command_file").toString();
     else if (python_salome_file != "")
       f_env_file = field("env_PythonSalome_file").toString();
-    env_file = f_env_file.trimmed().toStdString();
+    env_file = f_env_file.trimmed().toUtf8().constData();
 
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
-    batch_directory = f_batch_directory.trimmed().toStdString();
+    batch_directory = f_batch_directory.trimmed().toUtf8().constData();
 
     // For COORM
     QString f_coorm_batch_directory = field("coorm_batch_directory").toString();
-    coorm_batch_directory = f_coorm_batch_directory.toStdString();
+    coorm_batch_directory = f_coorm_batch_directory.toUtf8().constData();
 
 	// For COORM
     QString f_launcher_file = field("launcher_file").toString();
-    launcher_file = f_launcher_file.toStdString();
+    launcher_file = f_launcher_file.toUtf8().constData();
     QString f_launcher_args = field("launcher_args").toString();
-    launcher_args = f_launcher_args.toStdString();
+    launcher_args = f_launcher_args.toUtf8().constData();
 
     QString time_hour;
     QString time_min;
@@ -309,27 +309,27 @@ BL::CreateJobWizard::end(int result)
 
     // Files Panel
     QString f_result_directory = field("result_directory").toString();
-    result_directory = f_result_directory.trimmed().toStdString();
+    result_directory = f_result_directory.trimmed().toUtf8().constData();
     for (int i = 0; i < _input_files_list->count(); ++i)
     {
       QListWidgetItem * item = _input_files_list->item(i);
       QString item_text = item->text();
-      input_files_list.push_back(item_text.trimmed().toStdString());
+      input_files_list.push_back(item_text.trimmed().toUtf8().constData());
     }
     for (int i = 0; i < _output_files_list->count(); ++i)
     {
       QListWidgetItem * item = _output_files_list->item(i);
       QString item_text = item->text();
-      output_files_list.push_back(item_text.trimmed().toStdString());
+      output_files_list.push_back(item_text.trimmed().toUtf8().constData());
     }
 
     // Resource list
     QString f_resource_choosed = field("resource_choosed").toString();
-    resource_choosed = f_resource_choosed.trimmed().toStdString();
+    resource_choosed = f_resource_choosed.trimmed().toUtf8().constData();
 
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
-    batch_queue = f_batch_queue.trimmed().toStdString();
+    batch_queue = f_batch_queue.trimmed().toUtf8().constData();
 
     // LoadLeveler JobType
     BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
@@ -452,7 +452,7 @@ BL::JobNamePage::validatePage()
 
   // Check if job name already exists
   else {
-    if (_jobs_manager->job_already_exist(job_name.toStdString()) == false || _check_name == false)
+    if (_jobs_manager->job_already_exist(job_name.toUtf8().constData()) == false || _check_name == false)
     {
       return_value = true;
     }
@@ -690,7 +690,7 @@ BatchParametersPage::~BatchParametersPage()
 void
 BatchParametersPage::initializePage()
 {
-  string f_resource_choosed = field("resource_choosed").toString().toStdString();
+  string f_resource_choosed = field("resource_choosed").toString().toUtf8().constData();
   if (f_resource_choosed != resource_choosed)
   {
     resource_choosed = f_resource_choosed;
@@ -841,7 +841,7 @@ BL::COORM_BatchParametersPage::initializePage()
     resource_choosed = f_resource_choosed;
     // If choosed resource has a working_directory set
     // Generates a default remote working directory
-    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toUtf8().constData());
     QString res_work_dir = resource_descr.working_directory.c_str();
     if (res_work_dir != "")
     {
@@ -918,7 +918,7 @@ FilesPage::initializePage()
     resource_choosed = f_resource_choosed;
     // If choosed resource has a working_directory set
     // Generates a default remote working directory
-    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toUtf8().constData());
     QString res_work_dir = resource_descr.working_directory.c_str();
     if (res_work_dir != "")
     {
@@ -1151,7 +1151,7 @@ BL::ResourcePage::validatePage()
     return false;
   }
 
-  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toStdString());
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed.toUtf8().constData());
   std::string batch = resource_descr.batch.c_str();
   if (batch == "ll")
   {
@@ -1173,7 +1173,7 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
   _resource_choosed->setReadOnly(true);
 
   //Specific parameters for LoadLeveler
-  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(item->text().toStdString());
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(item->text().toUtf8().constData());
   std::string batch = resource_descr.batch.c_str();
   if (batch == "ll")
   {
@@ -1194,7 +1194,7 @@ BL::ResourcePage::itemSelected(QListWidgetItem * item)
 int 
 BL::ResourcePage::nextId() const
 {
-  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(_resource_choosed->text().toStdString());
+  BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(_resource_choosed->text().toUtf8().constData());
   std::string batch = resource_descr.batch.c_str();
   if (batch == "coorm")
   {

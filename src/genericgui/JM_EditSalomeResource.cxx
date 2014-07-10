@@ -331,12 +331,12 @@ JM::EditSalomeResource::accept()
   BL::ResourceDescr resource;
 
   // Text
-  resource.name = _name_line->text().trimmed().toStdString();
+  resource.name = _name_line->text().trimmed().toUtf8().constData();
   resource.hostname = _hostname_line->text().trimmed().toStdString();
   resource.username = _username_line->text().trimmed().toStdString();
-  resource.applipath = _applipath_line->text().trimmed().toStdString();
+  resource.applipath = _applipath_line->text().trimmed().toUtf8().constData();
   resource.OS = _os_line->text().trimmed().toStdString();
-  resource.working_directory = _working_directory->text().trimmed().toStdString();
+  resource.working_directory = _working_directory->text().trimmed().toUtf8().constData();
   resource.can_launch_batch_jobs = (_can_launch_batch_jobs->checkState() == Qt::Checked);
   resource.can_run_containers = (_can_run_containers->checkState() == Qt::Checked);
 

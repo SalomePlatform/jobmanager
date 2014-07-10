@@ -120,7 +120,7 @@ BL::JobsManager_QT::load_jobs_button()
     write_normal_text("Load jobs action cancelled\n");
   }
   else
-    load_jobs(jobs_file.toStdString());
+    load_jobs(jobs_file.toUtf8().constData());
 }
 
 void
@@ -152,7 +152,7 @@ BL::JobsManager_QT::save_jobs_button()
     write_normal_text("Save jobs action cancelled\n");
   }
   else
-    save_jobs(jobs_file.toStdString());
+    save_jobs(jobs_file.toUtf8().constData());
 }
 
 void
@@ -328,9 +328,9 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
 
   // End
   addJobToLauncher(wizard.job_name);
-  emit new_job_added(QString::fromStdString(wizard.job_name));
+  emit new_job_added(QString::fromUtf8(wizard.job_name.c_str()));
   QStandardItemModel * model = _model_manager->getModel();
-  QList<QStandardItem *> item_list = model->findItems(QString::fromStdString(wizard.job_name));
+  QList<QStandardItem *> item_list = model->findItems(QString::fromUtf8(wizard.job_name.c_str()));
   QStandardItem * job_state_item = model->item(item_list.at(0)->row(), 2);
   _main_gui->_jobs_table->selectRow(item_list.at(0)->row());
   if (wizard.start_job)
@@ -340,7 +340,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
 void
 BL::JobsManager_QT::delete_job(QString job_name)
 {
-  BL::JobsManager::removeJob(job_name.toStdString());
+  BL::JobsManager::removeJob(job_name.toUtf8().constData());
   _model_manager->delete_job(job_name);
   _main_gui->_job_tab->reset(job_name);
 }
@@ -371,17 +371,16 @@ BL::JobsManager_QT::event(QEvent * e)
 	   << event->job_name << " "
 	   << event->data);
 
+  QString job_name = QString::fromUtf8(event->job_name.c_str());
   if (event->action == "create_job")
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " created\n");
+      write_normal_text("Job " + job_name + " created\n");
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Error in creating job: " + str + "\n");
+      write_error_text("Error in creating job: " + job_name + "\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
@@ -391,33 +390,29 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " queued\n");
+      write_normal_text("Job " + job_name + " queued\n");
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Error in starting job: " + str + "\n");
+      write_error_text("Error in starting job: " + job_name + "\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
     }
-    emit job_state_changed(QString((event->job_name).c_str()));
+    emit job_state_changed(job_name);
   }
   else if (event->action == "refresh_job")
   {
     if (event->event_name == "Ok")
     {
-      QString name((event->job_name).c_str());
       QString state((event->data).c_str());
       state = state.toLower();
-      write_normal_text("Job " + name + " new state is " + state + "\n");
-      emit job_state_changed(QString((event->job_name).c_str()));
+      write_normal_text("Job " + job_name + " new state is " + state + "\n");
+      emit job_state_changed(job_name);
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Error in refreshing job: " + str + "\n");
+      write_error_text("Error in refreshing job: " + job_name + "\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
@@ -427,13 +422,11 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " deleted\n");
+      write_normal_text("Job " + job_name + " deleted\n");
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Warning delete job: " + str + " maybe not complete, exception catch in SALOME Launcher service\n");
+      write_error_text("Warning delete job: " + job_name + " maybe not complete, exception catch in SALOME Launcher service\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
@@ -443,13 +436,11 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Results of Job " + str + " are get\n");
+      write_normal_text("Results of Job " + job_name + " are get\n");
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Warning for results of job: " + str + " maybe not complete, exception catch in SALOME Launcher service\n");
+      write_error_text("Warning for results of job: " + job_name + " maybe not complete, exception catch in SALOME Launcher service\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
@@ -459,13 +450,11 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("Job " + str + " is stopped\n");
+      write_normal_text("Job " + job_name + " is stopped\n");
     }
     else
     {
-      QString str((event->job_name).c_str());
-      write_error_text("Error when trying to stop job: " + str + "\n");
+      write_error_text("Error when trying to stop job: " + job_name + "\n");
       write_error_text("*** ");
       write_error_text((event->data).c_str());
       write_error_text(" ***\n");
@@ -475,15 +464,13 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-
 	  vector<string> hostnames;
 
 	  Tokenize(event->data, hostnames, "+");
 
 	  vector<string>::iterator it;
 
-      write_normal_text("Job " + str + " assigned hostnames are :\n");
+      write_normal_text("Job " + job_name + " assigned hostnames are :\n");
 
 	  for (it = hostnames.begin(); it < hostnames.end(); it++)
 	  {
@@ -532,15 +519,14 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      QString str((event->job_name).c_str());
-      write_normal_text("New job added " + str + "\n");
-      emit new_job_added(str);
+      write_normal_text("New job added " + job_name + "\n");
+      emit new_job_added(job_name);
     }
   }
   else if (event->action == "to_remove_job")
   {
     if (event->event_name == "Ok")
-      _main_gui->delete_job_external((event->job_name).c_str());
+      _main_gui->delete_job_external(job_name);
   }
   else
   {
