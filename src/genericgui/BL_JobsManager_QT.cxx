@@ -94,7 +94,7 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
   scroll_widget->setWidgetResizable(true);
   setWidget(scroll_widget);
   setWindowTitle("Job Manager");
-  setObjectName("JobManagerDockWidget");
+  setObjectName("jmJobManagerDock");
 }
 
 BL::JobsManager_QT::~JobsManager_QT()

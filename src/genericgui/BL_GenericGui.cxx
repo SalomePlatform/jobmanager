@@ -54,7 +54,7 @@ BL::GenericGui::createDockWidgets()
   /* Summary */
   _dw_summary = new QDockWidget(_dock_parent);
   _dw_summary->setWindowTitle("Summary");
-  _dw_summary->setObjectName("SummaryDockWidget");
+  _dw_summary->setObjectName("jmSummaryDock");
   _summary = new BL::Summary(_dw_summary, _jobs_manager);
   _summary->setModel(_model);
   QScrollArea * scroll_widget_summary = new QScrollArea(_dw_summary);
@@ -65,7 +65,7 @@ BL::GenericGui::createDockWidgets()
   /* ResourceCatalog */
   _dw_resource_catalog = new QDockWidget(_dock_parent);
   _dw_resource_catalog->setWindowTitle("Resource Catalog");
-  _dw_resource_catalog->setObjectName("ResourceCatalogDockWidget");
+  _dw_resource_catalog->setObjectName("jmResourceCatalogDock");
   _resource_catalog = new JM::ResourceCatalog(_dw_resource_catalog, _salome_services, false);
   QScrollArea * scroll_widget_resource = new QScrollArea(_dw_resource_catalog);
   scroll_widget_resource->setWidget(_resource_catalog);
