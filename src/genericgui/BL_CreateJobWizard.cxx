@@ -29,6 +29,7 @@
 
 #include <ui_ResourceRequirementsWizardPage.h>
 #include <ui_FilesWizardPage.h>
+#include <ui_AdvancedParametersWizardPage.h>
 
 #ifdef WNT
 #undef ERROR
@@ -87,6 +88,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   setPage(Page_Files, new BL::FilesPage(this, salome_services));
   setPage(Page_Resource, new BL::ResourcePage(this, salome_services));
+  setPage(Page_Advanced, new BL::AdvancedParametersPage(this));
   setPage(Page_Conclusion, new BL::ConclusionPage(this));
 
   // Specific pages
@@ -214,6 +216,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     setField("resource_choosed", QString(job->getResource().c_str()));
     setField("batch_queue", QString(job->getBatchQueue().c_str()));
     setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
+    setField("wckey", QString(job->getWCKey().c_str()));
   }
 }
 
@@ -343,6 +346,10 @@ BL::CreateJobWizard::end(int result)
     {
       ll_jobtype = "";
     }
+
+    // WC Key
+    QString f_wckey = field("wckey").toString();
+    wckey = f_wckey.trimmed().toUtf8().constData();
 
     start_job = field("start_job").toBool();
   }
@@ -1041,7 +1048,7 @@ FilesPage::output_itemSelectionChanged()
 int 
 FilesPage::nextId() const
 {
-  return BL::CreateJobWizard::Page_Conclusion;
+  return BL::CreateJobWizard::Page_Advanced;
 }
 
 BL::ConclusionPage::ConclusionPage(QWidget * parent)
@@ -1280,4 +1287,25 @@ int
 BL::PythonSalomeMainPage::nextId() const
 {
   return BL::CreateJobWizard::Page_Resource;
+}
+
+
+
+AdvancedParametersPage::AdvancedParametersPage(CreateJobWizard * parent)
+: QWizardPage(parent),
+  ui(new Ui::AdvancedParametersWizardPage)
+{
+  ui->setupUi(this);
+  registerField("wckey", ui->line_wckey);
+};
+
+AdvancedParametersPage::~AdvancedParametersPage()
+{
+  delete ui;
+}
+
+int
+AdvancedParametersPage::nextId() const
+{
+  return BL::CreateJobWizard::Page_Conclusion;
 }
