@@ -92,6 +92,9 @@ namespace BL{
       void setWCKey(const std::string & wckey);
       const std::string & getWCKey();
 
+      void setExtraParams(const std::string & extra_params);
+      const std::string & getExtraParams();
+
       void setLoadLevelerJobType(const std::string & jobtype);
       std::string & getLoadLevelerJobType();
 
@@ -123,6 +126,7 @@ namespace BL{
       std::string _resource_choosed;
       std::string _batch_queue;
       std::string _wckey;
+      std::string _extra_params;
       std::string _ll_jobtype;
 
       int _salome_launcher_id;

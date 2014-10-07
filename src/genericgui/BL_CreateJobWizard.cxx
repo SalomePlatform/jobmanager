@@ -227,6 +227,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     setField("batch_queue", QString(job->getBatchQueue().c_str()));
     setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
     setField("wckey", QString(job->getWCKey().c_str()));
+    setField("extra_params", QString(job->getExtraParams().c_str()));
   }
 }
 
@@ -368,6 +369,10 @@ BL::CreateJobWizard::end(int result)
     // WC Key
     QString f_wckey = field("wckey").toString();
     wckey = f_wckey.trimmed().toUtf8().constData();
+
+    // Extra params
+    QString f_extra_params = field("extra_params").toString();
+    extra_params = f_extra_params.trimmed().toUtf8().constData();
 
     start_job = field("start_job").toBool();
   }
@@ -1340,6 +1345,7 @@ AdvancedParametersPage::AdvancedParametersPage(CreateJobWizard * parent)
 {
   ui->setupUi(this);
   registerField("wckey", ui->line_wckey);
+  registerField("extra_params", ui->text_extra_params, "plainText", "textChanged()");
 };
 
 AdvancedParametersPage::~AdvancedParametersPage()

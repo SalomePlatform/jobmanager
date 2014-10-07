@@ -96,6 +96,7 @@ namespace BL{
       std::string resource_choosed;
       std::string batch_queue;
       std::string wckey;
+      std::string extra_params;
 
       bool start_job;
       int dump_yacs_state;

@@ -322,6 +322,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->queue = CORBA::string_dup(job->getBatchQueue().c_str());
   job_parameters->exclusive = cpp_batch_params.exclusive;
   job_parameters->wckey = CORBA::string_dup(job->getWCKey().c_str());
+  job_parameters->extra_params = CORBA::string_dup(job->getExtraParams().c_str());
 
   // Memory
   switch (cpp_batch_params.mem_req_type)
@@ -623,6 +624,7 @@ BL::SALOMEServices::get_new_job(int job_number)
     job_return->setEnvFile(job_parameters->env_file.in());
     job_return->setBatchQueue(job_parameters->queue.in());
     job_return->setWCKey(job_parameters->wckey.in());
+    job_return->setExtraParams(job_parameters->extra_params.in());
 
     BL::Job::FilesParam param;
     param.result_directory = job_parameters->result_directory.in();
