@@ -171,11 +171,13 @@ BL::CreateJobWizard::clone(const std::string & name)
 
     if (batch_params.maximum_duration == "")
     {
+      setField("default_time", true);
       setField("duration_hour", 0);
       setField("duration_min", 0);
     }
     else
     {
+      setField("user_time", true);
       std::size_t pos = batch_params.maximum_duration.find(":");
       std::string hour_str = batch_params.maximum_duration.substr(0, pos);
       int hour; 
@@ -190,18 +192,26 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("duration_min", min);
     }
 
-    unsigned long long mem_mb = batch_params.mem_limit;
-    if (mem_mb % 1024 == 0)
+    long long mem_mb = batch_params.mem_limit;
+    if (mem_mb < 1)
     {
-      setField("mem_value", mem_mb / 1024);
-      _batch_parameters_page->setMemUnit(BatchParametersPage::GB);
+      setField("default_mem", true);
     }
     else
     {
-      setField("mem_value", mem_mb);
-      _batch_parameters_page->setMemUnit(BatchParametersPage::MB);
+      setField("user_mem", true);
+      if (mem_mb % 1024 == 0)
+      {
+        setField("mem_value", mem_mb / 1024);
+        _batch_parameters_page->setMemUnit(BatchParametersPage::GB);
+      }
+      else
+      {
+        setField("mem_value", mem_mb);
+        _batch_parameters_page->setMemUnit(BatchParametersPage::MB);
+      }
+      _batch_parameters_page->setMemReqType(batch_params.mem_req_type);
     }
-    _batch_parameters_page->setMemReqType(batch_params.mem_req_type);
 
     BL::Job::FilesParam files_params = job->getFilesParameters();
 
@@ -275,7 +285,8 @@ BL::CreateJobWizard::end(int result)
 
     QString time_hour;
     QString time_min;
-    if(field("duration_hour").toInt() == 0 && field("duration_min").toInt() == 0)
+    if (field("default_time").toBool() ||
+        (field("duration_hour").toInt() == 0 && field("duration_min").toInt() == 0))
     {
       maximum_duration = "";
     }
@@ -292,20 +303,27 @@ BL::CreateJobWizard::end(int result)
       maximum_duration = time_hour.toStdString() + ":" + time_min.toStdString();
     }
 
-    unsigned long mem = field("mem_value").toULongLong();
-    BatchParametersPage::MemUnit mem_unit = _batch_parameters_page->getMemUnit();
-    switch (mem_unit)
+    if(field("default_mem").toBool())
     {
-    case BatchParametersPage::MB:
-      mem_limit = mem;
-      break;
-    case BatchParametersPage::GB:
-      mem_limit = mem * 1024;
-      break;
-    default:
-      throw Exception("Invalid memory unit");
+      mem_limit = -1;
     }
-    mem_req_type = _batch_parameters_page->getMemReqType();
+    else
+    {
+      unsigned long mem = field("mem_value").toULongLong();
+      BatchParametersPage::MemUnit mem_unit = _batch_parameters_page->getMemUnit();
+      switch (mem_unit)
+      {
+      case BatchParametersPage::MB:
+        mem_limit = mem;
+        break;
+      case BatchParametersPage::GB:
+        mem_limit = mem * 1024;
+        break;
+      default:
+        throw Exception("Invalid memory unit");
+      }
+      mem_req_type = _batch_parameters_page->getMemReqType();
+    }
 
     nb_proc = field("proc_value").toInt();
     exclusive = field("exclusive").toBool();
@@ -678,6 +696,10 @@ BatchParametersPage::BatchParametersPage(QWidget * parent, SALOMEServices * salo
   registerField("mem_value", ui->spin_memory);
   registerField("proc_value", ui->spin_proc);
   registerField("exclusive", ui->check_exclusive);
+  registerField("default_time", ui->rb_default_time);
+  registerField("user_time", ui->rb_user_time);
+  registerField("default_mem", ui->rb_default_mem);
+  registerField("user_mem", ui->rb_user_mem);
 
   ui->combo_memory_unit->insertItem(ui->combo_memory_unit->count(), "MB", MB);
   ui->combo_memory_unit->insertItem(ui->combo_memory_unit->count(), "GB", GB);
@@ -687,6 +709,12 @@ BatchParametersPage::BatchParametersPage(QWidget * parent, SALOMEServices * salo
                                         "per node", Job::MEM_PER_NODE);
   ui->combo_memory_req_type->insertItem(ui->combo_memory_req_type->count(),
                                         "per core", Job::MEM_PER_CPU);
+
+  connect(ui->spin_duration_hour, SIGNAL(valueChanged(int)), this, SLOT(timeChanged()));
+  connect(ui->spin_duration_min, SIGNAL(valueChanged(int)), this, SLOT(timeChanged()));
+  connect(ui->spin_memory, SIGNAL(valueChanged(int)), this, SLOT(memChanged()));
+  connect(ui->combo_memory_unit, SIGNAL(currentIndexChanged(int)), this, SLOT(memChanged()));
+  connect(ui->combo_memory_req_type, SIGNAL(currentIndexChanged(int)), this, SLOT(memChanged()));
 };
 
 BatchParametersPage::~BatchParametersPage()
@@ -739,6 +767,21 @@ void
 BatchParametersPage::setMemReqType(Job::MemReqType mem_req_type)
 {
   ui->combo_memory_req_type->setCurrentIndex(ui->combo_memory_req_type->findData(mem_req_type));
+}
+
+void
+BatchParametersPage::timeChanged()
+{
+  if (ui->spin_duration_hour->value() == 0 && ui->spin_duration_min->value() == 0)
+    ui->rb_default_time->setChecked(true);
+  else
+    ui->rb_user_time->setChecked(true);
+}
+
+void
+BatchParametersPage::memChanged()
+{
+  ui->rb_user_mem->setChecked(true);
 }
 
 void

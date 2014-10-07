@@ -62,7 +62,7 @@ namespace BL{
       {
         std::string batch_directory;
         std::string maximum_duration;
-        unsigned long mem_limit;
+        long mem_limit;
         MemReqType mem_req_type;
         int nb_proc;
         bool exclusive;

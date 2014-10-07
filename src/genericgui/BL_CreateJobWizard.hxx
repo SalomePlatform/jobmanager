@@ -80,7 +80,7 @@ namespace BL{
       std::string coorm_batch_directory;
 
       std::string maximum_duration;
-      unsigned long mem_limit;
+      long mem_limit;
       BL::Job::MemReqType mem_req_type;
       int nb_proc;
       bool exclusive;
@@ -172,6 +172,10 @@ namespace BL{
 
       BL::Job::MemReqType getMemReqType() const;
       void setMemReqType(BL::Job::MemReqType mem_req_type);
+
+    public slots:
+      void timeChanged();
+      void memChanged();
 
     private:
       Ui::ResourceRequirementsWizardPage * ui;
