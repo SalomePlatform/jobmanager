@@ -88,6 +88,7 @@ SET(_other_SOURCES
 SET(_uic_files
   ResourceRequirementsWizardPage.ui
   FilesWizardPage.ui
+  AdvancedParametersWizardPage.ui
 )
 
 # header files / uic wrappings

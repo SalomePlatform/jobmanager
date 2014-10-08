@@ -204,6 +204,30 @@ BL::Job::getBatchQueue()
 }
 
 void
+BL::Job::setWCKey(const std::string & wckey)
+{
+  _wckey = wckey;
+}
+
+const std::string &
+BL::Job::getWCKey()
+{
+  return _wckey;
+}
+
+void
+BL::Job::setExtraParams(const std::string & extra_params)
+{
+  _extra_params = extra_params;
+}
+
+const std::string &
+BL::Job::getExtraParams()
+{
+  return _extra_params;
+}
+
+void
 BL::Job::setLoadLevelerJobType(const std::string & jobtype)
 {
   _ll_jobtype = jobtype;

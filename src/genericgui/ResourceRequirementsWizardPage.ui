@@ -90,10 +90,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QRadioButton" name="radioButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+         <widget class="QRadioButton" name="rb_default_time">
           <property name="text">
            <string>Default</string>
           </property>
@@ -105,7 +102,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QRadioButton" name="radioButton_2">
+           <widget class="QRadioButton" name="rb_user_time">
             <property name="text">
              <string/>
             </property>
@@ -210,12 +207,12 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QRadioButton" name="radioButton_3">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+         <widget class="QRadioButton" name="rb_default_mem">
           <property name="text">
            <string>Default</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">memoryButtonGroup</string>
@@ -225,12 +222,9 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QRadioButton" name="radioButton_4">
+           <widget class="QRadioButton" name="rb_user_mem">
             <property name="text">
              <string/>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">memoryButtonGroup</string>

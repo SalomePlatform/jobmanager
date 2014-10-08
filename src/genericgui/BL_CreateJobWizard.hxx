@@ -32,6 +32,7 @@
 namespace Ui {
   class ResourceRequirementsWizardPage;
   class FilesWizardPage;
+  class AdvancedParametersWizardPage;
 }
 
 namespace BL{
@@ -79,7 +80,7 @@ namespace BL{
       std::string coorm_batch_directory;
 
       std::string maximum_duration;
-      unsigned long mem_limit;
+      long mem_limit;
       BL::Job::MemReqType mem_req_type;
       int nb_proc;
       bool exclusive;
@@ -94,6 +95,8 @@ namespace BL{
 
       std::string resource_choosed;
       std::string batch_queue;
+      std::string wckey;
+      std::string extra_params;
 
       bool start_job;
       int dump_yacs_state;
@@ -108,6 +111,7 @@ namespace BL{
             Page_COORM_BatchParameters,
             Page_Files,
             Page_Resource,
+            Page_Advanced,
             Page_Conclusion};
   };
 
@@ -169,6 +173,10 @@ namespace BL{
 
       BL::Job::MemReqType getMemReqType() const;
       void setMemReqType(BL::Job::MemReqType mem_req_type);
+
+    public slots:
+      void timeChanged();
+      void memChanged();
 
     private:
       Ui::ResourceRequirementsWizardPage * ui;
@@ -316,6 +324,23 @@ namespace BL{
       QLineEdit * _line_PythonSalome;
       QLineEdit * _line_env_file;
   };
+
+  class AdvancedParametersPage: public QWizardPage
+  {
+    Q_OBJECT
+
+    public:
+      AdvancedParametersPage(BL::CreateJobWizard * parent);
+      virtual ~AdvancedParametersPage();
+
+      virtual int nextId() const;
+      virtual void cleanupPage() {}
+
+    private:
+      Ui::AdvancedParametersWizardPage * ui;
+
+  };
+
 }
 
 #endif

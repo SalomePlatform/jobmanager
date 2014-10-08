@@ -62,7 +62,7 @@ namespace BL{
       {
         std::string batch_directory;
         std::string maximum_duration;
-        unsigned long mem_limit;
+        long mem_limit;
         MemReqType mem_req_type;
         int nb_proc;
         bool exclusive;
@@ -88,6 +88,12 @@ namespace BL{
 
       void setBatchQueue(const std::string & queue);
       std::string & getBatchQueue();
+
+      void setWCKey(const std::string & wckey);
+      const std::string & getWCKey();
+
+      void setExtraParams(const std::string & extra_params);
+      const std::string & getExtraParams();
 
       void setLoadLevelerJobType(const std::string & jobtype);
       std::string & getLoadLevelerJobType();
@@ -119,6 +125,8 @@ namespace BL{
       BL::Job::FilesParam _files_params;
       std::string _resource_choosed;
       std::string _batch_queue;
+      std::string _wckey;
+      std::string _extra_params;
       std::string _ll_jobtype;
 
       int _salome_launcher_id;

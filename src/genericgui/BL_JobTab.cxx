@@ -100,8 +100,8 @@ BL::JobTab::createJobSummaryTab()
 
   QLabel * job_mdt_label = new QLabel("Maximum duration:");
   _job_mdt_label_value = new QLabel("");
-  QLabel * job_em_label = new QLabel("Expected memory:");
-  _job_em_label_value = new QLabel("");
+  QLabel * job_req_mem_label = new QLabel("Required memory:");
+  _job_req_mem_label_value = new QLabel("");
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
   QLabel * job_excl_label = new QLabel("Exclusive:");
@@ -131,7 +131,7 @@ BL::JobTab::createJobSummaryTab()
 
   _other_run_values_form = new QFormLayout;
   _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
-  _other_run_values_form->insertRow(1, job_em_label, _job_em_label_value);
+  _other_run_values_form->insertRow(1, job_req_mem_label, _job_req_mem_label_value);
   _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
   _other_run_values_form->insertRow(3, job_excl_label, _job_excl_label_value);
 
@@ -235,30 +235,37 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_bd_label_value->setText(QString::fromUtf8(batch_params.batch_directory.c_str()));
     _job_rd_label_value->setText(QString::fromUtf8(files_params.result_directory.c_str()));
 
-    _job_mdt_label_value->setText(QString(batch_params.maximum_duration.c_str()));
+    QString time = (batch_params.maximum_duration == "")? "Default" :
+                                                          batch_params.maximum_duration.c_str();
+    _job_mdt_label_value->setText(time);
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
     QString exclText = (batch_params.exclusive)? "yes" : "no";
     _job_excl_label_value->setText(exclText);
 
     // Memory requirement
-    unsigned long long mem_mb = batch_params.mem_limit;
+    long mem_mb = batch_params.mem_limit;
     ostringstream mem_ss;
-    if (mem_mb % 1024 == 0)
-      mem_ss << mem_mb / 1024 << "GB";
+    if (mem_mb < 1)
+      mem_ss << "Default";
     else
-      mem_ss << mem_mb << "MB";
-    switch (batch_params.mem_req_type)
     {
-    case BL::Job::MEM_PER_NODE:
-      mem_ss << " per node";
-      break;
-    case BL::Job::MEM_PER_CPU:
-      mem_ss << " per core";
-      break;
-    default:
-      throw Exception("Unknown memory requirement, unable to show selected job");
+      if (mem_mb % 1024 == 0)
+        mem_ss << mem_mb / 1024 << "GB";
+      else
+        mem_ss << mem_mb << "MB";
+      switch (batch_params.mem_req_type)
+      {
+      case BL::Job::MEM_PER_NODE:
+        mem_ss << " per node";
+        break;
+      case BL::Job::MEM_PER_CPU:
+        mem_ss << " per core";
+        break;
+      default:
+        throw Exception("Unknown memory requirement, unable to show selected job");
+      }
     }
-    _job_em_label_value->setText(QString(mem_ss.str().c_str()));
+    _job_req_mem_label_value->setText(QString(mem_ss.str().c_str()));
 
     // Parameters for COORM
     _job_lf_label_value->setText(QString::fromUtf8(batch_params.launcher_file.c_str()));
@@ -346,7 +353,7 @@ BL::JobTab::reset(QString job_name)
     _job_bd_label_value->setText("");
     _job_rd_label_value->setText("");
     _job_mdt_label_value->setText("");
-    _job_em_label_value->setText("");
+    _job_req_mem_label_value->setText("");
     _job_nop_label_value->setText("");
     _job_excl_label_value->setText("");
     _job_jobfile_label_value->setText("");
