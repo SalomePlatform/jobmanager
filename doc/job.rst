@@ -49,6 +49,8 @@ The first table below describes the attributes of a job.
 **Work directory**       Yes              It's the directory on the job's resource where the job will be executed.
 **Result directory**     Yes              It's the directory in the user computer where the job's results have to be 
                                           copied at the end of the job.
+**WC Key**               No               The Workload Characterization Key is used on some clusters to associate each
+                                          job with a project or organization.
 ======================== ================ ==============================================================================
 
 The second table below describes the attributes of computation requirements.
@@ -58,7 +60,7 @@ The second table below describes the attributes of computation requirements.
 ======================== ==============================================================================
 **Maximum duration**     It's the maximum expected duration of the job. When a batch manager is used, this
                          time is interpreted as a **walltime** and not as a **cputime**. If maximum
-                         duration is set to 0, the time will be set to the default value of the
+                         duration is not set or set to 0, the time will be set to the default value of the
                          batch queue selected.
 **Number of cpu**        It's the number of cpus/cores requested.
 **Memory**               It's the amount of required memory. It is generally specified **per node**.
@@ -69,6 +71,9 @@ The second table below describes the attributes of computation requirements.
                          that fits with the other attributes requirements.
 **Exclusive**            It indicates if the job can share nodes with other jobs or not.
 ======================== ==============================================================================
+
+In addition to those attributes, the user can also specify some extra parameters with a few lines that
+will be added "as is" to the job submission file.
 
 Job's states
 ++++++++++++

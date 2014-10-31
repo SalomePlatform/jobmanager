@@ -89,11 +89,11 @@ will be executed. You can also define the batch queue that you want to use.
   **Create wizard page 3**
 
 The fourth page (see :ref:`figure_jobmanager_job_workflow_3`) allows to define the resource requirements
-and limits for the job. You can define the maximum duration
-(set 0 hours and 0 minutes to use the default value for the queue),
+and limits for the job. You can define the maximum duration,
 the amount of memory needed (per node or per core if the batch manager supports it), the number of
 processors/cores for the job, and whether it should use nodes exclusively (not sharing them with other
-jobs).
+jobs). Time and memory requirements can be set to a "Default" value, which is the default for the
+selected cluster and queue.
 
 .. _figure_jobmanager_job_workflow_3:
 
@@ -120,6 +120,21 @@ In this page, you can also define the result directory where the job's results a
 
   **Create wizard page 5**
 
+The sixth page (see :ref:`figure_jobmanager_job_workflow_advanced`) can be
+used to define some advanced parameters, which are generally optional. The
+field "Workload Characterization Key" is used on some clusters to associate
+each job with a project for instance. The field "Extra parameters" can be used
+to specify some other parameters or environment variables that are not
+available through the JOBMANAGER interface. The content of this field is added
+"as is" in the job submission file.
+
+.. _figure_jobmanager_job_workflow_advanced:
+
+.. figure:: images/jobmanager_job_workflow_advanced.png
+  :align: center
+
+  **Create wizard page 6**
+
 The last page (see :ref:`figure_jobmanager_job_workflow_6`) finalizes the job creation. You could choose 
 if you want or not start the job at the end of the wizard.
 
@@ -128,7 +143,7 @@ if you want or not start the job at the end of the wizard.
 .. figure:: images/jobmanager_job_workflow_6.png
   :align: center
 
-  **Create wizard page 6**
+  **Create wizard page 7**
 
 Loading and saving job list
 ---------------------------
