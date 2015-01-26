@@ -272,24 +272,26 @@ void
 BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
 {
   BL::Job * new_job = createJob(wizard.job_name);
-  if (wizard.yacs_file != "")
+  switch (wizard.job_type)
   {
+  case BL::CreateJobWizard::YACS:
     // YACS schema job
     new_job->setType(BL::Job::YACS_SCHEMA);
     new_job->setJobFile(wizard.yacs_file);
     new_job->setDumpYACSState(wizard.dump_yacs_state);
-  }
-  else if (wizard.command != "")
-  {
+    break;
+  case BL::CreateJobWizard::COMMAND:
     // Command Job
     new_job->setType(BL::Job::COMMAND);
     new_job->setJobFile(wizard.command);
-  }
-  else if (wizard.python_salome_file != "")
-  {
-    // Command Job
+    break;
+  case BL::CreateJobWizard::PYTHON_SALOME:
+    // Python Salome Job
     new_job->setType(BL::Job::PYTHON_SALOME);
     new_job->setJobFile(wizard.python_salome_file);
+    break;
+  default:
+    throw BL::Exception("Unknown job type");
   }
 
   // For all jobs

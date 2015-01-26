@@ -67,6 +67,7 @@ namespace BL{
     public:
       // Results
       std::string job_name;
+      enum {YACS, COMMAND, PYTHON_SALOME} job_type;
 
       std::string yacs_file;
       std::string command;
@@ -137,9 +138,6 @@ namespace BL{
       QLabel * _explanation;
 
     public:
-      QRadioButton * _yacs_schema_button;
-      QRadioButton * _command_button;
-      QRadioButton * _python_salome_button;
       bool _check_name;
   };
 

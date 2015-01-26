@@ -47,6 +47,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   _salome_services = salome_services;
 
   job_name = "";
+  job_type = YACS;
   yacs_file = "";
   command = "";
   python_salome_file = "";
@@ -125,7 +126,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     if (job->getType() == BL::Job::YACS_SCHEMA)
     {
       setField("yacs_file", QString(job->getJobFile().c_str()));
-      _job_name_page->_yacs_schema_button->click();
+      setField("job_type_yacs", true);
       setField("env_yacs_file", QString(job->getEnvFile().c_str()));
       if (job->getDumpYACSState() != -1)
       {
@@ -137,13 +138,13 @@ BL::CreateJobWizard::clone(const std::string & name)
     else if (job->getType() == BL::Job::COMMAND)
     {
       setField("command", QString(job->getJobFile().c_str()));
-      _job_name_page->_command_button->click();
+      setField("job_type_command", true);
       setField("env_command_file", QString(job->getEnvFile().c_str()));
     }
     else if (job->getType() == BL::Job::PYTHON_SALOME)
     {
       setField("PythonSalome", QString(job->getJobFile().c_str()));
-      _job_name_page->_python_salome_button->click();
+      setField("job_type_python_salome", true);
       setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
     }
 
@@ -247,6 +248,12 @@ BL::CreateJobWizard::end(int result)
     // Job Name Panel
     QString f_job_name = field("job_name").toString();
     job_name = f_job_name.trimmed().toUtf8().constData();
+    if (field("job_type_yacs").toBool())
+      job_type = YACS;
+    else if (field("job_type_command").toBool())
+      job_type = COMMAND;
+    else
+      job_type = PYTHON_SALOME;
 
     // YACS Schema Panel
     QString f_yacs_file = field("yacs_file").toString();
@@ -262,11 +269,11 @@ BL::CreateJobWizard::end(int result)
     python_salome_file = f_python_salome_file.trimmed().toUtf8().constData();
 
     QString f_env_file;
-    if (yacs_file != "")
+    if (job_type == YACS)
       f_env_file = field("env_yacs_file").toString();
-    else if (command != "")
+    else if (job_type == COMMAND)
       f_env_file = field("env_command_file").toString();
-    else if (python_salome_file != "")
+    else if (job_type == PYTHON_SALOME)
       f_env_file = field("env_PythonSalome_file").toString();
     env_file = f_env_file.trimmed().toUtf8().constData();
 
@@ -394,16 +401,19 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
 
   QLabel * label_type = new QLabel("Choose type of batch job:");
   QGroupBox *groupBox = new QGroupBox("Type of job");
-  _yacs_schema_button = new QRadioButton(tr("YACS Schema"));
+  QRadioButton * _yacs_schema_button = new QRadioButton(tr("YACS Schema"));
   _yacs_schema_button->setChecked(true);
-  _command_button = new QRadioButton(tr("Command"));
-  _python_salome_button = new QRadioButton(tr("Python script in SALOME"));
+  QRadioButton * _command_button = new QRadioButton(tr("Command"));
+  QRadioButton * _python_salome_button = new QRadioButton(tr("Python script in SALOME"));
   QVBoxLayout *vbox = new QVBoxLayout;
   vbox->addWidget(_yacs_schema_button);
   vbox->addWidget(_command_button);
   vbox->addWidget(_python_salome_button);
   vbox->addStretch(1);
   groupBox->setLayout(vbox);
+  registerField("job_type_yacs", _yacs_schema_button);
+  registerField("job_type_command", _command_button);
+  registerField("job_type_python_salome", _python_salome_button);
 
   QGroupBox * explanationBox = new QGroupBox("Explanation");
   QVBoxLayout *explanationvbox = new QVBoxLayout;
@@ -425,9 +435,9 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
   layout->addWidget(explanationBox, 4, 0, 1, -1);
   setLayout(main_layout);
 
-  connect(_yacs_schema_button, SIGNAL(clicked(bool)), this, SLOT(yacs_schema_button(bool)));
-  connect(_command_button, SIGNAL(clicked(bool)), this, SLOT(command_button(bool)));
-  connect(_python_salome_button, SIGNAL(clicked(bool)), this, SLOT(python_salome_button(bool)));
+  connect(_yacs_schema_button, SIGNAL(toggled(bool)), this, SLOT(yacs_schema_button(bool)));
+  connect(_command_button, SIGNAL(toggled(bool)), this, SLOT(command_button(bool)));
+  connect(_python_salome_button, SIGNAL(toggled(bool)), this, SLOT(python_salome_button(bool)));
 
   // Default button
   yacs_schema_button(true);
@@ -501,11 +511,11 @@ BL::JobNamePage::validatePage()
 int
 BL::JobNamePage::nextId() const
 {
-  if (_yacs_schema_button->isChecked())
+  if (field("job_type_yacs").toBool())
   {
     return BL::CreateJobWizard::Page_YACSSchema;
   } 
-  else if (_command_button->isChecked())
+  else if (field("job_type_command").toBool())
   {
     return BL::CreateJobWizard::Page_Command_Main_Definitions;
   }
