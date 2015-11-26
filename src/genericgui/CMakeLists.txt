@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
+INCLUDE(UseQtExt)
 
 # --- options ---
 # additional include directories
@@ -65,7 +65,7 @@ SET(BL_GenericGui_HEADERS
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${BL_GenericGui_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${BL_GenericGui_HEADERS})
 
 # sources / static
 SET(_other_SOURCES 
@@ -92,7 +92,7 @@ SET(_uic_files
 )
 
 # header files / uic wrappings
-QT4_WRAP_UI(_uic_HEADERS ${_uic_files})
+QT_WRAP_UIC(_uic_HEADERS ${_uic_files})
 
 # sources / to compile
 SET(BL_GenericGui_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_uic_HEADERS})

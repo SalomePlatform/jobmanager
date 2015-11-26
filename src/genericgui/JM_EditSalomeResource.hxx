@@ -20,8 +20,14 @@
 #ifndef _JM_EDITSALOMERESOURCE_HXX_
 #define _JM_EDITSALOMERESOURCE_HXX_
 
-#include <string>
+#include <QtGlobal>
 #include <QtGui>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QtWidgets>
+#endif
+
+#include <string>
+
 #include "BL_SALOMEServices.hxx"
 
 namespace JM 

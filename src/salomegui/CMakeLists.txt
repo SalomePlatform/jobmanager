@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQtExt)
+
 # --- options ---
 # additional include directories
 INCLUDE_DIRECTORIES(
@@ -58,7 +60,7 @@ SET(JOBMANAGER_HEADERS
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${JOBMANAGER_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${JOBMANAGER_HEADERS})
 
 # sources / static
 SET(_other_SOURCES

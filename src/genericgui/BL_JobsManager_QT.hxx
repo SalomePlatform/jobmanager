@@ -20,7 +20,11 @@
 #ifndef _BL_JOBSMANAGER_QT_HXX_
 #define _BL_JOBSMANAGER_QT_HXX_
 
-#include <QObject>
+#include <QtGlobal>
+#include <QtGui>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QtWidgets>
+#endif
 
 #include "BL_Traces.hxx"
 #include "BL_JobsManager.hxx"
