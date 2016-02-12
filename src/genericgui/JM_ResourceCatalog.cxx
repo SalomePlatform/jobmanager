@@ -22,6 +22,11 @@
 #include "JM_SalomeResource.hxx"
 #include "JM_EditSalomeResource.hxx"
 
+#include <QHBoxLayout>
+#include <QListWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+
 JM::ResourceCatalog::ResourceCatalog(QWidget *parent, BL::SALOMEServices * salome_services, bool batch_only)
 : QWidget(parent),
   _batch_only(batch_only)

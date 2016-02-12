@@ -20,14 +20,19 @@
 #ifndef _BL_CREATEJOBWIZARD_HXX_
 #define _BL_CREATEJOBWIZARD_HXX_
 
-#include <QtGui>
-
 #include "BL_Traces.hxx"
 #include "BL_SALOMEServices.hxx"
 #include "JM_ResourceCatalog.hxx"
 
+#include <QWizard>
+#include <QWizardPage>
 #include <string>
 #include <list>
+
+class QGridLayout;
+class QLabel;
+class QLineEdit;
+class QListWidget;
 
 namespace Ui {
   class ResourceRequirementsWizardPage;
@@ -35,7 +40,7 @@ namespace Ui {
   class AdvancedParametersWizardPage;
 }
 
-namespace BL{
+namespace BL {
 
   class JobsManager_QT;
   class JobNamePage;

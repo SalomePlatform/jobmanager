@@ -20,8 +20,6 @@
 #ifndef _BL_GENERICGUI_HXX_
 #define _BL_GENERICGUI_HXX_
 
-#include <QtGui>
-
 #include "BL_GenericGuiDefines.hxx"
 
 #include "BL_Traces.hxx"
@@ -37,6 +35,13 @@
 #include "BL_Buttons.hxx"
 #include "BL_Summary.hxx"
 #include "JM_ResourceCatalog.hxx"
+
+#include <QObject>
+
+class QAction;
+class QDockWidget;
+class QMainWindow;
+class QModelIndex;
 
 namespace BL 
 {

@@ -17,9 +17,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <QtGui>
 #include "BL_GenericGui.hxx"
 #include "BL_MainWindows_Qt.hxx"
+
+#include <QApplication>
+#include <QMainWindow>
 
 int main(int argc, char *argv[])
 {

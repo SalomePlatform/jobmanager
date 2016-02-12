@@ -20,7 +20,10 @@
 #ifndef _BL_JOBSTABLE_HXX_
 #define _BL_JOBSTABLE_HXX_
 
-#include <QtGui>
+#include <QTableView>
+
+class QItemSelection;
+class QModelIndex;
 
 namespace BL
 {

@@ -20,9 +20,11 @@
 #ifndef _BL_BUTTONS_HXX_
 #define _BL_BUTTONS_HXX_
 
-#include <QtGui>
-
 #include "BL_Traces.hxx"
+
+#include <QWidget>
+
+class QPushButton;
 
 namespace BL 
 {

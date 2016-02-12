@@ -20,8 +20,14 @@
 #ifndef _BL_SUMMARY_HXX_
 #define _BL_SUMMARY_HXX_
 
-#include <QtGui>
 #include "BL_JobsManager_QT.hxx"
+
+#include <QWidget>
+
+class QLabel;
+class QModelIndex;
+class QStandardItem;
+class QStandardItemModel;
 
 namespace BL 
 {

@@ -19,6 +19,11 @@
 
 #include "BL_Buttons.hxx"
 
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QPushButton>
+
 BL::Buttons::Buttons(QWidget * parent) : QWidget(parent)
 {
   DEBTRACE("Creating BL::Buttons");

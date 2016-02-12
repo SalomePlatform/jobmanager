@@ -19,6 +19,18 @@
 
 #include "BL_JobsManager_QT.hxx"
 #include "BL_GenericGui.hxx"
+
+#include <QApplication>
+#include <QFileDialog>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QStandardItemModel>
+#include <QTextEdit>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <vector>
 
 using namespace std;
@@ -132,8 +144,8 @@ BL::JobsManager_QT::save_jobs_button()
   filters << "XML files (*.xml)"
           << "Any files (*)";
   dialog.setFileMode(QFileDialog::AnyFile);
-  dialog.setFilters(filters);
-  dialog.selectFilter("(*.xml)");
+  dialog.setNameFilters(filters);
+  dialog.selectNameFilter("(*.xml)");
   dialog.setDefaultSuffix("xml");
   dialog.setConfirmOverwrite(true);
   dialog.setAcceptMode(QFileDialog::AcceptSave);

@@ -20,6 +20,14 @@
 #include "BL_JobTab.hxx"
 #include "BL_Traces.hxx"
 
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QStandardItemModel>
+#include <QVBoxLayout>
+
 #ifdef WNT
 #undef ERROR
 #endif

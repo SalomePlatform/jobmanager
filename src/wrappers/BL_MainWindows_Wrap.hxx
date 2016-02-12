@@ -21,8 +21,14 @@
 #ifndef _BL_MAINWINDOWS_WRAP_HXX_
 #define _BL_MAINWINDOWS_WRAP_HXX_
 
-#include <QtGui>
 #include "BL_Traces.hxx"
+
+#include <QString>
+
+class QAction;
+class QIcon;
+class QMainWindow;
+class QObject;
 
 namespace BL
 {

@@ -19,6 +19,10 @@
 
 #include "BL_CreateJobWizard.hxx"
 #include "BL_JobsManager_QT.hxx"
+
+#include <QFileDialog>
+#include <QMessageBox>
+
 #ifndef WNT
 #include <unistd.h>
 #include <pwd.h>

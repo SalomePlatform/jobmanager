@@ -32,7 +32,11 @@
 #endif
 
 #include "BL_MainWindows_Wrap.hxx"
+
+#include <QObject>
 #include <map>
+
+class QMenu;
 
 namespace BL
 {

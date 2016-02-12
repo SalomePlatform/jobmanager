@@ -20,12 +20,15 @@
 #ifndef _JM_RESOURCECATALOG_HXX_
 #define _JM_RESOURCECATALOG_HXX_
 
-#include <QtGui>
-
 #include "BL_SALOMEServices.hxx"
 
+#include <QWidget>
 #include <string>
 #include <list>
+
+class QListWidget;
+class QListWidgetItem;
+class QPushButton;
 
 namespace JM 
 {

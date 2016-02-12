@@ -20,6 +20,9 @@
 #include "BL_SalomeGui.hxx"
 #include "JOBMANAGER_version.h"
 
+#include <SUIT_Desktop.h>
+#include <SUIT_ViewWindow.h>
+
 BL::SalomeGui::SalomeGui() : MainWindows_SALOME("JobManager")
 {
   DEBTRACE("Creating BL::SalomeGui");

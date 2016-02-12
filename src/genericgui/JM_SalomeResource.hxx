@@ -20,10 +20,14 @@
 #ifndef _JM_SALOMERESOURCE_HXX_
 #define _JM_SALOMERESOURCE_HXX_
 
-#include <QtGui>
 #include "BL_SALOMEServices.hxx"
 
+#include <QDialog>
 #include <string>
+
+class QCheckBox;
+class QLineEdit;
+class QListWidget;
 
 namespace JM 
 {

@@ -33,13 +33,11 @@
 
 #include "BL_MainWindows_Wrap.hxx"
 
-#include <SalomeApp_Application.h>
 #include <SalomeApp_Module.h>
 
-#include <SUIT_ViewManager.h>
-#include <SUIT_ViewModel.h>
-#include <SUIT_ViewWindow.h>
-#include <SUIT_Desktop.h>
+class SalomeApp_Application;
+class SUIT_ViewManager;
+class SUIT_ViewWindow;
 
 namespace BL
 {

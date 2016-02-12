@@ -20,9 +20,16 @@
 #ifndef _BL_JOBTAB_HXX_
 #define _BL_JOBTAB_HXX_
 
-#include <QtGui>
-
 #include "BL_JobsManager_QT.hxx"
+
+#include <QTabWidget>
+
+class QFormLayout;
+class QLabel;
+class QListWidget;
+class QModelIndex;
+class QStandardItem;
+class QStandardItemModel;
 
 namespace BL
 {

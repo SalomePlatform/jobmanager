@@ -21,6 +21,9 @@
 #include "BL_Traces.hxx"
 #include "BL_GenericGui.hxx"
 
+#include <QHeaderView>
+#include <QMainWindow>
+
 BL::JobsTable::JobsTable(QWidget *parent) : QTableView(parent)
 {
   DEBTRACE("Creating BL::JobsTable");
