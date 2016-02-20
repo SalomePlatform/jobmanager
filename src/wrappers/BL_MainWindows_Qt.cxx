@@ -19,6 +19,11 @@
 
 #include "BL_MainWindows_Qt.hxx"
 
+#include <QAction>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+
 BL::MainWindows_Qt::MainWindows_Qt(QMainWindow * main_window)
 {
   DEBTRACE("Creating BL::MainWindows_Qt");

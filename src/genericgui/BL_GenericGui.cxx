@@ -19,6 +19,14 @@
 
 #include "BL_GenericGui.hxx"
 
+#include <QAction>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QScrollArea>
+#include <QSplitter>
+#include <QStandardItemModel>
+#include <QVBoxLayout>
+
 #ifdef WNT
 #undef ERROR
 #endif

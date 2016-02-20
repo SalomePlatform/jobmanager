@@ -20,6 +20,10 @@
 #include "BL_Summary.hxx"
 #include "BL_Traces.hxx"
 
+#include <QFormLayout>
+#include <QLabel>
+#include <QStandardItemModel>
+
 BL::Summary::Summary(QWidget *parent, BL::JobsManager_QT * jobs_manager) : QWidget(parent)
 {
   DEBTRACE("Creating BL::Summary");

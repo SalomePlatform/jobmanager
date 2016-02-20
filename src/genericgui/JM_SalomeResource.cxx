@@ -20,6 +20,14 @@
 #include "JM_SalomeResource.hxx"
 #include "BL_Traces.hxx"
 
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QVBoxLayout>
+
 JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
                                    const std::string & resource_name) : QDialog(parent)
 {

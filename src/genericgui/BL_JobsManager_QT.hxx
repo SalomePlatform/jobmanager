@@ -20,21 +20,22 @@
 #ifndef _BL_JOBSMANAGER_QT_HXX_
 #define _BL_JOBSMANAGER_QT_HXX_
 
-#include <QtGlobal>
-#include <QtGui>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QtWidgets>
-#endif
-
 #include "BL_Traces.hxx"
 #include "BL_JobsManager.hxx"
 #include "BL_CreateJobWizard.hxx"
 #include "BL_JobsManager.hxx"
 #include "BL_QModelManager.hxx"
 
+#include <QDockWidget>
+#include <QEvent>
 #include <string>
 
-namespace BL{
+class QPushButton;
+class QTextEdit;
+class QTimer;
+
+namespace BL
+{
 
   class JobManagerEvent : public QEvent
   {

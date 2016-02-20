@@ -20,6 +20,20 @@
 #include "JM_EditSalomeResource.hxx"
 #include "BL_Traces.hxx"
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
+
 using namespace std;
 
 JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices * salome_services,

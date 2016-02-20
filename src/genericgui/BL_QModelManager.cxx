@@ -20,6 +20,8 @@
 #include "BL_QModelManager.hxx"
 #include "BL_JobsManager_QT.hxx"
 
+#include <QStandardItemModel>
+
 #ifdef WNT
 #undef ERROR
 #endif

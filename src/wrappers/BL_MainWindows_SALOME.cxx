@@ -18,7 +18,14 @@
 //
 
 #include "BL_MainWindows_SALOME.hxx"
+
+#include <SalomeApp_Application.h>
 #include <SalomeApp_Engine_i.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_ViewManager.h>
+#include <SUIT_ViewWindow.h>
+
+#include <QTextEdit>
 
 BL::MainWindows_SALOME::MainWindows_SALOME(const QString & module_name) :
   SalomeApp_Module(module_name)

@@ -19,6 +19,18 @@
 
 #include "BL_JobsManager_QT.hxx"
 #include "BL_GenericGui.hxx"
+
+#include <QApplication>
+#include <QFileDialog>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QStandardItemModel>
+#include <QTextEdit>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <vector>
 
 using namespace std;

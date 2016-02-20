@@ -20,11 +20,14 @@
 #ifndef _BL_QMODELMANAGER_HXX_
 #define _BL_QMODELMANAGER_HXX_
 
-#include <QtGui>
-
 #include "BL_Job.hxx"
 
-namespace BL{
+#include <QObject>
+
+class QStandardItemModel;
+
+namespace BL
+{
 
   class JobsManager_QT;
   class QModelManager: public QObject
