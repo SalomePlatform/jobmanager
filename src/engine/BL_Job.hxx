@@ -56,6 +56,9 @@ namespace BL{
       void setDumpYACSState(const int & dump_yacs_state);
       int getDumpYACSState();
 
+      void setYacsDriverOptions(const std::string& options);
+      const std::string& getYacsDriverOptions()const;
+
       enum MemReqType {MEM_PER_NODE, MEM_PER_CPU};
 
       struct BatchParam
@@ -114,6 +117,7 @@ namespace BL{
       BL::Job::State _state;
       BL::Job::ThreadState _thread_state;
       int _dump_yacs_state;
+      std::string _yacs_driver_options;
 
       std::string _name;
 

@@ -277,6 +277,14 @@ BL::SALOMEServices::create_job(BL::Job * job)
       new_parameter->value = CORBA::string_dup(oss.str().c_str());
       job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
     }
+    if (not job->getYacsDriverOptions().empty())
+    {
+      job_parameters->specific_parameters.length(job_parameters->specific_parameters.length() + 1);
+      Engines::Parameter_var new_parameter = new Engines::Parameter;
+      new_parameter->name = CORBA::string_dup("YACSDriverOptions");
+      new_parameter->value = CORBA::string_dup(job->getYacsDriverOptions().c_str());
+      job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
+    }
   }
   if (job->getLoadLevelerJobType() != "")
   {
@@ -669,6 +677,11 @@ BL::SALOMEServices::get_new_job(int job_number)
         int value;
         iss >> value;
         job_return->setDumpYACSState(value);
+      }
+      if (std::string(job_parameters->specific_parameters[i].name.in()) == "YACSDriverOptions")
+      {
+        std::string user_value = job_parameters->specific_parameters[i].value.in();
+        job_return->setYacsDriverOptions(user_value);
       }
       if (std::string(job_parameters->specific_parameters[i].name.in()) == "LoalLevelerJobType")
       {

@@ -107,6 +107,7 @@ namespace BL {
       bool start_job;
       int dump_yacs_state;
       std::string ll_jobtype;
+      std::string yacs_driver_options;
 
     public:
       enum {Page_JobName,

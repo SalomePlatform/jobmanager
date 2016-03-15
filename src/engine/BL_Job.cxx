@@ -39,6 +39,7 @@ BL::Job::Job()
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
+  _yacs_driver_options = "";
   _ll_jobtype = "";
 
   // Parameters for COORM
@@ -66,6 +67,7 @@ BL::Job::Job(const std::string & name)
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
   _dump_yacs_state = 0;
+  _yacs_driver_options = "";
   _ll_jobtype = "";
 
   // Parameters for COORM
@@ -127,6 +129,18 @@ int
 BL::Job::getDumpYACSState()
 {
   return _dump_yacs_state;
+}
+
+void
+BL::Job::setYacsDriverOptions(const std::string& options)
+{
+  _yacs_driver_options = options;
+}
+
+const std::string&
+BL::Job::getYacsDriverOptions()const
+{
+  return _yacs_driver_options;
 }
 
 void 
