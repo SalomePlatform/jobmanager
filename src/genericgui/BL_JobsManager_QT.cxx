@@ -291,6 +291,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
     new_job->setType(BL::Job::YACS_SCHEMA);
     new_job->setJobFile(wizard.yacs_file);
     new_job->setDumpYACSState(wizard.dump_yacs_state);
+    new_job->setYacsDriverOptions(wizard.yacs_driver_options);
     break;
   case BL::CreateJobWizard::COMMAND:
     // Command Job

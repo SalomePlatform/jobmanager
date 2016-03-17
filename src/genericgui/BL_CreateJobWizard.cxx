@@ -77,6 +77,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   start_job = false;
   dump_yacs_state = -1;
+  yacs_driver_options = "";
   ll_jobtype = "";
 
   setOptions(QWizard::NoBackButtonOnStartPage);
@@ -137,6 +138,10 @@ BL::CreateJobWizard::clone(const std::string & name)
         QString value;
         value.setNum(job->getDumpYACSState());
         setField("dump_yacs_state", value);
+      }
+      if (not job->getYacsDriverOptions().empty())
+      {
+        setField("yacs_driver_options", job->getYacsDriverOptions().c_str());
       }
     }
     else if (job->getType() == BL::Job::COMMAND)
@@ -263,6 +268,7 @@ BL::CreateJobWizard::end(int result)
     QString f_yacs_file = field("yacs_file").toString();
     yacs_file = f_yacs_file.trimmed().toUtf8().constData();
     dump_yacs_state = field("dump_yacs_state").toInt();
+    yacs_driver_options = field("yacs_driver_options").toString().trimmed().toUtf8().constData();
 
     // Command Panel
     QString f_command = field("command").toString();
@@ -558,15 +564,18 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
 
   QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
   QLabel * label_dump =  new QLabel("Dump YACS state each secs (0 disable this feature)");
-  QLabel * label_dump_warning = new QLabel("(WARNING: can only be used with SALOME >= 6.3.0)");
+  QLabel * label_driver_options = new QLabel("YACS driver options - see YACS driver documentation.");
   QSpinBox * spin_dump = new QSpinBox(this);
   spin_dump->setMinimum(0);
   spin_dump->setMaximum(1000000);
   registerField("dump_yacs_state", spin_dump);
+  QLineEdit* edit_yacs_driver_options = new QLineEdit(this);
+  registerField("yacs_driver_options", edit_yacs_driver_options);
   QGridLayout * specific_layout = new QGridLayout;
   specific_layout->addWidget(label_dump, 0, 0);
   specific_layout->addWidget(spin_dump, 0, 1);
-  specific_layout->addWidget(label_dump_warning, 1, 0);
+  specific_layout->addWidget(label_driver_options, 1, 0);
+  specific_layout->addWidget(edit_yacs_driver_options, 1, 1);
   spec_param_box->setLayout(specific_layout);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
