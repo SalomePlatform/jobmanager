@@ -277,7 +277,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
       new_parameter->value = CORBA::string_dup(oss.str().c_str());
       job_parameters->specific_parameters[job_parameters->specific_parameters.length() - 1] = new_parameter;
     }
-    if (not job->getYacsDriverOptions().empty())
+    if (!job->getYacsDriverOptions().empty())
     {
       job_parameters->specific_parameters.length(job_parameters->specific_parameters.length() + 1);
       Engines::Parameter_var new_parameter = new Engines::Parameter;

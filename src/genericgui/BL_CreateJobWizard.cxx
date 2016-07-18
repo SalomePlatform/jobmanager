@@ -139,7 +139,7 @@ BL::CreateJobWizard::clone(const std::string & name)
         value.setNum(job->getDumpYACSState());
         setField("dump_yacs_state", value);
       }
-      if (not job->getYacsDriverOptions().empty())
+      if (!job->getYacsDriverOptions().empty())
       {
         setField("yacs_driver_options", job->getYacsDriverOptions().c_str());
       }
