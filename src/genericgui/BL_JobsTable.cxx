@@ -83,7 +83,10 @@ BL::JobsTable::selectionChanged ( const QItemSelection & selected, const QItemSe
   QModelIndexList selected_rows = selectionModel()->selectedRows();
   if (selected_rows.length() == 0)
   {
-    _main_gui->reset_job_selection();
+    if (_main_gui)
+    {
+      _main_gui->reset_job_selection();
+    }
   }
   else if (selected_rows.length() == 1)
   {
