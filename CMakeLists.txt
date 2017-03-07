@@ -89,6 +89,11 @@ IF(SALOME_USE_MPI)
   FIND_PACKAGE(SalomeMPI) # needed for doc generation by Sphinx
 ENDIF()
 IF(SALOME_BUILD_DOC)
+
+  # Python: should be detected before sphinx
+  FIND_PACKAGE(SalomePythonInterp REQUIRED)
+  FIND_PACKAGE(SalomePythonLibs REQUIRED)
+
   FIND_PACKAGE(SalomeSphinx)
   SALOME_LOG_OPTIONAL_PACKAGE(Sphinx SALOME_BUILD_DOC)
 ENDIF()
