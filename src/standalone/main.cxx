@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
   QMainWindow main_window;
   BL::MainWindows_Qt wrapper(&main_window);
   BL::GenericGui * main_widget = new BL::GenericGui(&wrapper);
+  main_widget->createDockWidgets();
+  main_widget->createCentralWidget();
   main_widget->createActions();
   main_widget->createMenus();
   main_widget->updateButtonsStates();
