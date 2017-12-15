@@ -79,6 +79,7 @@ namespace BL {
       std::string python_salome_file;
 
       std::string env_file;
+      std::string pre_command;
 
       std::string batch_directory;
 
@@ -281,10 +282,12 @@ namespace BL {
     public slots:
       void choose_file();
       void choose_env_file();
+      void choose_pre_command_file();
 
     private:
       QLineEdit * _yacs_file_text;
       QLineEdit * _line_env_file;
+      QLineEdit * _line_pre_command;
   };
 
   class CommandMainPage: public QWizardPage
@@ -302,10 +305,12 @@ namespace BL {
     public slots:
       void choose_command_file();
       void choose_env_file();
+      void choose_pre_command_file();
 
     private:
       QLineEdit * _line_command;
       QLineEdit * _line_env_file;
+      QLineEdit * _line_pre_command;
   };
 
   class PythonSalomeMainPage: public QWizardPage
@@ -323,10 +328,12 @@ namespace BL {
     public slots:
       void choose_PythonSalome_file();
       void choose_env_file();
+      void choose_pre_command_file();
 
     private:
       QLineEdit * _line_PythonSalome;
       QLineEdit * _line_env_file;
+      QLineEdit * _line_pre_command;
   };
 
   class AdvancedParametersPage: public QWizardPage

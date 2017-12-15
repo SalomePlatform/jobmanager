@@ -309,6 +309,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
 
   // For all jobs
   new_job->setEnvFile(wizard.env_file);
+  new_job->setPreCommand(wizard.pre_command);
   BL::Job::BatchParam param;
 
   // For COORM

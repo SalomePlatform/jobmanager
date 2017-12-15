@@ -53,6 +53,9 @@ namespace BL{
       void setEnvFile(const std::string & env_file);
       std::string & getEnvFile();
 
+      void setPreCommand(const std::string & pre_command);
+      std::string & getPreCommand();
+
       void setDumpYACSState(const int & dump_yacs_state);
       int getDumpYACSState();
 
@@ -124,6 +127,7 @@ namespace BL{
       BL::Job::JobType _type;
       std::string _job_file;
       std::string _env_file;
+      std::string _pre_command;
 
       BL::Job::BatchParam _batch_params;
       BL::Job::FilesParam _files_params;

@@ -26,6 +26,7 @@ BL::Job::Job()
   _type = COMMAND;
   _job_file = "";
   _env_file = "";
+  _pre_command = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
   _batch_params.mem_limit = 0;
@@ -54,6 +55,7 @@ BL::Job::Job(const std::string & name)
   _type = COMMAND;
   _job_file = "";
   _env_file = "";
+  _pre_command = "";
   _batch_params.batch_directory = "";
   _batch_params.maximum_duration = "";
   _batch_params.mem_limit = 0;
@@ -165,6 +167,18 @@ std::string &
 BL::Job::getEnvFile()
 {
   return _env_file;
+}
+
+void 
+BL::Job::setPreCommand(const std::string & pre_command)
+{
+  _pre_command = pre_command;
+}
+
+std::string & 
+BL::Job::getPreCommand()
+{
+  return _pre_command;
 }
 
 void 

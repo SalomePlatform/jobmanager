@@ -56,6 +56,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   command = "";
   python_salome_file = "";
   env_file = "";
+  pre_command = "";
   batch_directory = "";
 
   // For COORM
@@ -133,6 +134,7 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("yacs_file", QString(job->getJobFile().c_str()));
       setField("job_type_yacs", true);
       setField("env_yacs_file", QString(job->getEnvFile().c_str()));
+      setField("pre_yacs_file", QString(job->getPreCommand().c_str()));
       if (job->getDumpYACSState() != -1)
       {
         QString value;
@@ -149,29 +151,31 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("command", QString(job->getJobFile().c_str()));
       setField("job_type_command", true);
       setField("env_command_file", QString(job->getEnvFile().c_str()));
+      setField("pre_command_file", QString(job->getPreCommand().c_str()));
     }
     else if (job->getType() == BL::Job::PYTHON_SALOME)
     {
       setField("PythonSalome", QString(job->getJobFile().c_str()));
       setField("job_type_python_salome", true);
       setField("env_PythonSalome_file", QString(job->getEnvFile().c_str()));
+      setField("pre_PythonSalome_file", QString(job->getPreCommand().c_str()));
     }
 
 
-	// For COORM
+    // For COORM
     BL::Job::BatchParam batch_params = job->getBatchParameters();
-	BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(job->getResource().c_str());
-	std::string batch = resource_descr.batch.c_str();
-	if (batch == "coorm")
-	{
-		setField("coorm_batch_directory", QString(batch_params.batch_directory.c_str()));
-		setField("launcher_file", QString(batch_params.launcher_file.c_str()));
-		setField("launcher_args", QString(batch_params.launcher_args.c_str()));
-	}
-	else
-	{
-		setField("batch_directory", QString(batch_params.batch_directory.c_str()));
-	}
+    BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(job->getResource().c_str());
+    std::string batch = resource_descr.batch.c_str();
+    if (batch == "coorm")
+    {
+      setField("coorm_batch_directory", QString(batch_params.batch_directory.c_str()));
+      setField("launcher_file", QString(batch_params.launcher_file.c_str()));
+      setField("launcher_args", QString(batch_params.launcher_args.c_str()));
+    }
+    else
+    {
+      setField("batch_directory", QString(batch_params.batch_directory.c_str()));
+    }
 
     QString proc_value;
     proc_value.setNum(batch_params.nb_proc);
@@ -286,6 +290,15 @@ BL::CreateJobWizard::end(int result)
     else if (job_type == PYTHON_SALOME)
       f_env_file = field("env_PythonSalome_file").toString();
     env_file = f_env_file.trimmed().toUtf8().constData();
+
+    QString f_pre_command_file;
+    if (job_type == YACS)
+      f_pre_command_file = field("pre_yacs_file").toString();
+    else if (job_type == COMMAND)
+      f_pre_command_file = field("pre_command_file").toString();
+    else if (job_type == PYTHON_SALOME)
+      f_pre_command_file = field("pre_PythonSalome_file").toString();
+    pre_command = f_pre_command_file.trimmed().toUtf8().constData();
 
     // Batch Panel
     QString f_batch_directory = field("batch_directory").toString();
@@ -555,11 +568,19 @@ BL::YACSSchemaPage::YACSSchemaPage(QWidget * parent)
   _line_env_file = new QLineEdit(this);
   registerField("env_yacs_file", _line_env_file);
   _line_env_file->setReadOnly(true);
+  QPushButton * command_pre_command_button = new QPushButton(tr("Choose a pre processing script"));
+  connect(command_pre_command_button, SIGNAL(clicked()),
+          this, SLOT(choose_pre_command_file()));
+  _line_pre_command = new QLineEdit(this);
+  registerField("pre_yacs_file", _line_pre_command);
+  _line_pre_command->setReadOnly(true);
   QGridLayout * files_layout = new QGridLayout;
   files_layout->addWidget(yacs_file_button, 0, 0);
   files_layout->addWidget(_yacs_file_text, 0, 1);
   files_layout->addWidget(command_env_file_button, 1, 0);
   files_layout->addWidget(_line_env_file, 1, 1);
+  files_layout->addWidget(command_pre_command_button, 2, 0);
+  files_layout->addWidget(_line_pre_command, 2, 1);
   files_param_box->setLayout(files_layout);
 
   QGroupBox * spec_param_box = new QGroupBox("YACS specific parameters");
@@ -628,6 +649,16 @@ BL::YACSSchemaPage::choose_env_file()
   _line_env_file->setReadOnly(true);
 }
 
+void
+BL::YACSSchemaPage::choose_pre_command_file()
+{
+  QString pre_command_file = QFileDialog::getOpenFileName(this,
+                                                    tr("Open script file"), "",
+                                                    tr("All Files (*)"));
+  _line_pre_command->setReadOnly(false);
+  _line_pre_command->setText(pre_command_file);
+  _line_pre_command->setReadOnly(true);
+}
 
 int 
 BL::YACSSchemaPage::nextId() const
@@ -655,11 +686,20 @@ BL::CommandMainPage::CommandMainPage(QWidget * parent)
   registerField("env_command_file", _line_env_file);
   _line_env_file->setReadOnly(true);
 
+  QPushButton * command_pre_command_button = new QPushButton(tr("Choose a pre processing script"));
+  connect(command_pre_command_button, SIGNAL(clicked()),
+          this, SLOT(choose_pre_command_file()));
+  _line_pre_command = new QLineEdit(this);
+  registerField("pre_command_file", _line_pre_command);
+  _line_pre_command->setReadOnly(true);
+
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(command_file_button, 0, 0);
   layout->addWidget(_line_command, 0, 1);
   layout->addWidget(command_env_file_button, 1, 0);
   layout->addWidget(_line_env_file, 1, 1);
+  layout->addWidget(command_pre_command_button, 2, 0);
+  layout->addWidget(_line_pre_command, 2, 1);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -690,6 +730,17 @@ BL::CommandMainPage::choose_env_file()
   _line_env_file->setReadOnly(false);
   _line_env_file->setText(env_file);
   _line_env_file->setReadOnly(true);
+}
+
+void
+BL::CommandMainPage::choose_pre_command_file()
+{
+  QString pre_command_file = QFileDialog::getOpenFileName(this,
+                                                    tr("Open script file"), "",
+                                                    tr("All Files (*)"));
+  _line_pre_command->setReadOnly(false);
+  _line_pre_command->setText(pre_command_file);
+  _line_pre_command->setReadOnly(true);
 }
 
 bool
@@ -1304,11 +1355,20 @@ BL::PythonSalomeMainPage::PythonSalomeMainPage(QWidget * parent)
   registerField("env_PythonSalome_file", _line_env_file);
   _line_env_file->setReadOnly(true);
 
+  QPushButton * command_pre_command_button = new QPushButton(tr("Choose a pre processing script"));
+  connect(command_pre_command_button, SIGNAL(clicked()),
+          this, SLOT(choose_pre_command_file()));
+  _line_pre_command = new QLineEdit(this);
+  registerField("pre_PythonSalome_file", _line_pre_command);
+  _line_pre_command->setReadOnly(true);
+
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(PythonSalome_file_button, 0, 0);
   layout->addWidget(_line_PythonSalome, 0, 1);
   layout->addWidget(PythonSalome_env_file_button, 1, 0);
   layout->addWidget(_line_env_file, 1, 1);
+  layout->addWidget(command_pre_command_button, 2, 0);
+  layout->addWidget(_line_pre_command, 2, 1);
 
   QVBoxLayout * main_layout = new QVBoxLayout;
   main_layout->addWidget(label);
@@ -1339,6 +1399,17 @@ BL::PythonSalomeMainPage::choose_env_file()
   _line_env_file->setReadOnly(false);
   _line_env_file->setText(env_file);
   _line_env_file->setReadOnly(true);
+}
+
+void
+BL::PythonSalomeMainPage::choose_pre_command_file()
+{
+  QString pre_command_file = QFileDialog::getOpenFileName(this,
+                                                    tr("Open script file"), "",
+                                                    tr("All Files (*)"));
+  _line_pre_command->setReadOnly(false);
+  _line_pre_command->setText(pre_command_file);
+  _line_pre_command->setReadOnly(true);
 }
 
 bool

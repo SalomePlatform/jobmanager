@@ -299,6 +299,7 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->job_name = CORBA::string_dup(job->getName().c_str());
   job_parameters->job_file = CORBA::string_dup(job->getJobFile().c_str());
   job_parameters->env_file = CORBA::string_dup(job->getEnvFile().c_str());
+  job_parameters->pre_command = CORBA::string_dup(job->getPreCommand().c_str());
   BL::Job::FilesParam files = job->getFilesParameters();
   std::list<std::string>::iterator it;
   int i = 0;
@@ -630,6 +631,7 @@ BL::SALOMEServices::get_new_job(int job_number)
     job_return->setType(job_parameters->job_type.in());
     job_return->setJobFile(job_parameters->job_file.in());
     job_return->setEnvFile(job_parameters->env_file.in());
+    job_return->setPreCommand(job_parameters->pre_command.in());
     job_return->setBatchQueue(job_parameters->queue.in());
     job_return->setWCKey(job_parameters->wckey.in());
     job_return->setExtraParams(job_parameters->extra_params.in());
