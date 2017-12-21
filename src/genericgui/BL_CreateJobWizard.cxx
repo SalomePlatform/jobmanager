@@ -22,6 +22,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTreeView>
 
 #ifndef WNT
 #include <unistd.h>
@@ -1095,13 +1096,29 @@ FilesPage::isComplete() const
 void
 FilesPage::choose_input_files()
 {
-  QStringList files = QFileDialog::getOpenFileNames(this,
-                                                    tr("Add input files"), "",
-                                                    tr("All Files (*)"));
-  for (int i = 0; i < files.size(); ++i) 
+  // We need to be able to select both files and folders.
+  // Standard QFileDialog cannot do it.
+  QFileDialog w(this, tr("Select input files"),
+              "", tr("All files and folders(*)")) ;
+  w.setOption(QFileDialog::DontUseNativeDialog,true);
+  QListView *l = w.findChild<QListView*>("listView");
+  if (l)
   {
-    if (ui->input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
-      ui->input_files_list->addItem(files.at(i));
+    l->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  QTreeView *t = w.findChild<QTreeView*>();
+  if (t)
+  {
+    t->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  if(w.exec())
+  {
+    QStringList files = w.selectedFiles();
+    for (int i = 0; i < files.size(); ++i)
+    {
+      if (ui->input_files_list->findItems(files.at(i), Qt::MatchFixedString).size() == 0)
+        ui->input_files_list->addItem(files.at(i));
+    }
   }
 }
 
