@@ -454,7 +454,7 @@ BL::JobsManager_QT::event(QEvent * e)
   {
     if (event->event_name == "Ok")
     {
-      write_normal_text("Results of Job " + job_name + " are get\n");
+      write_normal_text("Results of Job " + job_name + " have been got.\n");
     }
     else
     {
