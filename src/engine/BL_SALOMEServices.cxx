@@ -328,7 +328,9 @@ BL::SALOMEServices::create_job(BL::Job * job)
   job_parameters->maximum_duration = CORBA::string_dup(cpp_batch_params.maximum_duration.c_str());
   job_parameters->resource_required.name = CORBA::string_dup(job->getResource().c_str());
   job_parameters->resource_required.nb_proc = cpp_batch_params.nb_proc;
+  job_parameters->resource_required.nb_node = cpp_batch_params.nb_node;
   job_parameters->queue = CORBA::string_dup(job->getBatchQueue().c_str());
+  job_parameters->partition = CORBA::string_dup(job->getBatchPartition().c_str());
   job_parameters->exclusive = cpp_batch_params.exclusive;
   job_parameters->wckey = CORBA::string_dup(job->getWCKey().c_str());
   job_parameters->extra_params = CORBA::string_dup(job->getExtraParams().c_str());
@@ -349,7 +351,6 @@ BL::SALOMEServices::create_job(BL::Job * job)
   }
 
   // Unused parameters
-  job_parameters->resource_required.nb_node = -1;
   job_parameters->resource_required.nb_proc_per_node = -1;
   job_parameters->resource_required.cpu_clock = -1;
 
@@ -633,6 +634,7 @@ BL::SALOMEServices::get_new_job(int job_number)
     job_return->setEnvFile(job_parameters->env_file.in());
     job_return->setPreCommand(job_parameters->pre_command.in());
     job_return->setBatchQueue(job_parameters->queue.in());
+    job_return->setBatchPartition(job_parameters->partition.in());
     job_return->setWCKey(job_parameters->wckey.in());
     job_return->setExtraParams(job_parameters->extra_params.in());
 
@@ -648,6 +650,7 @@ BL::SALOMEServices::get_new_job(int job_number)
     batch_param.batch_directory = job_parameters->work_directory.in();
     batch_param.maximum_duration = job_parameters->maximum_duration.in();
     batch_param.nb_proc = job_parameters->resource_required.nb_proc;
+    batch_param.nb_node = job_parameters->resource_required.nb_node;
     batch_param.exclusive = job_parameters->exclusive;
 
     if (job_parameters->mem_per_cpu != 0)

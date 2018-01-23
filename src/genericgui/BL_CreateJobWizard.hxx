@@ -90,6 +90,7 @@ namespace BL {
       long mem_limit;
       BL::Job::MemReqType mem_req_type;
       int nb_proc;
+      int nb_node;
       bool exclusive;
 
       // Parameters for COORM
@@ -102,6 +103,7 @@ namespace BL {
 
       std::string resource_choosed;
       std::string batch_queue;
+      std::string batch_partition;
       std::string wckey;
       std::string extra_params;
 

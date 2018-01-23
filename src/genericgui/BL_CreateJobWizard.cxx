@@ -67,6 +67,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
   mem_limit = 0;
   mem_req_type = BL::Job::MEM_PER_NODE;
   nb_proc = 1;
+  nb_node = 0;
 
   // Parameters for COORM
   launcher_file = "";
@@ -76,6 +77,7 @@ BL::CreateJobWizard::CreateJobWizard(BL::JobsManager_QT * jobs_manager, BL::SALO
 
   resource_choosed = "";
   batch_queue = "";
+  batch_partition = "";
 
   start_job = false;
   dump_yacs_state = -1;
@@ -182,6 +184,10 @@ BL::CreateJobWizard::clone(const std::string & name)
     proc_value.setNum(batch_params.nb_proc);
     setField("proc_value", proc_value);
 
+    QString node_value;
+    node_value.setNum(batch_params.nb_node);
+    setField("node_value", node_value);
+
     setField("exclusive", batch_params.exclusive);
 
     if (batch_params.maximum_duration == "")
@@ -240,6 +246,7 @@ BL::CreateJobWizard::clone(const std::string & name)
     setField("result_directory", QString(files_params.result_directory.c_str()));
     setField("resource_choosed", QString(job->getResource().c_str()));
     setField("batch_queue", QString(job->getBatchQueue().c_str()));
+    setField("batch_partition", QString(job->getBatchPartition().c_str()));
     setField("ll_jobtype", QString(job->getLoadLevelerJobType().c_str()));
     setField("wckey", QString(job->getWCKey().c_str()));
     setField("extra_params", QString(job->getExtraParams().c_str()));
@@ -358,6 +365,7 @@ BL::CreateJobWizard::end(int result)
     }
 
     nb_proc = field("proc_value").toInt();
+    nb_node = field("node_value").toInt();
     exclusive = field("exclusive").toBool();
 
     // Files Panel
@@ -383,6 +391,10 @@ BL::CreateJobWizard::end(int result)
     // Batch Queue
     QString f_batch_queue = field("batch_queue").toString();
     batch_queue = f_batch_queue.trimmed().toUtf8().constData();
+
+    // Batch Partition
+    QString f_batch_partition = field("batch_partition").toString();
+    batch_partition = f_batch_partition.trimmed().toUtf8().constData();
 
     // LoadLeveler JobType
     BL::ResourceDescr resource_descr = _salome_services->getResourceDescr(resource_choosed);
@@ -775,6 +787,7 @@ BatchParametersPage::BatchParametersPage(QWidget * parent, SALOMEServices * salo
   registerField("duration_min", ui->spin_duration_min);
   registerField("mem_value", ui->spin_memory);
   registerField("proc_value", ui->spin_proc);
+  registerField("node_value", ui->spin_node);
   registerField("exclusive", ui->check_exclusive);
   registerField("default_time", ui->rb_default_time);
   registerField("user_time", ui->rb_user_time);
@@ -1244,6 +1257,10 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
   QLineEdit * _bqLineEdit = new QLineEdit(this);
   registerField("batch_queue", _bqLineEdit);
 
+  QLabel * bpLabel = new QLabel("Batch Partition (could be optional):");
+  QLineEdit * _bpLineEdit = new QLineEdit(this);
+  registerField("batch_partition", _bpLineEdit);
+
   _ll_label = new QLabel("LoadLeveler JobType:", this);
   _ll_value = new QLineEdit(this);
   registerField("ll_jobtype", _ll_value);
@@ -1256,6 +1273,8 @@ BL::ResourcePage::ResourcePage(BL::CreateJobWizard * parent, BL::SALOMEServices 
   _main_layout->addWidget(_resource_choosed, 1, 1);
   _main_layout->addWidget(bqLabel, 2, 0);
   _main_layout->addWidget(_bqLineEdit, 2, 1);
+  _main_layout->addWidget(bpLabel, 3, 0);
+  _main_layout->addWidget(_bpLineEdit, 3, 1);
   setLayout(_main_layout);
 
 };

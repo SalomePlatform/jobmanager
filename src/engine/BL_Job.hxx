@@ -71,11 +71,12 @@ namespace BL{
         long mem_limit;
         MemReqType mem_req_type;
         int nb_proc;
+        int nb_node;
         bool exclusive;
 
-		// Parameters for COORM
-		std::string launcher_file;
-		std::string launcher_args;
+        // Parameters for COORM
+        std::string launcher_file;
+        std::string launcher_args;
       };
       void setBatchParameters(const BL::Job::BatchParam & param);
       const BL::Job::BatchParam & getBatchParameters();
@@ -94,6 +95,9 @@ namespace BL{
 
       void setBatchQueue(const std::string & queue);
       std::string & getBatchQueue();
+
+      void setBatchPartition(const std::string & partition);
+      std::string & getBatchPartition();
 
       void setWCKey(const std::string & wckey);
       const std::string & getWCKey();
@@ -133,6 +137,7 @@ namespace BL{
       BL::Job::FilesParam _files_params;
       std::string _resource_choosed;
       std::string _batch_queue;
+      std::string _batch_partition;
       std::string _wckey;
       std::string _extra_params;
       std::string _ll_jobtype;

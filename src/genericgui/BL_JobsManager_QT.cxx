@@ -326,6 +326,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   param.mem_limit = wizard.mem_limit;
   param.mem_req_type = wizard.mem_req_type;
   param.nb_proc = wizard.nb_proc;
+  param.nb_node = wizard.nb_node;
   param.exclusive = wizard.exclusive;
 
   // Parameters for COORM
@@ -340,6 +341,7 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
   new_job->setFilesParameters(files_params);
   new_job->setResource(wizard.resource_choosed);
   new_job->setBatchQueue(wizard.batch_queue);
+  new_job->setBatchPartition(wizard.batch_partition);
   new_job->setLoadLevelerJobType(wizard.ll_jobtype);
   new_job->setWCKey(wizard.wckey);
   new_job->setExtraParams(wizard.extra_params);

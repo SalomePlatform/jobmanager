@@ -32,10 +32,12 @@ BL::Job::Job()
   _batch_params.mem_limit = 0;
   _batch_params.mem_req_type = MEM_PER_NODE;
   _batch_params.nb_proc = 0;
+  _batch_params.nb_node = 0;
   _batch_params.exclusive = false;
   _files_params.result_directory = "";
   _resource_choosed = "";
   _batch_queue = "";
+  _batch_partition = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
@@ -61,10 +63,12 @@ BL::Job::Job(const std::string & name)
   _batch_params.mem_limit = 0;
   _batch_params.mem_req_type = MEM_PER_NODE;
   _batch_params.nb_proc = 0;
+  _batch_params.nb_node = 0;
   _batch_params.exclusive = false;
   _files_params.result_directory = "";
   _resource_choosed = "";
   _batch_queue = "";
+  _batch_partition = "";
   _state = BL::Job::CREATED;
   _thread_state = BL::Job::NOTHING;
   _salome_launcher_id = -1;
@@ -229,6 +233,18 @@ std::string &
 BL::Job::getBatchQueue()
 {
   return _batch_queue;
+}
+
+void
+BL::Job::setBatchPartition(const std::string & partition)
+{
+  _batch_partition = partition;
+}
+
+std::string &
+BL::Job::getBatchPartition()
+{
+  return _batch_partition;
 }
 
 void

@@ -79,6 +79,7 @@ namespace BL
       QLabel * _job_mdt_label_value;
       QLabel * _job_req_mem_label_value;
       QLabel * _job_nop_label_value;
+      QLabel * _job_nono_label_value;
       QLabel * _job_excl_label_value;
 
       // Specific Values
@@ -86,6 +87,8 @@ namespace BL
       QLabel * _yacs_dump_state_value;
       QLabel * _batch_queue_label;
       QLabel * _batch_queue_value;
+      QLabel * _batch_partition_label;
+      QLabel * _batch_partition_value;
       QLabel * _ll_jobtype_label;
       QLabel * _ll_jobtype_value;
 

@@ -112,6 +112,8 @@ BL::JobTab::createJobSummaryTab()
   _job_req_mem_label_value = new QLabel("");
   QLabel * job_nop_label = new QLabel("Number of processors:");
   _job_nop_label_value = new QLabel("");
+  QLabel * job_nono_label = new QLabel("Number of nodes:");
+  _job_nono_label_value = new QLabel("");
   QLabel * job_excl_label = new QLabel("Exclusive:");
   _job_excl_label_value = new QLabel("");
 
@@ -124,6 +126,8 @@ BL::JobTab::createJobSummaryTab()
   // Specific values
   _batch_queue_label = new QLabel("Batch queue:");
   _batch_queue_value = new QLabel("");
+  _batch_partition_label = new QLabel("Batch partition:");
+  _batch_partition_value = new QLabel("");
   _ll_jobtype_label = new QLabel("LoadLeveler JobType:");
   _ll_jobtype_value = new QLabel("");
 
@@ -141,10 +145,11 @@ BL::JobTab::createJobSummaryTab()
   _other_run_values_form->insertRow(0, job_mdt_label, _job_mdt_label_value);
   _other_run_values_form->insertRow(1, job_req_mem_label, _job_req_mem_label_value);
   _other_run_values_form->insertRow(2, job_nop_label, _job_nop_label_value);
-  _other_run_values_form->insertRow(3, job_excl_label, _job_excl_label_value);
+  _other_run_values_form->insertRow(3, job_nono_label, _job_nono_label_value);
+  _other_run_values_form->insertRow(4, job_excl_label, _job_excl_label_value);
 
   // Parameters for COORM
-  _other_run_values_form->insertRow(4, job_la_label, _job_la_label_value);
+  _other_run_values_form->insertRow(5, job_la_label, _job_la_label_value);
 
   QHBoxLayout * box_layout = new QHBoxLayout();
   box_layout->addLayout(_run_values_form);
@@ -247,6 +252,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
                                                           batch_params.maximum_duration.c_str();
     _job_mdt_label_value->setText(time);
     _job_nop_label_value->setText(QVariant(batch_params.nb_proc).toString());
+    _job_nono_label_value->setText(QVariant(batch_params.nb_node).toString());
     QString exclText = (batch_params.exclusive)? "yes" : "no";
     _job_excl_label_value->setText(exclText);
 
@@ -304,6 +310,11 @@ BL::JobTab::job_selected(const QModelIndex & index)
     {
       _batch_queue_value->setText(QVariant(job->getBatchQueue().c_str()).toString());
       _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _batch_queue_label, _batch_queue_value);
+    }
+    if (job->getBatchPartition() != "")
+    {
+      _batch_partition_value->setText(QVariant(job->getBatchPartition().c_str()).toString());
+      _other_run_values_form->insertRow(_other_run_values_form->rowCount(), _batch_partition_label, _batch_partition_value);
     }
     if (job->getLoadLevelerJobType() != "")
     {
@@ -363,6 +374,7 @@ BL::JobTab::reset(QString job_name)
     _job_mdt_label_value->setText("");
     _job_req_mem_label_value->setText("");
     _job_nop_label_value->setText("");
+    _job_nono_label_value->setText("");
     _job_excl_label_value->setText("");
     _job_jobfile_label_value->setText("");
     _job_envfile_label_value->setText("");
@@ -372,6 +384,7 @@ BL::JobTab::reset(QString job_name)
 
     _yacs_dump_state_value->setText("");
     _batch_queue_value->setText("");
+    _batch_partition_value->setText("");
     _ll_jobtype_value->setText("");
 
 	// Parameters for COORM

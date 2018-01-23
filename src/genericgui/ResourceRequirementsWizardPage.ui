@@ -45,6 +45,27 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="hl_node">
+        <item>
+         <widget class="QLabel" name="label_node">
+          <property name="text">
+           <string>Number of nodes (0 for unspecified) :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spin_node">
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>1000000000</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QCheckBox" name="check_exclusive">
         <property name="text">
          <string>Exclusive (do not share nodes with other jobs)</string>
