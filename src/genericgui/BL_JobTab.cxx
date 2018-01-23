@@ -80,6 +80,8 @@ BL::JobTab::createJobSummaryTab()
   _job_jobfile_label_value = new QLabel("");
   QLabel * job_envfile_label = new QLabel("Env File:");
   _job_envfile_label_value = new QLabel("");
+  QLabel * job_prefile_label = new QLabel("Preprocessing File:");
+  _job_prefile_label_value = new QLabel("");
 
 
   // Specific values
@@ -95,6 +97,7 @@ BL::JobTab::createJobSummaryTab()
   _main_values_form->insertRow(4, job_resource_label, _job_resource_label_value);
   _main_values_form->insertRow(5, job_jobfile_label, _job_jobfile_label_value);
   _main_values_form->insertRow(6, job_envfile_label, _job_envfile_label_value);
+  _main_values_form->insertRow(7, job_prefile_label, _job_prefile_label_value);
   main_values_box->setLayout(_main_values_form);
 
   QLabel * job_nif_label = new QLabel("Number of Input Files:");
@@ -229,6 +232,7 @@ BL::JobTab::job_selected(const QModelIndex & index)
     _job_launcher_label_value->setText(QVariant(job->getSalomeLauncherId()).toString());
     _job_jobfile_label_value->setText(QString::fromUtf8(job->getJobFile().c_str()));
     _job_envfile_label_value->setText(QString::fromUtf8(job->getEnvFile().c_str()));
+    _job_prefile_label_value->setText(QString::fromUtf8(job->getPreCommand().c_str()));
     if (job->getType() == BL::Job::YACS_SCHEMA)
       _job_type_label_value->setText("YACS_Schema");
     else if (job->getType() == BL::Job::COMMAND)
