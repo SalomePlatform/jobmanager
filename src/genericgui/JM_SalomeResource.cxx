@@ -29,7 +29,8 @@
 #include <QVBoxLayout>
 
 JM::SalomeResource::SalomeResource(QWidget *parent, BL::SALOMEServices * salome_services, 
-                                   const std::string & resource_name) : QDialog(parent)
+                                   const std::string & resource_name)
+: QDialog(parent, Qt::Window)
 {
   DEBTRACE("Creating JM::SalomeResource");
   BL_ASSERT(parent);
