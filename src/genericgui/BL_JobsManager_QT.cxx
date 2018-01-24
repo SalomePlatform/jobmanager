@@ -298,6 +298,11 @@ BL::JobsManager_QT::create_job_with_wizard(BL::CreateJobWizard & wizard)
     new_job->setType(BL::Job::COMMAND);
     new_job->setJobFile(wizard.command);
     break;
+  case BL::CreateJobWizard::COMMAND_SALOME:
+    // Command Job
+    new_job->setType(BL::Job::COMMAND_SALOME);
+    new_job->setJobFile(wizard.command);
+    break;
   case BL::CreateJobWizard::PYTHON_SALOME:
     // Python Salome Job
     new_job->setType(BL::Job::PYTHON_SALOME);

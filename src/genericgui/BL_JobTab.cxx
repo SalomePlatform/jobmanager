@@ -237,6 +237,8 @@ BL::JobTab::job_selected(const QModelIndex & index)
       _job_type_label_value->setText("YACS_Schema");
     else if (job->getType() == BL::Job::COMMAND)
       _job_type_label_value->setText("Command");
+    else if (job->getType() == BL::Job::COMMAND_SALOME)
+      _job_type_label_value->setText("Command_Salome");
     else if (job->getType() == BL::Job::PYTHON_SALOME)
       _job_type_label_value->setText("Python_Salome");
 

@@ -263,6 +263,10 @@ BL::SALOMEServices::create_job(BL::Job * job)
   {
     job_parameters->job_type = CORBA::string_dup("python_salome");
   }
+  else if (job->getType() == BL::Job::COMMAND_SALOME)
+  {
+    job_parameters->job_type = CORBA::string_dup("command_salome");
+  }
 
   // Specific parameters
   if (job->getType() == BL::Job::YACS_SCHEMA)

@@ -117,6 +117,10 @@ BL::Job::setType(const std::string & type)
   {
     setType(BL::Job::PYTHON_SALOME);
   }
+  else if (type == "command_salome")
+  {
+    setType(BL::Job::COMMAND_SALOME);
+  }
 }
 
 BL::Job::JobType

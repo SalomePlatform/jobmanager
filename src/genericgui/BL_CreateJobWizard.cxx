@@ -156,6 +156,13 @@ BL::CreateJobWizard::clone(const std::string & name)
       setField("env_command_file", QString(job->getEnvFile().c_str()));
       setField("pre_command_file", QString(job->getPreCommand().c_str()));
     }
+    else if (job->getType() == BL::Job::COMMAND_SALOME)
+    {
+      setField("command", QString(job->getJobFile().c_str()));
+      setField("job_type_command_salome", true);
+      setField("env_command_file", QString(job->getEnvFile().c_str()));
+      setField("pre_command_file", QString(job->getPreCommand().c_str()));
+    }
     else if (job->getType() == BL::Job::PYTHON_SALOME)
     {
       setField("PythonSalome", QString(job->getJobFile().c_str()));
@@ -273,6 +280,8 @@ BL::CreateJobWizard::end(int result)
       job_type = YACS;
     else if (field("job_type_command").toBool())
       job_type = COMMAND;
+    else if (field("job_type_command_salome").toBool())
+      job_type = COMMAND_SALOME;
     else
       job_type = PYTHON_SALOME;
 
@@ -293,7 +302,7 @@ BL::CreateJobWizard::end(int result)
     QString f_env_file;
     if (job_type == YACS)
       f_env_file = field("env_yacs_file").toString();
-    else if (job_type == COMMAND)
+    else if (job_type == COMMAND || job_type == COMMAND_SALOME)
       f_env_file = field("env_command_file").toString();
     else if (job_type == PYTHON_SALOME)
       f_env_file = field("env_PythonSalome_file").toString();
@@ -302,7 +311,7 @@ BL::CreateJobWizard::end(int result)
     QString f_pre_command_file;
     if (job_type == YACS)
       f_pre_command_file = field("pre_yacs_file").toString();
-    else if (job_type == COMMAND)
+    else if (job_type == COMMAND || job_type == COMMAND_SALOME)
       f_pre_command_file = field("pre_command_file").toString();
     else if (job_type == PYTHON_SALOME)
       f_pre_command_file = field("pre_PythonSalome_file").toString();
@@ -440,15 +449,18 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
   QRadioButton * _yacs_schema_button = new QRadioButton(tr("YACS Schema"));
   _yacs_schema_button->setChecked(true);
   QRadioButton * _command_button = new QRadioButton(tr("Command"));
+  QRadioButton * _command_salome_button = new QRadioButton(tr("Command in salome shell"));
   QRadioButton * _python_salome_button = new QRadioButton(tr("Python script in SALOME"));
   QVBoxLayout *vbox = new QVBoxLayout;
   vbox->addWidget(_yacs_schema_button);
   vbox->addWidget(_command_button);
+  vbox->addWidget(_command_salome_button);
   vbox->addWidget(_python_salome_button);
   vbox->addStretch(1);
   groupBox->setLayout(vbox);
   registerField("job_type_yacs", _yacs_schema_button);
   registerField("job_type_command", _command_button);
+  registerField("job_type_command_salome", _command_salome_button);
   registerField("job_type_python_salome", _python_salome_button);
 
   QGroupBox * explanationBox = new QGroupBox("Explanation");
@@ -473,6 +485,7 @@ BL::JobNamePage::JobNamePage(QWidget * parent, BL::JobsManager_QT * jobs_manager
 
   connect(_yacs_schema_button, SIGNAL(toggled(bool)), this, SLOT(yacs_schema_button(bool)));
   connect(_command_button, SIGNAL(toggled(bool)), this, SLOT(command_button(bool)));
+  connect(_command_salome_button, SIGNAL(toggled(bool)), this, SLOT(command_salome_button(bool)));
   connect(_python_salome_button, SIGNAL(toggled(bool)), this, SLOT(python_salome_button(bool)));
 
   // Default button
@@ -487,7 +500,7 @@ BL::JobNamePage::yacs_schema_button(bool checked)
 {
   if (checked)
   {
-    _explanation->setText("This job permits to launch a YACS schema into a SALOME application");
+    _explanation->setText("Launch a YACS schema.");
     setField("exclusive", true);
   }
 }
@@ -497,7 +510,19 @@ BL::JobNamePage::command_button(bool checked)
 {
   if (checked)
   {
-    _explanation->setText("This job permits to launch a script into a distributed resource. This script is not launched into a SALOME application");
+    _explanation->setText("Launch a script on a remote resource without using "
+                          "SALOME environment.");
+    setField("exclusive", false);
+  }
+}
+
+void
+BL::JobNamePage::command_salome_button(bool checked)
+{
+  if (checked)
+  {
+    _explanation->setText("Launch a script on a remote resource within SALOME "
+                          "environment but whitout the SALOME application.");
     setField("exclusive", false);
   }
 }
@@ -507,7 +532,7 @@ BL::JobNamePage::python_salome_button(bool checked)
 {
   if (checked)
   {
-    _explanation->setText("This job permits to launch a python script into a SALOME application");
+    _explanation->setText("Launch a python script into a SALOME application.");
     setField("exclusive", true);
   }
 }
@@ -551,7 +576,8 @@ BL::JobNamePage::nextId() const
   {
     return BL::CreateJobWizard::Page_YACSSchema;
   } 
-  else if (field("job_type_command").toBool())
+  else if (field("job_type_command").toBool() ||
+           field("job_type_command_salome").toBool())
   {
     return BL::CreateJobWizard::Page_Command_Main_Definitions;
   }

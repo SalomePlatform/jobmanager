@@ -72,7 +72,7 @@ namespace BL {
     public:
       // Results
       std::string job_name;
-      enum {YACS, COMMAND, PYTHON_SALOME} job_type;
+      enum {YACS, COMMAND, PYTHON_SALOME, COMMAND_SALOME} job_type;
 
       std::string yacs_file;
       std::string command;
@@ -140,6 +140,7 @@ namespace BL {
     public slots:
       void yacs_schema_button(bool checked);
       void command_button(bool checked);
+      void command_salome_button(bool checked);
       void python_salome_button(bool checked);
 
     private:

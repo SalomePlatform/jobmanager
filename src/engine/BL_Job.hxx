@@ -42,7 +42,7 @@ namespace BL{
       void setName(const std::string & name);
       std::string getName();
 
-      enum JobType {YACS_SCHEMA, COMMAND, PYTHON_SALOME};
+      enum JobType {YACS_SCHEMA, COMMAND, PYTHON_SALOME, COMMAND_SALOME};
       void setType(BL::Job::JobType type);
       void setType(const std::string & type);
       BL::Job::JobType getType();
