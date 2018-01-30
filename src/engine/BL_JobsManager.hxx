@@ -80,6 +80,8 @@ namespace BL{
       static void launcher_event_remove_job_thread(void * object_ptr);
       void launcher_event_update_job_state(const std::string & data);
 
+      bool emptyJobsList() {return _jobs.empty();}
+
       struct thread_info
       {
         BL::JobsManager * object_ptr;

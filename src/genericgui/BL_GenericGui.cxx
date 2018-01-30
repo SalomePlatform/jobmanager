@@ -26,6 +26,7 @@
 #include <QSplitter>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 #ifdef WNT
 #undef ERROR
@@ -622,5 +623,19 @@ BL::GenericGui::updateButtonsStatesSingleSelection()
   else
   {
     DEBTRACE("ERROR in updateButtonsStates !!!!!!");
+  }
+}
+
+void
+BL::GenericGui::saveIfNeeded()
+{
+  if(!_jobs_manager->emptyJobsList())
+  {
+    if(QMessageBox::question (0,
+                              tr("List of jobs in JOBMANAGER."),
+                              tr("Do you want to save the list of jobs?"),
+                              QMessageBox::Yes | QMessageBox::No,
+                              QMessageBox::No) == QMessageBox::Yes)
+      _jobs_manager->save_jobs_button();
   }
 }

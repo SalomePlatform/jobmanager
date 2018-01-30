@@ -67,6 +67,7 @@ namespace BL
 
       void reset_job_selection();
 
+      void saveIfNeeded();
 
     public slots:
       void create_job();

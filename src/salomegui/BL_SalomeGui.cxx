@@ -54,6 +54,7 @@ BL::SalomeGui::studyClosed()
 {
   if (_gengui)
   {
+    _gengui->saveIfNeeded();
     _gengui->deleteDockWidget();
     delete _gengui;
     _gengui = NULL;
