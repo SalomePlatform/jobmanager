@@ -68,9 +68,10 @@ BL::JobsManager_QT::JobsManager_QT(QWidget * parent, BL::GenericGui * main_gui, 
   connect(_load_jobs, SIGNAL(clicked()), this, SLOT(load_jobs_button()));
   connect(_save_jobs, SIGNAL(clicked()), this, SLOT(save_jobs_button()));
 
-  _auto_refresh_jobs = new QPushButton("Auto Refresh: no");
+  _auto_refresh_jobs = new QPushButton("Auto Refresh: 30s");
   _timer = new QTimer(this);
   _timer->stop();
+  _timer->start(30 * 1000);
   connect(_timer, SIGNAL(timeout()), this, SLOT(RefreshJobs()));
 
   // Menu for auto refresh
