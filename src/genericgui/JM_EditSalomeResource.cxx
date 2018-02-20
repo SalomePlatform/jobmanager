@@ -66,6 +66,7 @@ JM::EditSalomeResource::EditSalomeResource(QWidget *parent, BL::SALOMEServices *
   _protocol_line->addItem("ssh");
   _protocol_line->addItem("rsh");
   _protocol_line->addItem("sh");
+  _protocol_line->addItem("rsync");
   _protocol_line->setCurrentIndex(0);
 
   QLabel * componentList_label = new QLabel("Component List:");
@@ -240,6 +241,8 @@ JM::EditSalomeResource::get_infos()
     _protocol_line->setCurrentIndex(1);
   else if(protocol == "sh")
     _protocol_line->setCurrentIndex(2);
+  else if(protocol == "rsync")
+    _protocol_line->setCurrentIndex(3);
   else
     _protocol_line->setCurrentIndex(-1);
 
