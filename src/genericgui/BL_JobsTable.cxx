@@ -42,11 +42,7 @@ BL::JobsTable::JobsTable(QWidget *parent) : QTableView(parent)
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   QHeaderView * header_view = verticalHeader();
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  header_view->setClickable(false);
-#else
   header_view->setSectionsClickable(false);
-#endif
 }
 
 BL::JobsTable::~JobsTable()
