@@ -23,6 +23,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTreeView>
+#include <QDir>
 
 #ifndef WNT
 #include <unistd.h>
@@ -1051,19 +1052,7 @@ FilesPage::FilesPage(CreateJobWizard * parent, SALOMEServices * salome_services)
   registerField("result_directory", ui->line_result_dir);
 
   // Default result directory is home directory (if we found it)
-  // First try -> HOME
-#ifdef WNT
-  ui->line_result_dir->setText(getenv("HOME"));
-#else
-  if (getenv("HOME"))
-    ui->line_result_dir->setText(getenv("HOME"));
-  else {
-    // Second try -> getpwuid
-    struct passwd * pass_struct = getpwuid(getuid());
-    if (pass_struct)
-      ui->line_result_dir->setText(pass_struct->pw_dir);
-  }
-#endif
+  ui->line_result_dir->setText(QDir::homePath());
 
   parent->setFilesList(ui->input_files_list, ui->output_files_list);
 
