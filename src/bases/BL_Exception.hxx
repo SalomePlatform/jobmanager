@@ -40,8 +40,8 @@ namespace BL
     std::string _what;
   public:
     Exception(const std::string& what);
-    const char *what( void ) const throw ();
-    virtual ~Exception() throw ();
+    const char *what( void ) const noexcept;
+    virtual ~Exception() noexcept;
   };
 }
 

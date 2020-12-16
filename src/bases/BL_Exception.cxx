@@ -23,12 +23,12 @@ BL::Exception::Exception(const std::string& what):_what(what)
 {
 }
 
-BL::Exception::~Exception() throw ()
+BL::Exception::~Exception() noexcept
 {
 }
 
 const char *
-BL::Exception::what( void ) const throw ()
+BL::Exception::what( void ) const noexcept
 {
   return _what.c_str();
 }
