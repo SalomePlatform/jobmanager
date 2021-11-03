@@ -23,6 +23,7 @@
 #include "BL_Engine.hxx"
 #include "BL_Traces.hxx"
 #include "BL_Job.hxx"
+#include "BL_NamingService_Wrapper.hxx"
 
 #include "SALOME_NamingService.hxx"
 #include "SALOME_LifeCycleCORBA.hxx"
@@ -97,7 +98,7 @@ namespace BL{
 
     private:
       CORBA::ORB_var _orb;
-      SALOME_NamingService * _salome_naming_service;
+      BL_SALOME_NamingService_Wrapper * _salome_naming_service;
       SALOME_LifeCycleCORBA * _lcc;
       Engines::SalomeLauncher_var _salome_launcher;
       Engines::ResourcesManager_var _resources_manager;

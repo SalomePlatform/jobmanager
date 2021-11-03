@@ -53,6 +53,8 @@ SET(BL_Engine_SOURCES
   BL_SALOMEServices.hxx 
   BL_SALOMEServices.cxx
   BL_Observer.hxx
+  BL_NamingService_Wrapper.hxx
+  BL_NamingService_Wrapper.cxx
 )
 
 # --- rules ---

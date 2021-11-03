@@ -61,7 +61,7 @@ bool
 BL::SALOMEServices::initNS()
 {
   bool return_value = true;
-  _salome_naming_service = new SALOME_NamingService(_orb);
+  _salome_naming_service = new BL_SALOME_NamingService_Wrapper(_orb);
   _lcc = new SALOME_LifeCycleCORBA(_salome_naming_service);
   CORBA::Object_var obj = _salome_naming_service->Resolve("/SalomeLauncher");
   _salome_launcher = Engines::SalomeLauncher::_narrow(obj);
